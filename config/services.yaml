@@ -1,0 +1,15 @@
+parameters:
+    entity_generator:
+        default_bundle: 'App'
+
+services:
+    _defaults:
+        autowire: true
+        autoconfigure: true
+        public: false
+        bind:
+            $rootDir: '%kernel.root_dir%'
+
+    Kevin3ssen\EntityGeneratorBundle\:
+        resource: '../*'
+        exclude: '../{Entity,Migrations,Tests}'
