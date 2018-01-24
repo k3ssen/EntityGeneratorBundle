@@ -10,6 +10,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
+use Kevin3ssen\EntityGeneratorBundle\Generator\MetaData;
 
 class EntityCommand extends Command
 {
@@ -38,8 +39,34 @@ class EntityCommand extends Command
         $io = new SymfonyStyle($input, $output);
         $entity = $input->getArgument('entity');
 
-        $entityFile = $this->entityGenerator->createEntity($entity);
+        $metaEntity = static::createExampleMetaEntity();
+
+        $entityFile = $this->entityGenerator->createEntity($metaEntity);
 
         $io->success(sprintf('Generated new entity in file %s', $entityFile));
+    }
+
+    public static function createExampleMetaEntity()
+    {
+        $metaEntity = new MetaData\MetaEntity('Library', 'EntityGeneratorBundle', 'Admin');
+
+        $title = (new MetaData\Property\StringProperty($metaEntity, 'title'));
+
+        $metaEntity->setDisplayProperty($title);
+
+        (new MetaData\Property\IntegerProperty($metaEntity, 'numberOfSomething'))
+            ->setNullable(true)
+            ->setLength(6);
+
+        (new MetaData\Property\ManyToOneProperty($metaEntity, 'country'))
+            ->setNullable(true)
+        ;
+
+        (new MetaData\Property\OneToManyProperty($metaEntity, 'books'))
+            ->setTargetEntityNamespace('SomeOtherBundle\\Entity')
+            ->setNullable(true)
+        ;
+
+        return $metaEntity;
     }
 }

@@ -12,15 +12,11 @@ use Symfony\Component\HttpKernel\Config\FileLocator;
 
 class EntityGenerator
 {
-    /** @var \Twig_Environment */
-    protected $twigEngine;
-
     /** @var FileLocator */
     protected $fileLocator;
 
-    public function __construct(\Twig_Environment $twigEngine, FileLocator $fileLocator)
+    public function __construct(FileLocator $fileLocator)
     {
-        $this->twigEngine = $twigEngine;
         $this->fileLocator = $fileLocator;
     }
 
@@ -51,9 +47,8 @@ class EntityGenerator
         return $dirs;
     }
 
-    public function createEntity($dataInput = null): string
+    public function createEntity(MetaEntity $metaEntity): string
     {
-        $metaEntity = static::createExampleMetaEntity();
         $entityFileData = $this->getEntityContent($metaEntity);
 
         $targetFile = $this->getTargetFile($metaEntity);
@@ -89,29 +84,5 @@ class EntityGenerator
         $twigEnvironment->setLexer(new IndentLexer($twigEnvironment));
 
         return $twigEnvironment;
-    }
-
-    public static function createExampleMetaEntity()
-    {
-        $metaEntity = new MetaEntity('Library', 'EntityGeneratorBundle', 'Admin');
-
-        $title = (new MetaData\Property\StringProperty($metaEntity, 'title'));
-
-        $metaEntity->setDisplayProperty($title);
-
-        (new MetaData\Property\IntegerProperty($metaEntity, 'numberOfSomething'))
-            ->setNullable(true)
-            ->setLength(6);
-
-        (new MetaData\Property\ManyToOneProperty($metaEntity, 'country'))
-            ->setNullable(true)
-        ;
-
-        (new MetaData\Property\OneToManyProperty($metaEntity, 'books'))
-            ->setTargetEntityNamespace('SomeOtherBundle\\Entity')
-            ->setNullable(true)
-        ;
-
-        return $metaEntity;
     }
 }

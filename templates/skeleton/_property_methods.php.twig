@@ -1,17 +1,10 @@
 {# @var meta_entity \App\Generator\MetaData\MetaEntity #}
 {# @var property \App\Generator\MetaData\Property\AbstractProperty #}
-
-{# NOTE: coded return type 'self' will be annoying when using inheritance, so annotations '@return static' is used instead #}
-
 {% block property_methods %}
 {% for property in meta_entity.properties %}
-{% if 'Collection' in property.returnType %}
-{{ block('property_collection_methods') }}
-{% else %}
-    /**
-     * @return static
-     */
-    public function set{{ property.name | classify }}({{ property.nullable ? '?' : '' }}{{ property.returnType }} ${{ property.name }})
+
+{% if 'Collection' in property.returnType %}{{ block('property_collection_methods') }}{% else %}
+    public function set{{ property.name | classify }}({{ property.nullable ? '?' : '' }}{{ property.returnType }} ${{ property.name }}): self
     {
         $this->{{ property.name }} = ${{ property.name }};
         return $this;
@@ -27,7 +20,6 @@
 
 {% block property_collection_methods %}
 {# @var property \App\Generator\MetaData\Property\AbstractRelationshipProperty #}
-
     /**
      * @return Collection|ArrayCollection|{{ property.targetEntity }}[]
      */
@@ -36,10 +28,7 @@
         return $this->{{ property.name }};
     }
 
-    /**
-    * @return static
-    */
-    public function add{{ property.name | singularize | classify }}({{ property.targetEntity }} ${{ property.name | singularize }})
+    public function add{{ property.name | singularize | classify }}({{ property.targetEntity }} ${{ property.name | singularize }}): self
     {
         $this->{{ property.name }}->add(${{ property.name | singularize }});
 {% if property.mappedBy %}
@@ -48,10 +37,7 @@
         return $this;
     }
 
-    /**
-    * @return static
-    */
-    public function remove{{ property.name | singularize | classify }}({{ property.targetEntity }} ${{ property.name | singularize }})
+    public function remove{{ property.name | singularize | classify }}({{ property.targetEntity }} ${{ property.name | singularize }}): self
     {
         $this->{{ property.name }}->removeElement($book);
         return $this;

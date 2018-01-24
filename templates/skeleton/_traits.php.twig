@@ -1,6 +1,6 @@
 {# @var meta_entity \App\Generator\MetaData\MetaEntity #}
 {% block traits %}
-    {% for trait in meta_entity.traits %}
+{% for trait in meta_entity.traits %}
     use {{ trait.name }};
-    {% endfor %}
+{% endfor %}
 {% endblock %}
