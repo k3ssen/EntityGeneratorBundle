@@ -26,6 +26,7 @@ class EntityGeneratorExtension extends Extension
         $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__.'/../config'));
         $loader->load('services.yaml');
 
+
         if ($container->getParameter('kernel.environment') === 'test') {
             $config['default_bundle'] = 'WameGeneratorBundle';
         }

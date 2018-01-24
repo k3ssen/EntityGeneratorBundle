@@ -8,7 +8,9 @@ services:
         autoconfigure: true
         public: false
         bind:
-            $rootDir: '%kernel.root_dir%'
+#            $rootDir: '%kernel.root_dir%'
+#            $entityTargetDir:
+#            $templateDir: "@=service('kernel').locateResource('@EntityGeneratorBundle/templates/skeleton')"
 
     Kevin3ssen\EntityGeneratorBundle\:
         resource: '../*'

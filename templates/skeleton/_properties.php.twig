@@ -1,0 +1,16 @@
+{# @var meta_entity \App\Generator\MetaData\MetaEntity #}
+{# @var property \App\Generator\MetaData\Property\AbstractProperty #}
+{% block properties %}
+{%- for property in meta_entity.properties %}
+
+    /**
+     * @var {{ property.returnType }}{{ property.returnType == 'Collection' ? '|ArrayCollection|'~property.targetEntity~'[]' }}
+     {%- for annotation_line in property.annotationLines %}
+
+     * {{ annotation_line | raw }}
+     {%- endfor %}
+
+     */
+    private ${{ property.name }};
+{% endfor %}
+{% endblock %}

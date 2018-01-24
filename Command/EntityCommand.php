@@ -38,8 +38,8 @@ class EntityCommand extends Command
         $io = new SymfonyStyle($input, $output);
         $entity = $input->getArgument('entity');
 
-        $this->entityGenerator->createEntity($entity);
+        $entityFile = $this->entityGenerator->createEntity($entity);
 
-        $io->success('You have a new command! Now make it your own! Pass --help to see your options.');
+        $io->success(sprintf('Generated new entity in file %s', $entityFile));
     }
 }

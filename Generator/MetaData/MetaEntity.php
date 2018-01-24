@@ -18,6 +18,10 @@ class MetaEntity
 
     protected $namespace;
 
+    protected $bundle;
+
+    protected $subDir;
+
     protected $usages = [];
 
     protected $entityAnnotations = [];
@@ -30,11 +34,12 @@ class MetaEntity
     /** @var AbstractPrimitiveProperty */
     protected $displayProperty;
 
-    public function __construct(string $name)
+    public function __construct(string $name, $bundle = null, $subDir = null)
     {
         $this->name = Inflector::classify($name);
-        // TODO: mogelijk maken dit op te geven
-        $this->namespace = 'App\Entity';
+
+        $this->setBundle($bundle);
+        $this->setSubDir($subDir);
 
         $this->properties = new ArrayCollection();
 
@@ -45,6 +50,42 @@ class MetaEntity
     public function getName(): string
     {
         return $this->name;
+    }
+
+    public function getBundle(): ?string
+    {
+        return $this->bundle;
+    }
+
+    protected function setNamespace()
+    {
+        if ($bundle = $this->getBundle()) {
+            $this->namespace = $bundle.'\Entity';
+        } else {
+            $this->namespace = 'App\Entity';
+        }
+        if ($subDir = $this->getSubDir()) {
+            $this->namespace .= '\\'.$subDir;
+        }
+    }
+
+    public function setBundle(?string $bundle)
+    {
+        $this->bundle = $bundle;
+        $this->setNamespace();
+        return $this;
+    }
+
+    public function getSubDir(): ?string
+    {
+        return $this->subDir;
+    }
+
+    public function setSubDir(?string $subDir)
+    {
+        $this->subDir = $subDir;
+        $this->setNamespace();
+        return $this;
     }
 
     public function getNamespace(): string

@@ -1,0 +1,59 @@
+{# @var meta_entity \App\Generator\MetaData\MetaEntity #}
+{# @var property \App\Generator\MetaData\Property\AbstractProperty #}
+
+{# NOTE: coded return type 'self' will be annoying when using inheritance, so annotations '@return static' is used instead #}
+
+{% block property_methods %}
+{% for property in meta_entity.properties %}
+{% if 'Collection' in property.returnType %}
+{{ block('property_collection_methods') }}
+{% else %}
+    /**
+     * @return static
+     */
+    public function set{{ property.name | classify }}({{ property.nullable ? '?' : '' }}{{ property.returnType }} ${{ property.name }})
+    {
+        $this->{{ property.name }} = ${{ property.name }};
+        return $this;
+    }
+
+    public function get{{ property.name | classify }}(): {{ property.nullable ? '?' : '' }}{{ property.returnType }}
+    {
+        return $this->{{ property.name }};
+    }
+{% endif %}
+{% endfor %}
+{% endblock %}
+
+{% block property_collection_methods %}
+{# @var property \App\Generator\MetaData\Property\AbstractRelationshipProperty #}
+
+    /**
+     * @return Collection|ArrayCollection|{{ property.targetEntity }}[]
+     */
+    public function get{{ property.name | classify }}(): ?Collection
+    {
+        return $this->{{ property.name }};
+    }
+
+    /**
+    * @return static
+    */
+    public function add{{ property.name | singularize | classify }}({{ property.targetEntity }} ${{ property.name | singularize }})
+    {
+        $this->{{ property.name }}->add(${{ property.name | singularize }});
+{% if property.mappedBy %}
+        ${{ property.name | singularize }}->set{{ property.mappedBy | classify }}($this);
+{% endif %}
+        return $this;
+    }
+
+    /**
+    * @return static
+    */
+    public function remove{{ property.name | singularize | classify }}({{ property.targetEntity }} ${{ property.name | singularize }})
+    {
+        $this->{{ property.name }}->removeElement($book);
+        return $this;
+    }
+{% endblock %}

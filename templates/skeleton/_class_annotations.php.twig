@@ -1,0 +1,18 @@
+{# @var meta_entity \App\Generator\MetaData\MetaEntity #}
+{% block class_annotations %}
+{% if meta_entity.entityAnnotations | length %}
+/**
+{% for annotation in meta_entity.entityAnnotations %}
+ * @{{ annotation.namespace }}
+{%- if annotation.annotationProperties |length -%}
+    (
+        {%- for propertyName, value in annotation.annotationProperties -%}
+            {{- loop.first ? '' : ', ' }}
+            {{- propertyName }}="{{ value }}"
+        {%- endfor -%}
+    )
+{% endif %}
+{% endfor %}
+ */
+{% endif %}
+{% endblock %}
