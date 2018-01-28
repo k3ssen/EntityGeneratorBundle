@@ -7,7 +7,7 @@ use Doctrine\Common\Inflector\Inflector;
 
 class ManyToOneProperty extends AbstractRelationshipProperty
 {
-    public function setMappedBy(string $mappedBy): AbstractRelationshipProperty
+    public function setMappedBy(?string $mappedBy): AbstractRelationshipProperty
     {
         throw new \RuntimeException(sprintf('Cannot call setMappedBy on "%s"; A ManyToOne property always is the mapping side', static::class));
     }
@@ -31,5 +31,10 @@ class ManyToOneProperty extends AbstractRelationshipProperty
             '@ORM\ManyToOne('.$manyToOneOptions.', cascade={"persist"})',
             '@ORM\JoinColumn('.$joinColumnOptions.')',
         ];
+    }
+
+    public function getOrmType(): string
+    {
+        return MetaPropertyFactory::MANY_TO_ONE;
     }
 }

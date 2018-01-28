@@ -1,0 +1,11 @@
+{# @var meta_entity \Kevin3ssen\EntityGeneratorBundle\Generator\MetaData\MetaEntity #}
+<?php
+declare(strict_types=1);
+
+namespace {{ meta_entity.repositoryNamespace }};
+
+use Doctrine\ORM\EntityRepository;
+
+class {{ meta_entity.name}}Repository extends EntityRepository
+{
+}

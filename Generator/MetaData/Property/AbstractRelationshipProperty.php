@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Kevin3ssen\EntityGeneratorBundle\Generator\MetaData\Property;
 
+use Doctrine\Common\Util\Inflector;
 use Kevin3ssen\EntityGeneratorBundle\Generator\MetaData\MetaEntity;
 
 abstract class AbstractRelationshipProperty extends AbstractProperty
@@ -28,8 +29,7 @@ abstract class AbstractRelationshipProperty extends AbstractProperty
     public function __construct(MetaEntity $metaEntity, string $name)
     {
         parent::__construct($metaEntity, $name);
-
-        $this->setTargetEntity(ucfirst($name));
+        $this->setTargetEntity(Inflector::classify($name));
     }
 
     public function getTargetEntity(): ?string
@@ -45,7 +45,7 @@ abstract class AbstractRelationshipProperty extends AbstractProperty
 
     public function getTargetEntityNamespace(): ?string
     {
-        return $this->targetEntityNamespace ?: $this->getMetaEntity()->getName();
+        return $this->targetEntityNamespace ?: $this->getMetaEntity()->getNamespace();
     }
 
     public function getTargetEntityFullClassName(): string
@@ -78,7 +78,7 @@ abstract class AbstractRelationshipProperty extends AbstractProperty
         return $this->inversedBy;
     }
 
-    public function setInversedBy(string $inversedBy): self
+    public function setInversedBy(?string $inversedBy): self
     {
         $this->inversedBy = $inversedBy;
         return $this;
@@ -89,7 +89,7 @@ abstract class AbstractRelationshipProperty extends AbstractProperty
         return $this->mappedBy;
     }
 
-    public function setMappedBy(string $mappedBy): self
+    public function setMappedBy(?string $mappedBy): self
     {
         if ($this->getInversedBy()) {
             throw new \RuntimeException(sprintf('Cannot set mappedBy on property with name "%s"; The inversedBy has already been set', $this->getName()));

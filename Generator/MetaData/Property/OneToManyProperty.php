@@ -8,18 +8,20 @@ use Doctrine\Common\Inflector\Inflector;
 
 class OneToManyProperty extends AbstractRelationshipProperty
 {
+    protected $nullable = true;
+    protected $unique = false;
+
     public function __construct(MetaEntity $metaEntity, string $name)
     {
         parent::__construct($metaEntity, $name);
-
-        $this->setTargetEntity(ucfirst(Inflector::tableize($name)));
+        $this->setTargetEntity(Inflector::classify(Inflector::singularize($name)));
         $this->setMappedBy(lcfirst(Inflector::classify($metaEntity->getName())));
 
         $metaEntity->addUsage('Doctrine\Common\Collections\Collection');
         $metaEntity->addUsage('Doctrine\Common\Collections\ArrayCollection');
     }
 
-    public function setInversedBy(string $inversedBy): AbstractRelationshipProperty
+    public function setInversedBy(?string $inversedBy): AbstractRelationshipProperty
     {
         throw new \RuntimeException(sprintf('Cannot call setInversedBy on "%s"; A OneToMany property always is the inversed side', static::class));
     }
@@ -55,5 +57,10 @@ class OneToManyProperty extends AbstractRelationshipProperty
     public function getReturnType(): string
     {
         return 'Collection';
+    }
+
+    public function getOrmType(): string
+    {
+        return MetaPropertyFactory::ONE_TO_MANY;
     }
 }

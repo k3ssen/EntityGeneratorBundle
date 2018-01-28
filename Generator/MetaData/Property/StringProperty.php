@@ -5,7 +5,7 @@ namespace Kevin3ssen\EntityGeneratorBundle\Generator\MetaData\Property;
 
 use Doctrine\DBAL\Types\Type;
 
-class StringProperty extends AbstractPrimitiveProperty
+class StringProperty extends AbstractPrimitiveProperty implements HasLengthInterface
 {
     /** @var int */
     protected $length;
@@ -15,7 +15,7 @@ class StringProperty extends AbstractPrimitiveProperty
         return $this->length;
     }
 
-    public function setLength(int $length)
+    public function setLength(?int $length)
     {
         $this->length = $length;
     }
@@ -25,7 +25,7 @@ class StringProperty extends AbstractPrimitiveProperty
         return Type::STRING;
     }
 
-    protected function getColumnAnnotationOptions()
+    public function getColumnAnnotationOptions()
     {
         $optionsString = parent::getColumnAnnotationOptions();
         $optionsString .= $this->getLength() ? ', length='.$this->getLength() : '';

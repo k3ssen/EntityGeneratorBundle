@@ -18,7 +18,7 @@ class DecimalProperty extends AbstractPrimitiveProperty
         return $this->precision;
     }
 
-    public function setPrecision(int $precision): self
+    public function setPrecision(?int $precision): self
     {
         $this->precision = $precision;
         return $this;
@@ -29,7 +29,7 @@ class DecimalProperty extends AbstractPrimitiveProperty
         return $this->scale;
     }
 
-    public function setScale(int $scale): self
+    public function setScale(?int $scale): self
     {
         $this->scale = $scale;
         return $this;
@@ -40,7 +40,7 @@ class DecimalProperty extends AbstractPrimitiveProperty
         return 'string';
     }
 
-    protected function getColumnAnnotationOptions()
+    public function getColumnAnnotationOptions()
     {
         $optionsString = parent::getColumnAnnotationOptions();
         $optionsString .= $this->getPrecision() ? ', length='.$this->getPrecision() : '';

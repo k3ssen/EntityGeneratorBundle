@@ -6,11 +6,6 @@ namespace Kevin3ssen\EntityGeneratorBundle\DependencyInjection;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 
-/**
- * This is the class that validates and merges configuration from your app/config files
- *
- * To learn more see {@link http://symfony.com/doc/current/cookbook/bundles/extension.html#cookbook-bundles-extension-config-class}
- */
 class Configuration implements ConfigurationInterface
 {
     /**
@@ -31,21 +26,20 @@ class Configuration implements ConfigurationInterface
                         ->thenInvalid('A bundle name in "default_bundle should" end with "Bundle"')
                     ->end()
                 ->end()
-                ->booleanNode('enable_traits')
-                    ->defaultTrue()
-                    ->info('enables Trait options in the entity generator.')
+                ->arrayNode('traits')
+                    ->scalarPrototype()->end()
                 ->end()
-                ->booleanNode('enable_datatables')
-                    ->defaultTrue()
-                    ->info('enables Datatable option in the CRUD generator.')
-                ->end()
-                ->booleanNode('enable_voters')
-                    ->defaultTrue()
-                    ->info('enables Voters option in the CRUD generator.')
-                ->end()
+//                ->booleanNode('enable_datatables')
+//                    ->defaultTrue()
+//                    ->info('enables Datatable option in the CRUD generator.')
+//                ->end()
+//                ->booleanNode('enable_voters')
+//                    ->defaultTrue()
+//                    ->info('enables Voters option in the CRUD generator.')
+//                ->end()
             ->end()
-            ->append($this->getClassNode())
-            ->append($this->getCrudNode())
+//            ->append($this->getClassNode())
+//            ->append($this->getCrudNode())
         ;
 
         return $treeBuilder;

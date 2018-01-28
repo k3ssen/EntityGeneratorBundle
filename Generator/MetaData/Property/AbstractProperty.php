@@ -5,7 +5,7 @@ namespace Kevin3ssen\EntityGeneratorBundle\Generator\MetaData\Property;
 
 use Kevin3ssen\EntityGeneratorBundle\Generator\MetaData\MetaEntity;
 use Doctrine\Common\Collections\ArrayCollection;
-use Wame\GeneratorBundle\MetaData\Validation;
+use Kevin3ssen\EntityGeneratorBundle\Generator\MetaData\Validation;
 
 abstract class AbstractProperty
 {
@@ -71,7 +71,7 @@ abstract class AbstractProperty
         return $this->unique;
     }
 
-    public function setUnique(bool $unique): self
+    public function setUnique(?bool $unique): self
     {
         $this->unique = $unique;
         return $this;
@@ -107,6 +107,8 @@ abstract class AbstractProperty
     }
 
     abstract public function getReturnType(): string;
+
+    abstract public function getOrmType(): string;
 
     abstract public function getAnnotationLines(): array;
 

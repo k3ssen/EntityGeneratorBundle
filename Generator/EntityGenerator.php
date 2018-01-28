@@ -55,7 +55,26 @@ class EntityGenerator
 
         $fs = new Filesystem();
         $fs->dumpFile($targetFile, $entityFileData);
+
         return $targetFile;
+    }
+
+    public function createRepository(MetaEntity $metaEntity): string
+    {
+        $repoFileData = $this->getRepositoryContent($metaEntity);
+        $targetFile = str_replace(['Entity', '.php'], ['Repository', 'Repository.php'], $this->getTargetFile($metaEntity));
+
+        $fs = new Filesystem();
+        $fs->dumpFile($targetFile, $repoFileData);
+
+        return $targetFile;
+    }
+
+    public function getRepositoryContent(MetaEntity $metaEntity)
+    {
+        return $this->getTwigEnvironment()->render('skeleton/repository.php.twig', [
+            'meta_entity' => $metaEntity,
+        ]);
     }
 
     public function getEntityContent(MetaEntity $metaEntity)

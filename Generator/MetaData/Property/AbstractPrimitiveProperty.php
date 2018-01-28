@@ -39,8 +39,6 @@ abstract class AbstractPrimitiveProperty extends AbstractProperty
         return $this;
     }
 
-    abstract public function getOrmType(): string;
-
     public function getAnnotationLines(): array
     {
         $annotationLines = [
@@ -52,7 +50,7 @@ abstract class AbstractPrimitiveProperty extends AbstractProperty
         return $annotationLines;
     }
 
-    protected function getColumnAnnotationOptions()
+    public function getColumnAnnotationOptions()
     {
         $optionsString = 'name="'.Inflector::tableize($this->getName()).'"';
         $optionsString .= ', type="'.$this->getOrmType().'"';

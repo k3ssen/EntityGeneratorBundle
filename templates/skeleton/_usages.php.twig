@@ -1,4 +1,4 @@
-{# @var meta_entity \App\Generator\MetaData\MetaEntity #}
+{# @var meta_entity \Kevin3ssen\EntityGeneratorBundle\Generator\MetaData\MetaEntity #}
 {% block usages %}
 {% for namespace, alias in meta_entity.usages %}
 use {{ namespace }}{{ alias ? ' as '~alias : '' }};

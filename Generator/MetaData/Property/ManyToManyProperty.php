@@ -8,11 +8,13 @@ use Doctrine\Common\Inflector\Inflector;
 
 class ManyToManyProperty extends AbstractRelationshipProperty
 {
+    protected $nullable = true;
+    protected $unique = false;
+
     public function __construct(MetaEntity $metaEntity, string $name)
     {
         parent::__construct($metaEntity, $name);
-
-        $this->setTargetEntity(ucfirst(Inflector::pluralize($name)));
+        $this->setTargetEntity(ucfirst(Inflector::singularize($name)));
 
         $metaEntity->addUsage('Doctrine\Common\Collections\Collection');
         $metaEntity->addUsage('Doctrine\Common\Collections\ArrayCollection');
@@ -62,5 +64,10 @@ class ManyToManyProperty extends AbstractRelationshipProperty
         }
 
         return $annotationLines;
+    }
+
+    public function getOrmType(): string
+    {
+        return MetaPropertyFactory::MANY_TO_MANY;
     }
 }

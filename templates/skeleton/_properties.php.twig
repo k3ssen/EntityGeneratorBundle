@@ -1,6 +1,16 @@
-{# @var meta_entity \App\Generator\MetaData\MetaEntity #}
-{# @var property \App\Generator\MetaData\Property\AbstractProperty #}
+{# @var meta_entity \Kevin3ssen\EntityGeneratorBundle\Generator\MetaData\MetaEntity #}
+{# @var property \Kevin3ssen\EntityGeneratorBundle\Generator\MetaData\Property\AbstractProperty #}
 {% block properties %}
+{%- if meta_entity.idProperty is null %}
+
+    /**
+    * @var int
+    * @ORM\Column(name="id", type="integer")
+    * @ORM\Id
+    * @ORM\GeneratedValue(strategy="AUTO")
+    */
+    private $id;
+{% endif %}
 {%- for property in meta_entity.properties %}
 
     /**

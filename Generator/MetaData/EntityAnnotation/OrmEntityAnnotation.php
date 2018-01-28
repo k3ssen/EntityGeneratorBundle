@@ -22,8 +22,11 @@ class OrmEntityAnnotation implements AnnotationInterface
 
     public function getAnnotationProperties(): ?array
     {
-       return [
-           'repositoryClass' => $this->metaEntity->getRepositoryFullClassName(),
-       ];
+        if ($this->metaEntity->hasCustomRepository()) {
+            return [
+                'repositoryClass' => $this->metaEntity->getRepositoryFullClassName(),
+            ];
+        }
+        return [];
     }
 }

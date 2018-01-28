@@ -1,17 +1,28 @@
-parameters:
-    entity_generator:
-        default_bundle: 'App'
-
 services:
     _defaults:
         autowire: true
         autoconfigure: true
         public: false
-        bind:
-#            $rootDir: '%kernel.root_dir%'
-#            $entityTargetDir:
-#            $templateDir: "@=service('kernel').locateResource('@EntityGeneratorBundle/templates/skeleton')"
 
     Kevin3ssen\EntityGeneratorBundle\:
         resource: '../*'
         exclude: '../{Entity,Migrations,Tests}'
+
+    Kevin3ssen\EntityGeneratorBundle\Generator\GeneratorConfig:
+        arguments:
+            $config:
+                traits: '%entity_generator.traits%'
+                auto_generate_repository: true
+                use_default_validations: true
+                ask_bundle: true
+                ask_sub_dir: true
+                ask_display_field: true
+                ask_id: true
+                ask_nullable: true
+                ask_unique: true
+                ask_length: true
+                ask_precision: true
+                ask_scale: true
+                ask_target_entity: true
+                ask_inversed_by: true
+                ask_mapped_by: true

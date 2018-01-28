@@ -34,9 +34,11 @@ class MetaEntity
     /** @var AbstractPrimitiveProperty */
     protected $displayProperty;
 
+    protected $customRepository = true;
+
     public function __construct(string $name, $bundle = null, $subDir = null)
     {
-        $this->name = Inflector::classify($name);
+        $this->setName($name);
 
         $this->setBundle($bundle);
         $this->setSubDir($subDir);
@@ -50,6 +52,12 @@ class MetaEntity
     public function getName(): string
     {
         return $this->name;
+    }
+
+    public function setName(string $name): self
+    {
+        $this->name = Inflector::classify($name);
+        return $this;
     }
 
     public function getBundle(): ?string
@@ -123,7 +131,12 @@ class MetaEntity
 
     public function getRepositoryFullClassName(): ?string
     {
-        return str_replace('Entity', 'Repository', $this->namespace) . '\\' . $this->getName() . 'Repository';
+        return str_replace('Entity', 'Repository', $this->getNamespace()) . '\\' . $this->getName() . 'Repository';
+    }
+
+    public function getRepositoryNamespace(): ?string
+    {
+        return str_replace('Entity', 'Repository', $this->getNamespace());
     }
 
     /**
@@ -166,5 +179,26 @@ class MetaEntity
             throw new \RuntimeException(sprintf('Cannot set property %s as display-property; This property hasn\'t been added to this entity yet', $displayProperty));
         }
         $this->displayProperty = $displayProperty;
+    }
+
+    public function getIdProperty(): ?AbstractPrimitiveProperty
+    {
+        foreach ($this->getProperties() as $property) {
+            if ($property instanceof  AbstractPrimitiveProperty && $property->isId()) {
+                return $property;
+            }
+        }
+        return null;
+    }
+
+    public function hasCustomRepository(): bool
+    {
+        return $this->customRepository;
+    }
+
+    public function setUseCustomRepository(bool $customRepository): self
+    {
+        $this->customRepository = $customRepository;
+        return $this;
     }
 }

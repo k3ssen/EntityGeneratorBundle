@@ -32,4 +32,9 @@ class OneToOneProperty extends AbstractRelationshipProperty
 
         return $annotationLines;
     }
+
+    public function getOrmType(): string
+    {
+        return MetaPropertyFactory::ONE_TO_ONE;
+    }
 }

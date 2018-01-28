@@ -1,6 +1,13 @@
-{# @var meta_entity \App\Generator\MetaData\MetaEntity #}
-{# @var property \App\Generator\MetaData\Property\AbstractProperty #}
+{# @var meta_entity \Kevin3ssen\EntityGeneratorBundle\Generator\MetaData\MetaEntity #}
+{# @var property \Kevin3ssen\EntityGeneratorBundle\Generator\MetaData\Property\AbstractProperty #}
 {% block property_methods %}
+{% if meta_entity.idProperty is null %}
+
+    public function getId(): ?int
+    {
+        return $this->id;
+    }
+{% endif %}
 {% for property in meta_entity.properties %}
 
 {% if 'Collection' in property.returnType %}{{ block('property_collection_methods') }}{% else %}
@@ -19,7 +26,7 @@
 {% endblock %}
 
 {% block property_collection_methods %}
-{# @var property \App\Generator\MetaData\Property\AbstractRelationshipProperty #}
+{# @var property \Kevin3ssen\EntityGeneratorBundle\Generator\MetaData\Property\AbstractRelationshipProperty #}
     /**
      * @return Collection|ArrayCollection|{{ property.targetEntity }}[]
      */
@@ -39,7 +46,7 @@
 
     public function remove{{ property.name | singularize | classify }}({{ property.targetEntity }} ${{ property.name | singularize }}): self
     {
-        $this->{{ property.name }}->removeElement($book);
+        $this->{{ property.name }}->removeElement(${{ property.name | singularize }});
         return $this;
     }
 {% endblock %}
