@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Kevin3ssen\EntityGeneratorBundle\Generator\MetaData\Property;
 
+use Doctrine\Common\Util\Inflector;
 use Kevin3ssen\EntityGeneratorBundle\Generator\MetaData\MetaEntity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Kevin3ssen\EntityGeneratorBundle\Generator\MetaData\Validation;
@@ -26,8 +27,8 @@ abstract class AbstractProperty
 
     public function __construct(MetaEntity $metaEntity, string $name)
     {
-        $this->metaEntity = $metaEntity;
-        $this->name = $name;
+        $this->setMetaEntity($metaEntity);
+        $this->setName($name);
         $this->validations = new ArrayCollection();
 
         $metaEntity->addProperty($this);
@@ -51,7 +52,7 @@ abstract class AbstractProperty
 
     public function setName(string $name): self
     {
-        $this->name = $name;
+        $this->name = lcfirst(Inflector::classify($name));
         return $this;
     }
 

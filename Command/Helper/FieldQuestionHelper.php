@@ -8,10 +8,8 @@ use Doctrine\DBAL\Types\Type;
 use Kevin3ssen\EntityGeneratorBundle\Generator\MetaData\Property\AbstractProperty;
 use Kevin3ssen\EntityGeneratorBundle\Generator\MetaData\Property\AbstractRelationshipProperty;
 use Kevin3ssen\EntityGeneratorBundle\Generator\MetaData\Property\MetaPropertyFactory;
-use Symfony\Component\Console\Helper\QuestionHelper;
-use Symfony\Component\Console\Question\Question;
 
-class FieldQuestionHelper extends QuestionHelper
+class FieldQuestionHelper
 {
     use QuestionTrait;
     /** @var EntityFinder */
@@ -38,43 +36,39 @@ class FieldQuestionHelper extends QuestionHelper
     {
         $this->commandInfo = $commandInfo;
         if ($metaProperty) {
-            $commandInfo->output->writeln(sprintf('<info>Currently continuing with field %s</info>', $metaProperty->getName()));
-            $this->fieldAttributesQuestionHelper->setAttributes($commandInfo, $metaProperty);
-            return $metaProperty;
+            $this->getIo()->text(sprintf('<info>Edit field:</info> %s', $metaProperty->getName()));
+            $fieldName = $this->ask('Field name', $metaProperty->getName());
+            $metaProperty->setName($fieldName);
+        } else {
+            $fieldName = $this->ask('New field name (optional)');
+            if (!$fieldName) {
+                return null;
+            }
         }
-        $fieldName = $this->askQuestion(new Question('<info>New field name</info> (press <return> to stop adding fields): '));
-        if (!$fieldName) {
-            return null;
-        }
-        $metaProperty = $this->askFieldType($fieldName);
+        $metaProperty = $this->askFieldType($fieldName, $metaProperty);
 
         $this->fieldAttributesQuestionHelper->setAttributes($commandInfo, $metaProperty);
 
         return $metaProperty;
     }
 
-    protected function askFieldType(string $fieldName): AbstractProperty
+    protected function askFieldType(string $fieldName, AbstractProperty $metaProperty = null): AbstractProperty
     {
-        $typeOptions = array_keys($this->metaPropertyFactory->getTypes());
-        $this->outputOptions($typeOptions);
-
-        $defaultType = $this->guessFieldType($fieldName);
-
-        $question = new Question(sprintf('<info>Field type</info> [<comment>%s</comment>]: ', $defaultType), $defaultType);
-        $question->setNormalizer(function($type) {
-            return $this->metaPropertyFactory->getTypeAliases()[$type] ?? $type;
-        });
-        $question->setValidator(function($type) use ($typeOptions) {
-            if (!in_array($type, $typeOptions, true)) {
-                throw new \InvalidArgumentException(sprintf('Invalid type "%s".', $type));
+        $typeOptions = $this->metaPropertyFactory->getAliasedTypeOptions();
+        $defaultType = $metaProperty ? $metaProperty->getOrmType() : $this->guessFieldType($fieldName);
+        $type = $this->getIo()->choice('Field type', $typeOptions, $defaultType);
+        $type = $typeOptions[$type] ?? $type;
+        if ($metaProperty) {
+            if ($metaProperty->getOrmType() === $type) {
+                return $metaProperty;
             }
-            return $type;
-        });
-        $question->setAutocompleterValues(array_merge($typeOptions, $this->metaPropertyFactory->getTypeAliases()));
+            if ($this->commandInfo->metaEntity->getDisplayProperty() === $metaProperty) {
+                $this->commandInfo->metaEntity->setDisplayProperty(null);
+            }
+            $metaProperty->getMetaEntity()->removeProperty($metaProperty);
+        }
 
-        $type = $this->askQuestion($question);
         $metaProperty = $this->metaPropertyFactory->getMetaPropertyByType($this->commandInfo->metaEntity, $type, $fieldName);
-        $this->commandInfo->metaEntity->addProperty($metaProperty);
 
         if ($metaProperty instanceof AbstractRelationshipProperty && $this->guessedEntity) {
             $metaProperty->setTargetEntity($this->guessedEntity);

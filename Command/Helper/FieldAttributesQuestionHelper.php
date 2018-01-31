@@ -11,10 +11,9 @@ use Kevin3ssen\EntityGeneratorBundle\Generator\MetaData\Property\HasLengthInterf
 use Kevin3ssen\EntityGeneratorBundle\Generator\MetaData\Property\ManyToManyProperty;
 use Kevin3ssen\EntityGeneratorBundle\Generator\MetaData\Property\ManyToOneProperty;
 use Kevin3ssen\EntityGeneratorBundle\Generator\MetaData\Property\OneToManyProperty;
-use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Question\Question;
 
-class FieldAttributesQuestionHelper extends QuestionHelper
+class FieldAttributesQuestionHelper
 {
     use QuestionTrait;
 
@@ -29,9 +28,9 @@ class FieldAttributesQuestionHelper extends QuestionHelper
     public function setAttributes(CommandInfo $commandInfo, AbstractProperty $metaProperty)
     {
         $this->commandInfo = $commandInfo;
+        $this->askId($metaProperty);
         $this->askNullable($metaProperty);
         $this->askUnique($metaProperty);
-        $this->askId($metaProperty);
         $this->askLength($metaProperty);
         $this->askPrecision($metaProperty);
         $this->askScale($metaProperty);
@@ -45,10 +44,11 @@ class FieldAttributesQuestionHelper extends QuestionHelper
         if (!$this->commandInfo->generatorConfig->askNullable()
             || $metaProperty instanceof OneToManyProperty
             || $metaProperty instanceof ManyToManyProperty
+            || $this->commandInfo->metaEntity->getIdProperty() === $metaProperty
         ) {
             return;
         }
-        $nullable = $this->askSimpleQuestion('Nullable', $metaProperty->isNullable() ? true : false);
+        $nullable = $this->confirm('Nullable', $metaProperty->isNullable() ? true : false);
         $metaProperty->setNullable($nullable);
     }
 
@@ -57,19 +57,24 @@ class FieldAttributesQuestionHelper extends QuestionHelper
         if (!$this->commandInfo->generatorConfig->askUnique()
             || $metaProperty instanceof OneToManyProperty
             || $metaProperty instanceof ManyToManyProperty
+            || $this->commandInfo->metaEntity->getIdProperty() === $metaProperty
         ) {
             return;
         }
-        $unique = $this->askSimpleQuestion('Unique', $metaProperty->isUnique() ? true : false);
+        $unique = $this->confirm('Unique', $metaProperty->isUnique() ? true : false);
         $metaProperty->setUnique($unique);
     }
 
     protected function askId(AbstractProperty $metaProperty)
     {
-        if (!$this->commandInfo->generatorConfig->askId() || !$metaProperty instanceof AbstractPrimitiveProperty) {
+        $currentId = $this->commandInfo->metaEntity->getIdProperty();
+        if (!$this->commandInfo->generatorConfig->askId()
+            || !$metaProperty instanceof AbstractPrimitiveProperty
+            || ($currentId !== null && $currentId !== $metaProperty)
+        ) {
             return;
         }
-        $id = $this->askSimpleQuestion('Id', $metaProperty->isId() ? true : false);
+        $id = $this->confirm('Id', $metaProperty->isId() ? true : false);
         $metaProperty->setId($id);
     }
 
@@ -78,7 +83,7 @@ class FieldAttributesQuestionHelper extends QuestionHelper
         if (!$this->commandInfo->generatorConfig->askLength() || !$metaProperty instanceof HasLengthInterface) {
             return;
         }
-        $length = $this->askSimpleQuestion('Length', $metaProperty->getLength());
+        $length = $this->ask('Length (optional)', $metaProperty->getLength());
         $metaProperty->setLength($length ? (int) $length : null);
     }
 
@@ -87,7 +92,7 @@ class FieldAttributesQuestionHelper extends QuestionHelper
         if (!$this->commandInfo->generatorConfig->askPrecision() || !$metaProperty instanceof DecimalProperty) {
             return;
         }
-        $precision = $this->askSimpleQuestion('Precision', $metaProperty->getPrecision());
+        $precision = $this->ask('Precision (optional)', $metaProperty->getPrecision());
         $metaProperty->setPrecision($precision ? (int) $precision : null);
     }
 
@@ -96,7 +101,7 @@ class FieldAttributesQuestionHelper extends QuestionHelper
         if (!$this->commandInfo->generatorConfig->askScale() || !$metaProperty instanceof DecimalProperty) {
             return;
         }
-        $scale = $this->askSimpleQuestion('Scale', $metaProperty->getScale());
+        $scale = $this->ask('Scale (optional)', $metaProperty->getScale());
         $metaProperty->setScale($scale ? (int) $scale : null);
     }
 
@@ -107,8 +112,7 @@ class FieldAttributesQuestionHelper extends QuestionHelper
         }
         $options = $this->entityFinder->getExistingEntities();
         $this->outputOptions($options);
-        $defaultText = $metaProperty->getTargetEntity() ? ' [<comment>'.$metaProperty->getTargetEntity().'</comment>]' : '';
-        $question = new Question('<info>Target entity</info>'.$defaultText.': ', $metaProperty->getTargetEntity());
+        $question = new Question('Target entity', $metaProperty->getTargetEntity());
         $question->setAutocompleterValues($options);
         $targetEntity = $this->askQuestion($question);
         $metaProperty->setTargetEntity($targetEntity);
@@ -122,7 +126,7 @@ class FieldAttributesQuestionHelper extends QuestionHelper
         ) {
             return;
         }
-        $inversedBy = $this->askSimpleQuestion('Inversed by', $metaProperty->getInversedBy());
+        $inversedBy = $this->ask('Inversed by', $metaProperty->getInversedBy());
         $metaProperty->setInversedBy($inversedBy);
     }
 
@@ -135,7 +139,7 @@ class FieldAttributesQuestionHelper extends QuestionHelper
         ) {
             return;
         }
-        $mappedBy = $this->askSimpleQuestion('Mapped by', $metaProperty->getMappedBy());
+        $mappedBy = $this->ask('Mapped by', $metaProperty->getMappedBy());
         $metaProperty->setMappedBy($mappedBy);
     }
 }

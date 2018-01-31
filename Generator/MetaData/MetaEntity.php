@@ -162,10 +162,19 @@ class MetaEntity
 
     public function addProperty(AbstractProperty $property)
     {
-        if (!$this->properties->contains($property)) {
-            $this->properties->add($property);
+        if (!$this->getProperties()->contains($property)) {
+            $this->getProperties()->add($property);
             $property->setMetaEntity($this);
         }
+        return $this;
+    }
+
+    public function removeProperty(AbstractProperty $property)
+    {
+        if ($this->getProperties()->contains($property)) {
+            $this->getProperties()->removeElement($property);
+        }
+        return $this;
     }
 
     public function getDisplayProperty(): ?AbstractPrimitiveProperty
@@ -173,9 +182,9 @@ class MetaEntity
         return $this->displayProperty;
     }
 
-    public function setDisplayProperty(AbstractPrimitiveProperty $displayProperty)
+    public function setDisplayProperty(?AbstractPrimitiveProperty $displayProperty)
     {
-        if (!$this->getProperties()->contains($displayProperty)) {
+        if ($displayProperty && !$this->getProperties()->contains($displayProperty)) {
             throw new \RuntimeException(sprintf('Cannot set property %s as display-property; This property hasn\'t been added to this entity yet', $displayProperty));
         }
         $this->displayProperty = $displayProperty;

@@ -5,13 +5,18 @@ namespace Kevin3ssen\EntityGeneratorBundle\Command\Helper;
 
 use Kevin3ssen\EntityGeneratorBundle\Generator\MetaData\MetaEntity;
 use Kevin3ssen\EntityGeneratorBundle\Generator\MetaData\MetaEntityFactory;
-use Symfony\Component\Console\Helper\QuestionHelper;
-use Symfony\Component\Console\Question\ChoiceQuestion;
-use Symfony\Component\Console\Question\Question;
+use Kevin3ssen\EntityGeneratorBundle\Generator\MetaData\Property\AbstractProperty;
 
-class EntityQuestionHelper extends QuestionHelper
+class EntityQuestionHelper
 {
     use QuestionTrait;
+
+    protected const ACTION_NEW_PROPERTY = 1;
+    protected const ACTION_EDIT_PROPERTY = 2;
+    protected const ACTION_DELETE_PROPERTY = 3;
+    protected const ACTION_CHANGE_ENTITY_NAME = 4;
+    protected const ACTION_SET_DISPLAY_FIELD = 5;
+    protected const ACTION_COMPLETE = 6;
 
     /** @var MetaEntityFactory */
     protected $metaEntityFactory;
@@ -30,7 +35,10 @@ class EntityQuestionHelper extends QuestionHelper
     {
         $this->commandInfo = $commandInfo;
         [$bundle, $subDir, $entityName] = $this->extractFromEntityNameAnswer($entityName);
-        $this->askEntityName($entityName);
+
+        $this->header('Create new entity');
+
+        $this->askNameAndCreateEntity($entityName);
         $this->askBundle($bundle);
         $this->askSubDir($subDir);
         //TODO: trait-questions
@@ -40,39 +48,106 @@ class EntityQuestionHelper extends QuestionHelper
 
         $this->askDisplayField();
         $this->saveTemporaryFile();
+        $this->askAction();
         return $commandInfo->metaEntity;
     }
 
     public function continueEntity(CommandInfo $commandInfo, MetaEntity $metaEntity)
     {
-        $this->commandInfo = $commandInfo;
         $commandInfo->metaEntity = $metaEntity;
-        $this->showCurrentOverview();
-//        $this->getIo()->section(sprintf('Continue editing entity %s', $metaEntity->getName()));
-
-        foreach ($metaEntity->getProperties() as $property) {
-            $propertyOptions[$property->getName()] = $property;
-        }
-        $this->outputOptions($propertyOptions);
-        $question = new Question('<info>Edit property</info> (leave blank for new or no property): ');
-        $question->setAutocompleterValues($propertyOptions);
-        $propertyChoices = $this->askQuestion($question);
-
-        $this->fieldTypeQuestionHelper->makeField($this->commandInfo, $propertyOptions[$propertyChoices] ?? null);
-        do {
-            $metaProperty = $this->fieldTypeQuestionHelper->makeField($this->commandInfo);
-        } while ($metaProperty !== null);
-
-        $this->askDisplayField();
-        $this->saveTemporaryFile();
+        $this->commandInfo = $commandInfo;
+        $this->header(sprintf('Continue creating entity "%s"', $metaEntity->getName()));
+        $this->askAction();
         return $commandInfo->metaEntity;
     }
 
-    protected function askEntityName(string $entityName = null)
+    protected function askAction()
     {
-        $entityName = $this->askSimpleQuestion('Entity name', $entityName);
+        $this->showCurrentOverview();
+        $actionChoices = [
+            static::ACTION_NEW_PROPERTY => 'Add field',
+            static::ACTION_EDIT_PROPERTY => 'Edit field',
+            static::ACTION_DELETE_PROPERTY => 'Remove field',
+            static::ACTION_CHANGE_ENTITY_NAME => 'Change entity name / bundle / directory',
+            static::ACTION_SET_DISPLAY_FIELD => 'Set display field',
+            static::ACTION_COMPLETE => 'All done! Generate entity!',
+            //Savepoint with name
+        ];
+        if (!$this->commandInfo->metaEntity->getProperties()->count()) {
+            unset($actionChoices[static::ACTION_EDIT_PROPERTY], $actionChoices[static::ACTION_DELETE_PROPERTY], $actionChoices[static::ACTION_SET_DISPLAY_FIELD]);
+        }
+        $nextAction = $this->getIo()->choice('What to do next?' , $actionChoices);
+        $nextAction = array_search($nextAction, $actionChoices) ?: $nextAction;
+
+        switch ($nextAction) {
+            case static::ACTION_COMPLETE;
+                $this->saveTemporaryFile();
+                return;
+            case static::ACTION_CHANGE_ENTITY_NAME:
+                $this->askNewEntityName();
+                $this->askBundle();
+                $this->askSubDir();
+                break;
+            case static::ACTION_SET_DISPLAY_FIELD:
+                $this->askDisplayField();
+                $this->saveTemporaryFile();
+                break;
+            case static::ACTION_DELETE_PROPERTY:
+                $metaProperty = $this->askPropertyChoice();
+                if ($this->commandInfo->metaEntity->getDisplayProperty() === $metaProperty) {
+                    $this->commandInfo->metaEntity->setDisplayProperty(null);
+                }
+                $this->commandInfo->metaEntity->removeProperty($metaProperty);
+                unset($metaProperty);
+                break;
+            case static::ACTION_EDIT_PROPERTY:
+                $metaProperty = $this->askPropertyChoice();
+                $this->fieldTypeQuestionHelper->makeField($this->commandInfo, $metaProperty);
+                break;
+            case static::ACTION_NEW_PROPERTY:
+                do {
+                    $metaProperty = $this->fieldTypeQuestionHelper->makeField($this->commandInfo);
+                } while ($metaProperty !== null);
+                $this->askDisplayField();
+                break;
+        }
+        $this->saveTemporaryFile();
+        $this->askAction();
+    }
+
+    protected function askPropertyChoice(): AbstractProperty
+    {
+        $properties = $this->commandInfo->metaEntity->getProperties();
+        $propertyChoice = $this->getIo()->choice('Edit property', $properties->toArray());
+        foreach ($properties as $property) {
+            if ($property->getName() === $propertyChoice) {
+                return $property;
+            }
+        }
+        throw new \RuntimeException(sprintf('No property found for choice %s', $propertyChoice));
+    }
+
+    protected function askNameAndCreateEntity(string $entityName = null)
+    {
+        $entityName = $this->ask('Entity name', $entityName, function ($value) {
+            if (!$value) {
+                throw new \InvalidArgumentException('The entity name cannot be empty');
+            }
+            return $value;
+        });
         [$bundle, $subDir, $entityName] = $this->extractFromEntityNameAnswer($entityName);
         $this->commandInfo->metaEntity = $this->metaEntityFactory->createMetaEntity($entityName, $bundle, $subDir);
+    }
+
+    protected function askNewEntityName()
+    {
+        $entityName = $this->ask('Entity name', $this->commandInfo->metaEntity->getName(), function ($value) {
+            if (!$value) {
+                throw new \InvalidArgumentException('The entity name cannot be empty');
+            }
+            return $value;
+        });
+        $this->commandInfo->metaEntity->setName($entityName);
     }
 
     /**
@@ -106,7 +181,7 @@ class EntityQuestionHelper extends QuestionHelper
         if (!$this->commandInfo->generatorConfig->askBundle()) {
             return;
         }
-        $bundle = $this->askSimpleQuestion('Bundle', $this->commandInfo->metaEntity->getBundle() ?: $bundle);
+        $bundle = $this->ask('Bundle (optional)', $this->commandInfo->metaEntity->getBundle() ?: $bundle);
         $this->commandInfo->metaEntity->setBundle($bundle);
     }
 
@@ -115,7 +190,7 @@ class EntityQuestionHelper extends QuestionHelper
         if (!$this->commandInfo->generatorConfig->askSubDir()) {
             return;
         }
-        $subDir = $this->askSimpleQuestion('Sub directory', $this->commandInfo->metaEntity->getSubDir() ?: $subDir);
+        $subDir = $this->ask('Sub directory (optional)', $this->commandInfo->metaEntity->getSubDir() ?: $subDir);
         $this->commandInfo->metaEntity->setSubDir($subDir);
     }
 
@@ -124,23 +199,19 @@ class EntityQuestionHelper extends QuestionHelper
         if (!$this->commandInfo->generatorConfig->askDisplayField()) {
             return;
         }
-        $propertyOptions = [];
+        $propertyOptions = ['' => null];
         foreach ($this->commandInfo->metaEntity->getProperties() as $property) {
             if (in_array($property->getReturnType(), ['string', 'int'], true)) {
                 $propertyOptions[$property->getName()] = $property;
             }
         }
-        if (empty($propertyOptions)) {
+        if (count($propertyOptions) === 1) {
+            $this->getIo()->warning('There are no properties suitable for using as display field automatically.');
             return;
         }
-        $this->outputOptions($propertyOptions);
-        $question = new Question('<info>Display field</info>[<comment>leave blank for none</comment>]: ', null);
-        $question->setAutocompleterValues(array_keys($propertyOptions));
-        $propertyName = $this->askQuestion($question);
-        $property = $propertyOptions[$propertyName] ?? null;
-        if ($property) {
-            $this->commandInfo->metaEntity->setDisplayProperty($property);
-
-        }
+        $defaultDisplayField = $this->commandInfo->metaEntity->getDisplayProperty();
+        $answer = $this->getIo()->choice('Display field (optional)', array_keys($propertyOptions), $defaultDisplayField ? (string) $defaultDisplayField : null);
+        $property = $propertyOptions[$answer] ?? $answer;
+        $this->commandInfo->metaEntity->setDisplayProperty($property === '' ? null : $property);
     }
 }

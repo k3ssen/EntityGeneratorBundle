@@ -36,21 +36,26 @@ class MetaPropertyFactory
         ];
     }
 
-    public function getTypeAliases()
+    public function getAliasedTypeOptions(): array
     {
         return [
-            'many2one' => static::MANY_TO_ONE,
+            'str' => Type::STRING,
+            'int' => Type::INTEGER,
+            'sint' => Type::SMALLINT,
+            'bint' => TYPE::BIGINT,
+            'dec' => Type::DECIMAL,
+            'txt' => Type::TEXT,
+            'date' => Type::DATE,
+            'time' => Type::TIME,
+            'dt' => Type::DATETIME,
+            'bool' => Type::BOOLEAN,
+            'sarr' => Type::SIMPLE_ARRAY,
+            'json' => Type::JSON,
+            'obj' => TYPE::OBJECT,
             'm2o' => static::MANY_TO_ONE,
-            'manytoone' => static::MANY_TO_ONE,
-            'one2many' => static::ONE_TO_MANY,
             'o2m' => static::ONE_TO_MANY,
-            'onetomany' => static::ONE_TO_MANY,
-            'many2many' => static::MANY_TO_MANY,
             'm2m' => static::MANY_TO_MANY,
-            'manytomany' => static::MANY_TO_MANY,
-            'one2one' => static::ONE_TO_ONE,
             'o2o' => static::ONE_TO_ONE,
-            'onetoone' => static::ONE_TO_ONE,
         ];
     }
 
