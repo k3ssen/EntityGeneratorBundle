@@ -88,4 +88,14 @@ class GeneratorConfig extends QuestionHelper
     {
         return $this->config['ask_mapped_by'];
     }
+
+    public function askValidations(): bool
+    {
+        return $this->config['ask_validations'];
+    }
+
+    public function showAllValidationOptions(): bool
+    {
+        return $this->config['show_all_validation_options'];
+    }
 }

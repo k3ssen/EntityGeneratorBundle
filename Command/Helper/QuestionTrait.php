@@ -45,6 +45,10 @@ trait QuestionTrait
         $this->getIo()->text(sprintf('<info>Current Entity:</info> %s', $this->commandInfo->metaEntity->getName()));
         $propertyOutputs = [];
         foreach ($this->commandInfo->metaEntity->getProperties() as $property) {
+            $validationNames = [];
+            foreach ($property->getValidations() as $validation) {
+                $validationNames[] = $validation->getClassShortName();
+            }
             $propertyOutputs[] = [
                 $property->getName(),
                 $property->getOrmType()
@@ -52,9 +56,11 @@ trait QuestionTrait
                     . ($property instanceof AbstractPrimitiveProperty && $property->isId() ? ' [<comment>id</comment>]' : '')
                     . ($this->commandInfo->metaEntity->getDisplayProperty() === $property ? ' [<comment>display field</comment>]' : '')
                     . ($property instanceof AbstractPrimitiveProperty && $property->isNullable() ? ' <comment>[nullable]</comment>' : '')
+                ,
+                implode(', ', $validationNames),
             ];
         }
-        $this->getIo()->table(['Property', 'Type'], $propertyOutputs);
+        $this->getIo()->table(['Property', 'Type', 'Validations'], $propertyOutputs);
     }
 
     protected function askQuestion(Question $question)
@@ -86,7 +92,6 @@ trait QuestionTrait
     {
         if (count($options)) {
             $this->commandInfo->output->writeln(sprintf(' <info>Available options:</info> <comment>%s</comment>', implode('</comment>, <comment>', $options)));
-            $this->commandInfo->output->writeln('');
         }
     }
 

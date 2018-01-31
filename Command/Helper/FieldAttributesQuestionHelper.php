@@ -20,9 +20,13 @@ class FieldAttributesQuestionHelper
     /** @var EntityFinder */
     protected $entityFinder;
 
-    public function __construct(EntityFinder $entityFinder)
+    /** @var ValidationQuestionHelper */
+    protected $validationQuestionHelper;
+
+    public function __construct(EntityFinder $entityFinder, ValidationQuestionHelper $validationQuestionHelper)
     {
         $this->entityFinder = $entityFinder;
+        $this->validationQuestionHelper = $validationQuestionHelper;
     }
 
     public function setAttributes(CommandInfo $commandInfo, AbstractProperty $metaProperty)
@@ -37,6 +41,7 @@ class FieldAttributesQuestionHelper
         $this->askTargetEntity($metaProperty);
         $this->askInversedBy($metaProperty);
         $this->askMappedBy($metaProperty);
+        $this->validationQuestionHelper->validationAction($commandInfo, $metaProperty);
     }
 
     protected function askNullable(AbstractProperty $metaProperty)

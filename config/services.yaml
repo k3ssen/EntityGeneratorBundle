@@ -26,3 +26,5 @@ services:
                 ask_target_entity: true
                 ask_inversed_by: true
                 ask_mapped_by: true
+                ask_validations: true
+                show_all_validation_options: false

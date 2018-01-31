@@ -3,23 +3,41 @@ declare(strict_types=1);
 
 namespace Kevin3ssen\EntityGeneratorBundle\Generator\MetaData;
 
-class Validation
+use Kevin3ssen\EntityGeneratorBundle\Generator\MetaData\Property\AbstractProperty;
+
+class MetaValidation
 {
+    /** @var AbstractProperty */
+    protected $metaProperty;
+
     /** @var string */
-    protected $type;
+    protected $className;
 
     /** @var array */
     protected $options;
 
-    public function getType(): ?string
+    public function __construct(AbstractProperty $metaProperty, string $className, array $options = [])
     {
-        return $this->type;
+        $this->setMetaProperty($metaProperty);
+        $this->setClassName($className);
+        $this->setOptions($options);
     }
 
-    public function setType(string $type): self
+    public function getClassName(): ?string
     {
-        $this->type = $type;
+        return $this->className;
+    }
+
+    public function setClassName(string $className): self
+    {
+        $this->className = $className;
         return $this;
+    }
+
+    public function getClassShortName(): ?string
+    {
+        $parts = explode('\\', $this->className);
+        return array_pop($parts);
     }
 
     public function getOptions(): ?array
@@ -35,7 +53,7 @@ class Validation
 
     public function getAnnotationFormatted(): string
     {
-        $formattedString = $this->getType();
+        $formattedString = $this->getClassName();
         $numberOfOptions = count($this->getOptions());
         if ($numberOfOptions === 0) {
             return $formattedString;
@@ -55,7 +73,7 @@ class Validation
                     ? implode(', ', $optionValue)
                     : ('"'.implode('", "', $optionValue) ).'"';
             } else {
-                $formattedString .= is_int($optionValue) ? $optionValue : ('"'.$optionValue.'"');
+                $formattedString .= is_numeric($optionValue) ? $optionValue : ('"'.$optionValue.'"');
             }
         }
         $formattedString .= ")";
@@ -73,8 +91,19 @@ class Validation
         return true;
     }
 
+    public function getMetaProperty(): ?AbstractProperty
+    {
+        return $this->metaProperty;
+    }
+
+    public function setMetaProperty(AbstractProperty $metaProperty)
+    {
+        $this->metaProperty = $metaProperty;
+        $metaProperty->addValidation($this);
+    }
+
     public function __toString()
     {
-        return $this->getType();
+        return $this->getClassName();
     }
 }

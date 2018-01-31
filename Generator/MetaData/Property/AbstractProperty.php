@@ -6,7 +6,8 @@ namespace Kevin3ssen\EntityGeneratorBundle\Generator\MetaData\Property;
 use Doctrine\Common\Util\Inflector;
 use Kevin3ssen\EntityGeneratorBundle\Generator\MetaData\MetaEntity;
 use Doctrine\Common\Collections\ArrayCollection;
-use Kevin3ssen\EntityGeneratorBundle\Generator\MetaData\Validation;
+use Kevin3ssen\EntityGeneratorBundle\Generator\MetaData\MetaValidation;
+use Symfony\Component\Validator\Constraints;
 
 abstract class AbstractProperty
 {
@@ -22,7 +23,7 @@ abstract class AbstractProperty
     /** @var bool */
     protected $unique = false;
 
-    /** @var Validation[]|ArrayCollection */
+    /** @var MetaValidation[]|ArrayCollection */
     protected $validations = [];
 
     public function __construct(MetaEntity $metaEntity, string $name)
@@ -78,7 +79,7 @@ abstract class AbstractProperty
         return $this;
     }
 
-    /** @return ArrayCollection|Validation[] */
+    /** @return ArrayCollection|MetaValidation[] */
     public function getValidations(): ArrayCollection
     {
         return $this->validations;
@@ -90,15 +91,20 @@ abstract class AbstractProperty
         return $this;
     }
 
-    public function addValidation(Validation $validations): self
+    public function addValidation(MetaValidation $validation): self
     {
-        $this->validations->add($validations);
+        if (!$this->getValidations()->contains($validation)) {
+            $this->getValidations()->add($validation);
+            $validation->setMetaProperty($this);
+        }
         return $this;
     }
 
-    public function removeValidation(Validation $validations): self
+    public function removeValidation(MetaValidation $validation): self
     {
-        $this->validations->removeElement($validations);
+        if (!$this->getValidations()->contains($validation)) {
+            $this->getValidations()->removeElement($validation);
+        }
         return $this;
     }
 
