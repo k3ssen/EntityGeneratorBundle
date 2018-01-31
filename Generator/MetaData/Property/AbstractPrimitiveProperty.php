@@ -47,7 +47,7 @@ abstract class AbstractPrimitiveProperty extends AbstractProperty
         if ($this->isId()) {
             $annotationLines[] = '@ORM\Id';
         }
-        return $annotationLines;
+        return array_merge($annotationLines, parent::getAnnotationLines());
     }
 
     public function getColumnAnnotationOptions()

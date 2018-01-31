@@ -49,9 +49,10 @@ class OneToManyProperty extends AbstractRelationshipProperty
         //TODO: what about cascade delete?
         $OneToManyOptions .= ', cascade={"persist"}';
 
-        return [
+        $annotationLines = [
             '@ORM\OneToMany('.$OneToManyOptions.')',
         ];
+        return array_merge($annotationLines, parent::getAnnotationLines());
     }
 
     public function getReturnType(): string

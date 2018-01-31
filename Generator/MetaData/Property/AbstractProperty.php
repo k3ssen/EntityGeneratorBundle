@@ -117,7 +117,14 @@ abstract class AbstractProperty
 
     abstract public function getOrmType(): string;
 
-    abstract public function getAnnotationLines(): array;
+    public function getAnnotationLines(): array
+    {
+        $annotationLines = [];
+        foreach ($this->getValidations() as $validation) {
+            $annotationLines[] = $validation->getAnnotationFormatted();
+        }
+        return $annotationLines;
+    }
 
     public function __toString()
     {

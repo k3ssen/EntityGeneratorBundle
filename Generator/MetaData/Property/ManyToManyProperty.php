@@ -63,7 +63,7 @@ class ManyToManyProperty extends AbstractRelationshipProperty
             $annotationLines[] = '  }';
         }
 
-        return $annotationLines;
+        return array_merge($annotationLines, parent::getAnnotationLines());
     }
 
     public function getOrmType(): string

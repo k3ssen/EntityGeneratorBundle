@@ -29,8 +29,7 @@ class OneToOneProperty extends AbstractRelationshipProperty
             $joinColumnOptions .= $this->isNullable() ? ', nullable=true' : ', nullable=false';
             $annotationLines[] = '@ORM\JoinColumn('.$joinColumnOptions.')';
         }
-
-        return $annotationLines;
+        return array_merge($annotationLines, parent::getAnnotationLines());
     }
 
     public function getOrmType(): string

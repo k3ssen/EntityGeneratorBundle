@@ -27,10 +27,11 @@ class ManyToOneProperty extends AbstractRelationshipProperty
         $joinColumnOptions .= ', referencedColumnName="id"';
         $joinColumnOptions .= $this->isNullable() ? ', nullable=true' : ', nullable=false';
 
-        return [
+        $annotationLines = [
             '@ORM\ManyToOne('.$manyToOneOptions.', cascade={"persist"})',
             '@ORM\JoinColumn('.$joinColumnOptions.')',
         ];
+        return array_merge($annotationLines, parent::getAnnotationLines());
     }
 
     public function getOrmType(): string

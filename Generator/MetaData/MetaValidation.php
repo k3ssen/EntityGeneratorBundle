@@ -18,6 +18,7 @@ class MetaValidation
 
     public function __construct(AbstractProperty $metaProperty, string $className, array $options = [])
     {
+        $metaProperty->getMetaEntity()->addUsage('Symfony\Component\Validator\Constraints', 'Assert');
         $this->setMetaProperty($metaProperty);
         $this->setClassName($className);
         $this->setOptions($options);
@@ -53,7 +54,7 @@ class MetaValidation
 
     public function getAnnotationFormatted(): string
     {
-        $formattedString = $this->getClassName();
+        $formattedString = '@Assert\\'.$this->getClassShortName();
         $numberOfOptions = count($this->getOptions());
         if ($numberOfOptions === 0) {
             return $formattedString;
