@@ -3,30 +3,21 @@ declare(strict_types=1);
 
 namespace Kevin3ssen\EntityGeneratorBundle\Generator\MetaData\Property;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Kevin3ssen\EntityGeneratorBundle\Generator\MetaData\MetaEntity;
 use Doctrine\Common\Inflector\Inflector;
+use Kevin3ssen\EntityGeneratorBundle\Generator\MetaData\MetaPropertyFactory;
 
 class ManyToManyProperty extends AbstractRelationshipProperty
 {
-    protected $nullable = true;
-    protected $unique = false;
-
-    public function __construct(MetaEntity $metaEntity, string $name)
+    public function __construct(MetaEntity $metaEntity, ArrayCollection $metaAttributes, string $name)
     {
-        parent::__construct($metaEntity, $name);
-        $this->setTargetEntity(ucfirst(Inflector::singularize($name)));
+        parent::__construct($metaEntity, $metaAttributes, $name);
+        $this->getMetaAttribute('targetEntity')->setDefaultValue(ucfirst(Inflector::singularize($name)));
+        $this->getMetaAttribute('inversedBy')->setDefaultValue(lcfirst($metaEntity->getName()));
 
         $metaEntity->addUsage('Doctrine\Common\Collections\Collection');
         $metaEntity->addUsage('Doctrine\Common\Collections\ArrayCollection');
-    }
-
-    public function setNullable(?bool $nullable)
-    {
-        if ($nullable === false) {
-            throw new \BadMethodCallException('Setting nullable to false on ManyToMany is not possible.');
-        }
-        $this->nullable = $nullable;
-        return $this;
     }
 
     public function getReturnType(): string
@@ -34,10 +25,12 @@ class ManyToManyProperty extends AbstractRelationshipProperty
         return 'Collection';
     }
 
-    public function getOrphanRemoval(): bool
+    public function setNullable(?bool $nullable)
     {
-        //TODO: add setter
-        return false;
+        if ($nullable === false) {
+            throw new \BadMethodCallException('Setting nullable to false on ManyToMany is not possible.');
+        }
+        return parent::setNullable($nullable);
     }
 
     public function getAnnotationLines(): array
@@ -59,7 +52,7 @@ class ManyToManyProperty extends AbstractRelationshipProperty
             $annotationLines[] = '    @ORM\JoinColumn(name="'.Inflector::tableize($this->getName()).'_id", referencedColumnName="id", onDelete="CASCADE")';
             $annotationLines[] = '  }';
             $annotationLines[] = '  inverseJoinColumns={';
-            $annotationLines[] = '    @ORM\JoinColumn(name="'.Inflector::tableize($this->getTargetEntity()).'_id", referencedColumnName="id", onDelete="CASCADE")';
+            $annotationLines[] = '    @ORM\JoinColumn(name="'.Inflector::tableize($this->getTargetEntity()).'_'.$this->getReferencedColumnName().'" , referencedColumnName="'.$this->getReferencedColumnName().'", onDelete="CASCADE")';
             $annotationLines[] = '  }';
         }
 

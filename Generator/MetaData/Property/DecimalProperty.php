@@ -15,24 +15,22 @@ class DecimalProperty extends AbstractPrimitiveProperty
 
     public function getPrecision(): ?int
     {
-        return $this->precision;
+        return $this->getAttribute('precision');
     }
 
     public function setPrecision(?int $precision): self
     {
-        $this->precision = $precision;
-        return $this;
+        return $this->setAttribute('precision', $precision);
     }
 
     public function getScale(): ?int
     {
-        return $this->scale;
+        return $this->getAttribute('scale');
     }
 
     public function setScale(?int $scale): self
     {
-        $this->scale = $scale;
-        return $this;
+        return $this->setAttribute('scale', $scale);
     }
 
     public function getReturnType(): string

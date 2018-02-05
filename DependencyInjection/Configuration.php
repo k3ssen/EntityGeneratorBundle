@@ -17,84 +17,62 @@ class Configuration implements ConfigurationInterface
         $rootNode = $treeBuilder->root('entity_generator');
         $rootNode
             ->children()
-                ->scalarNode('default_bundle')
-                    ->defaultValue('App')
-                    ->validate()
-                    ->ifTrue(function ($name) {
-                        return !preg_match('/.Bundle$/', $name);
-                    })
-                        ->thenInvalid('A bundle name in "default_bundle should" end with "Bundle"')
-                    ->end()
-                ->end()
                 ->arrayNode('traits')
                     ->scalarPrototype()->end()
                 ->end()
-//                ->booleanNode('enable_datatables')
-//                    ->defaultTrue()
-//                    ->info('enables Datatable option in the CRUD generator.')
-//                ->end()
-//                ->booleanNode('enable_voters')
-//                    ->defaultTrue()
-//                    ->info('enables Voters option in the CRUD generator.')
-//                ->end()
-            ->end()
-//            ->append($this->getClassNode())
-//            ->append($this->getCrudNode())
-        ;
-
-        return $treeBuilder;
-    }
-
-    protected function getClassNode()
-    {
-        $treeBuilder = new TreeBuilder();
-        $node = $treeBuilder->root('class');
-
-        $node
-            ->addDefaultsIfNotSet()
-            ->children()
-                ->scalarNode('softdeleteable_trait')
-                    ->cannotBeEmpty()
-                    ->defaultValue('Gedmo\\SoftDeleteable\\Traits\\SoftDeleteableEntity')
+                ->scalarNode('override_skeleton_path')
+                    ->defaultNull()
                 ->end()
-                ->scalarNode('iptraceable_trait')
-                    ->cannotBeEmpty()
-                    ->defaultValue('Gedmo\\IpTraceable\\Traits\\IpTraceableEntity')
-                ->end()
-                ->scalarNode('timestampable_trait')
-                    ->cannotBeEmpty()
-                    ->defaultValue('Gedmo\\Timestampable\\Traits\\TimestampableEntity')
-                ->end()
-                ->scalarNode('blameable_trait')
-                    ->cannotBeEmpty()
-                    ->defaultValue('Gedmo\\Blameable\\Traits\\BlameableEntity')
-                ->end()
-                ->scalarNode('nestedset_trait')
-                    ->cannotBeEmpty()
-                    ->defaultValue('Gedmo\\Tree\\Traits\\NestedSetEntity')
-                ->end()
-                ->scalarNode('blameable_repository_trait')
-                    ->cannotBeEmpty()
-                ->end()
-            ->end()
-        ;
-        return $node;
-    }
-
-    protected function getCrudNode()
-    {
-        $treeBuilder = new TreeBuilder();
-        $node = $treeBuilder->root('crud');
-
-        $node
-            ->addDefaultsIfNotSet()
-            ->children()
-                ->booleanNode('datatables')
+                ->booleanNode('auto_generate_repository')
                     ->defaultTrue()
-                    ->info('Use Datatables on CRUD index by default when not set to false')
+                ->end()
+                ->booleanNode('use_default_validations')
+                    ->defaultTrue()
+                ->end()
+                ->booleanNode('ask_bundle')
+                    ->defaultTrue()
+                ->end()
+                ->booleanNode('ask_sub_dir')
+                    ->defaultTrue()
+                ->end()
+                ->booleanNode('ask_display_field')
+                    ->defaultTrue()
+                ->end()
+                ->booleanNode('ask_id')
+                    ->defaultTrue()
+                ->end()
+                ->booleanNode('ask_nullable')
+                    ->defaultTrue()
+                ->end()
+                ->booleanNode('ask_unique')
+                    ->defaultTrue()
+                ->end()
+                ->booleanNode('ask_length')
+                    ->defaultTrue()
+                ->end()
+                ->booleanNode('ask_precision')
+                    ->defaultTrue()
+                ->end()
+                ->booleanNode('ask_scale')
+                    ->defaultTrue()
+                ->end()
+                ->booleanNode('ask_target_entity')
+                    ->defaultTrue()
+                ->end()
+                ->booleanNode('ask_inversed_by')
+                    ->defaultTrue()
+                ->end()
+                ->booleanNode('ask_mapped_by')
+                    ->defaultTrue()
+                ->end()
+                ->booleanNode('ask_validations')
+                    ->defaultTrue()
+                ->end()
+                ->booleanNode('show_all_validation_options')
+                    ->defaultTrue()
                 ->end()
             ->end()
         ;
-        return $node;
+        return $treeBuilder;
     }
 }

@@ -115,6 +115,11 @@ class EntityQuestionHelper
         $this->askAction();
     }
 
+    protected function askTraits()
+    {
+
+    }
+
     protected function askPropertyChoice(): AbstractProperty
     {
         $properties = $this->commandInfo->metaEntity->getProperties();

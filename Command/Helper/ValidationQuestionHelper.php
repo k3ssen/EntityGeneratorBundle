@@ -183,7 +183,7 @@ class ValidationQuestionHelper
         foreach (scandir($constraintsDir) as $fileName) {
             $className = basename($fileName, '.php');
             $classFullName = 'Symfony\\Component\\Validator\\Constraints\\'.$className;
-            if (class_exists($classFullName) && is_subclass_of($classFullName, Constraint::class)) {
+            if (class_exists($classFullName) && is_a($classFullName, Constraint::class, true)) {
                 $constraints[$classFullName] = $className;
             }
         }

@@ -7,17 +7,14 @@ use Doctrine\DBAL\Types\Type;
 
 class StringProperty extends AbstractPrimitiveProperty implements HasLengthInterface
 {
-    /** @var int */
-    protected $length;
-
     public function getLength(): ?int
     {
-        return $this->length;
+        return $this->getAttribute('length');
     }
 
     public function setLength(?int $length)
     {
-        $this->length = $length;
+        return $this->setAttribute('length', $length);
     }
 
     public function getReturnType(): string

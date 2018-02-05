@@ -30,4 +30,9 @@ class CommandInfo
         $this->generatorConfig = $generatorConfig;
         $this->metaEntity = $metaEntity;
     }
+
+    public function getIo()
+    {
+
+    }
 }

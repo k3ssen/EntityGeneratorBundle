@@ -14,6 +14,16 @@ class GeneratorConfig extends QuestionHelper
         $this->config = $config;
     }
 
+    public function getAttributes(): array
+    {
+        return $this->config['attributes'];
+    }
+
+    public function getOverrideSkeletonPath(): ?string
+    {
+        return $this->config['override_skeleton_path'];
+    }
+
     public function getTraitOptions(): array
     {
         return $this->config['traits'];

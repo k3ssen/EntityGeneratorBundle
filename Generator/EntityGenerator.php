@@ -14,10 +14,13 @@ class EntityGenerator
 {
     /** @var FileLocator */
     protected $fileLocator;
+    /** @var GeneratorConfig */
+    protected $generatorConfig;
 
-    public function __construct(FileLocator $fileLocator)
+    public function __construct(FileLocator $fileLocator, GeneratorConfig $generatorConfig)
     {
         $this->fileLocator = $fileLocator;
+        $this->generatorConfig = $generatorConfig;
     }
 
     protected function getTargetFile(MetaEntity $metaEntity): string
@@ -37,13 +40,27 @@ class EntityGenerator
     protected function getSkeletonDirs(): array
     {
         $dirs = [];
+        if ($skeletonPath = $this->generatorConfig->getOverrideSkeletonPath()) {
+            try {
+                $dirs[$this->fileLocator->locate($skeletonPath)] = 'App';
+            } catch (FileLocatorFileNotFoundException $e) {}
+        }
         try {
-            $dirs[$this->fileLocator->locate('../templates/EntityGeneratorBundle/')] = 'App';
+            $dirs[$this->fileLocator->locate('../templates/EntityGeneratorBundle/skeleton/')] = 'App';
         } catch (FileLocatorFileNotFoundException $e) {}
         try {
-            $dirs[$this->fileLocator->locate('../templates/bundles/EntityGeneratorBundle/')] = 'App';
+            $dirs[$this->fileLocator->locate('../templates/bundles/EntityGeneratorBundle/skeleton/')] = 'App';
         } catch (FileLocatorFileNotFoundException $e) {}
-        $dirs[$this->fileLocator->locate('@EntityGeneratorBundle/templates/')] = 'EntityGeneratorBundle';
+        try {
+            $dirs[$this->fileLocator->locate('EntityGenerator/skeleton/')] = 'App';
+        } catch (FileLocatorFileNotFoundException $e) {}
+        try {
+            $dirs[$this->fileLocator->locate('EntityGeneratorBundle/skeleton/')] = 'App';
+        } catch (FileLocatorFileNotFoundException $e) {}
+        try {
+            $dirs[$this->fileLocator->locate('../EntityGenerator/templates/skeleton/')] = 'App';
+        } catch (FileLocatorFileNotFoundException $e) {}
+        $dirs[$this->fileLocator->locate('@EntityGeneratorBundle/templates/skeleton/')] = 'EntityGeneratorBundle';
         return $dirs;
     }
 
@@ -62,7 +79,7 @@ class EntityGenerator
     public function createRepository(MetaEntity $metaEntity): string
     {
         $repoFileData = $this->getRepositoryContent($metaEntity);
-        $targetFile = str_replace(['Entity', '.php'], ['Repository', 'Repository.php'], $this->getTargetFile($metaEntity));
+        $targetFile = str_replace(['/Entity', '.php'], ['/Repository', 'Repository.php'], $this->getTargetFile($metaEntity));
 
         $fs = new Filesystem();
         $fs->dumpFile($targetFile, $repoFileData);
@@ -72,14 +89,14 @@ class EntityGenerator
 
     public function getRepositoryContent(MetaEntity $metaEntity)
     {
-        return $this->getTwigEnvironment()->render('skeleton/repository.php.twig', [
+        return $this->getTwigEnvironment()->render('repository.php.twig', [
             'meta_entity' => $metaEntity,
         ]);
     }
 
     public function getEntityContent(MetaEntity $metaEntity)
     {
-        return $this->getTwigEnvironment()->render('skeleton/entity.php.twig', [
+        return $this->getTwigEnvironment()->render('entity.php.twig', [
             'meta_entity' => $metaEntity,
         ]);
     }

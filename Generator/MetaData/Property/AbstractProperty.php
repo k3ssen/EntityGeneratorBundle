@@ -4,30 +4,25 @@ declare(strict_types=1);
 namespace Kevin3ssen\EntityGeneratorBundle\Generator\MetaData\Property;
 
 use Doctrine\Common\Util\Inflector;
+use Kevin3ssen\EntityGeneratorBundle\Generator\MetaData\MetaAttribute;
 use Kevin3ssen\EntityGeneratorBundle\Generator\MetaData\MetaEntity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Kevin3ssen\EntityGeneratorBundle\Generator\MetaData\MetaValidation;
-use Symfony\Component\Validator\Constraints;
 
 abstract class AbstractProperty
 {
-    /** @var string */
-    protected $name;
-
     /** @var MetaEntity */
     protected $metaEntity;
 
-    /** @var bool */
-    protected $nullable;
-
-    /** @var bool */
-    protected $unique = false;
-
     /** @var MetaValidation[]|ArrayCollection */
-    protected $validations = [];
+    protected $validations;
 
-    public function __construct(MetaEntity $metaEntity, string $name)
+    /** @var MetaAttribute[]|ArrayCollection */
+    protected $metaAttributes;
+
+    public function __construct(MetaEntity $metaEntity, ArrayCollection $metaAttributes, string $name)
     {
+        $this->metaAttributes = $metaAttributes;
         $this->setMetaEntity($metaEntity);
         $this->setName($name);
         $this->validations = new ArrayCollection();
@@ -48,35 +43,32 @@ abstract class AbstractProperty
 
     public function getName(): ?string
     {
-        return $this->name;
+        return $this->getAttribute('name');
     }
 
     public function setName(string $name): self
     {
-        $this->name = lcfirst(Inflector::classify($name));
-        return $this;
+        return $this->setAttribute('name', lcfirst(Inflector::classify($name)));
     }
 
     public function isNullable(): ?bool
     {
-        return $this->nullable;
+        return $this->getAttribute('nullable');
     }
 
     public function setNullable(?bool $nullable)
     {
-        $this->nullable = $nullable;
-        return $this;
+        return $this->setAttribute('nullable', $nullable);
     }
 
     public function isUnique(): ?bool
     {
-        return $this->unique;
+        return $this->getAttribute('unique');
     }
 
     public function setUnique(?bool $unique): self
     {
-        $this->unique = $unique;
-        return $this;
+        return $this->setAttribute('unique', $unique);
     }
 
     /** @return ArrayCollection|MetaValidation[] */
@@ -113,6 +105,56 @@ abstract class AbstractProperty
         return !$this->getValidations()->isEmpty();
     }
 
+    /**
+     * @return array|ArrayCollection|MetaAttribute[]
+     */
+    public function getMetaAttributes(): ArrayCollection
+    {
+        return $this->metaAttributes;
+    }
+
+    public function addMetaAttribute(MetaAttribute $metaAttribute): self
+    {
+        if (!$this->getMetaAttributes()->contains($metaAttribute)) {
+            $this->getMetaAttributes()->set($metaAttribute->getName(), $metaAttribute);
+            $metaAttribute->setMetaProperty($this);
+        }
+        return $this;
+    }
+
+    public function removeMetaAttribute(MetaAttribute $metaAttribute): self
+    {
+        if (!$this->getMetaAttributes()->contains($metaAttribute)) {
+            $this->getMetaAttributes()->removeElement($metaAttribute);
+        }
+        return $this;
+    }
+
+    public function getMetaAttribute($name): MetaAttribute
+    {
+        $metaAttribute = $this->getMetaAttributes()->get($name);
+        if ($metaAttribute === null) {
+            throw new \InvalidArgumentException(sprintf('No attribute "%s" has been defined for this metaProperty', $name));
+        }
+        return $metaAttribute;
+    }
+
+    public function hasAttribute($name): bool
+    {
+        return $this->getMetaAttributes()->containsKey($name);
+    }
+
+    public function getAttribute($name)
+    {
+        return $this->getMetaAttribute($name)->getValue();
+    }
+
+    public function setAttribute($name, $value)
+    {
+        $this->getMetaAttribute($name)->setValue($value);
+        return $this;
+    }
+    
     abstract public function getReturnType(): string;
 
     abstract public function getOrmType(): string;

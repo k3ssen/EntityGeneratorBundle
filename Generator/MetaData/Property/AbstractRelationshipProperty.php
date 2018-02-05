@@ -3,49 +3,35 @@ declare(strict_types=1);
 
 namespace Kevin3ssen\EntityGeneratorBundle\Generator\MetaData\Property;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Util\Inflector;
 use Kevin3ssen\EntityGeneratorBundle\Generator\MetaData\MetaEntity;
 
 abstract class AbstractRelationshipProperty extends AbstractProperty
 {
-    /** @var string */
-    protected $targetEntity;
-
-    /** @var string */
-    protected $targetEntityNamespace;
-
-    /** @var string */
-    protected $referencedColumnName = 'id';
-
-    /** @var string */
-    protected $inversedBy;
-
-    /** @var string */
-    protected $mappedBy;
-
-    /** @var bool */
-    protected $orphanRemoval = true;
-
-    public function __construct(MetaEntity $metaEntity, string $name)
+    public function __construct(MetaEntity $metaEntity, ArrayCollection $metaAttributes, string $name)
     {
-        parent::__construct($metaEntity, $name);
-        $this->setTargetEntity(Inflector::classify($name));
+        parent::__construct($metaEntity, $metaAttributes, $name);
+        $this->getMetaAttribute('targetEntity')->setDefaultValue(Inflector::classify($name));
     }
 
     public function getTargetEntity(): ?string
     {
-        return $this->targetEntity;
+        return $this->getAttribute('targetEntity');
     }
 
     public function setTargetEntity(string $targetEntity): self
     {
-        $this->targetEntity = $targetEntity;
-        return $this;
+        return $this->setAttribute('targetEntity', $targetEntity);
     }
 
     public function getTargetEntityNamespace(): ?string
     {
-        return $this->targetEntityNamespace ?: $this->getMetaEntity()->getNamespace();
+        $metaAttribute = $this->getMetaAttributes()->get('targetEntityNamespace');
+        if ($metaAttribute) {
+            return $metaAttribute->getValue();
+        }
+        return $this->getMetaEntity()->getNamespace();
     }
 
     public function getTargetEntityFullClassName(): string
@@ -55,7 +41,7 @@ abstract class AbstractRelationshipProperty extends AbstractProperty
 
     public function setTargetEntityNamespace(string $targetEntityNamespace): self
     {
-        $this->targetEntityNamespace = $targetEntityNamespace;
+        $this->setAttribute('targetEntityNamespace', $targetEntityNamespace);
         if ($targetEntityNamespace !== $this->getMetaEntity()->getNamespace()) {
             $this->getMetaEntity()->addUsage($this->getTargetEntityFullClassName());
         }
@@ -64,29 +50,30 @@ abstract class AbstractRelationshipProperty extends AbstractProperty
 
     public function getReferencedColumnName(): ?string
     {
-        return $this->referencedColumnName;
+        return $this->getAttribute('referencedColumnName');
     }
 
     public function setReferencedColumnName(string $referencedColumnName): self
     {
-        $this->referencedColumnName = $referencedColumnName;
-        return $this;
+        return $this->setAttribute('referencedColumnName', $referencedColumnName);
     }
 
     public function getInversedBy(): ?string
     {
-        return $this->inversedBy;
+        return $this->hasAttribute('inversedBy') ? $this->getAttribute('inversedBy') : null;
     }
 
     public function setInversedBy(?string $inversedBy): self
     {
-        $this->inversedBy = $inversedBy;
-        return $this;
+        if ($this->getMappedBy()) {
+            throw new \RuntimeException(sprintf('Cannot set inversedBy on property with name "%s"; The mappedBy has already been set', $this->getName()));
+        }
+        return $this->setAttribute('inversedBy', $inversedBy);
     }
 
     public function getMappedBy(): ?string
     {
-        return $this->mappedBy;
+        return $this->hasAttribute('mappedBy') ? $this->getAttribute('mappedBy') : null;
     }
 
     public function setMappedBy(?string $mappedBy): self
@@ -94,18 +81,16 @@ abstract class AbstractRelationshipProperty extends AbstractProperty
         if ($this->getInversedBy()) {
             throw new \RuntimeException(sprintf('Cannot set mappedBy on property with name "%s"; The inversedBy has already been set', $this->getName()));
         }
-        $this->mappedBy = $mappedBy;
-        return $this;
+        return $this->setAttribute('mappedBy', $mappedBy);
     }
 
-    public function isOrphanRemoval(): ?bool
+    public function getOrphanRemoval(): ?bool
     {
-        return $this->orphanRemoval;
+        return $this->getAttribute('orphanRemoval');
     }
 
     public function setOrphanRemoval(bool $orphanRemoval): self
     {
-        $this->orphanRemoval = $orphanRemoval;
-        return $this;
+        return $this->setAttribute('orphanRemoval', $orphanRemoval);
     }
 }

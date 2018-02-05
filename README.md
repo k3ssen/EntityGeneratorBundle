@@ -7,9 +7,9 @@ Bundle to interactively generate entities in Symfony4.
 
 
 
-
-
 ## Extensibility
+One that fits all. Such generator probably won't exist. 
+
 There are quite a few generators created for symfony projects, but 
 every project or developer has different needs, 
 so there won't be any generator that will fit everyone's needs. 
@@ -28,12 +28,28 @@ classes that you've defined.
 
 ### Overriding skeleton
 The entity is generated through twig-files, which you can overwrite or
-extend by adding files with identical names to 
-`{projectDir}/templates/bundles/EntityGeneratorBundle/skeleton`.
+extend by adding files with identical names to any of the following directories:
+- `{projectDir}/templates/bundles/EntityGeneratorBundle/skeleton`
+- `{projectDir}/EntityGenerator/skeleton`
+- `{projectDir}/EntityGeneratorBundle/skeleton`
 
-**TODO:** when someone needs to extend this bundle, it might be
-nice to have everything bundled together. For instance, a directory 
-'EntityGenerator' that contains all extensions.
-So in addition to overriding the
-skeleton in the templates directory, it should be possible to override
-the skeleton in a custom defined directory.
+Instead of either of these options, you can also specify any skeleton-location
+in the configuration option `entity_generator.override_skeleton_path`. 
+For example:
+
+
+    entity_generator:
+        override_skeleton_path: '%kernel.root_dir%/Generators/EntityGenerator/skeleton/'
+        
+
+If you want to extend one of the files, you could for example add a file
+`_traits.php.twig` to your skeleton-dir, with the following content:
+
+    {% use '@EntityGeneratorBundle/_traits.php.twig' %}
+    {% block traits %}
+        use MySpecificEntityTraitThatShouldAlwaysBeIncluded;
+        {{ parent() }}
+    {% endblock %}
+
+This way you can add a trait which will always be included, while other traits
+are still managed by the generator itself.

@@ -3,19 +3,19 @@ declare(strict_types=1);
 
 namespace Kevin3ssen\EntityGeneratorBundle\Generator\MetaData\Property;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Kevin3ssen\EntityGeneratorBundle\Generator\MetaData\MetaEntity;
 use Doctrine\Common\Inflector\Inflector;
+use Kevin3ssen\EntityGeneratorBundle\Generator\MetaData\MetaPropertyFactory;
 
 class OneToManyProperty extends AbstractRelationshipProperty
 {
-    protected $nullable = true;
-    protected $unique = false;
-
-    public function __construct(MetaEntity $metaEntity, string $name)
+    public function __construct(MetaEntity $metaEntity, ArrayCollection $metaAttributes, string $name)
     {
-        parent::__construct($metaEntity, $name);
+        parent::__construct($metaEntity, $metaAttributes, $name);
         $this->setTargetEntity(Inflector::classify(Inflector::singularize($name)));
         $this->setMappedBy(lcfirst(Inflector::classify($metaEntity->getName())));
+        $this->setOrphanRemoval(false);
 
         $metaEntity->addUsage('Doctrine\Common\Collections\Collection');
         $metaEntity->addUsage('Doctrine\Common\Collections\ArrayCollection');
@@ -29,16 +29,9 @@ class OneToManyProperty extends AbstractRelationshipProperty
     public function setNullable(?bool $nullable)
     {
         if ($nullable === false) {
-            throw new \BadMethodCallException('Setting nullable to false on ManyToMany is not possible.');
+            throw new \BadMethodCallException('Setting nullable to false on OneToMany is not possible.');
         }
-        $this->nullable = $nullable;
-        return $this;
-    }
-
-    public function getOrphanRemoval(): bool
-    {
-        //TODO: add setter
-        return false;
+        return parent::setNullable($nullable);
     }
 
     public function getAnnotationLines(): array

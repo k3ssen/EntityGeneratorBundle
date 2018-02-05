@@ -7,7 +7,7 @@ use Doctrine\Common\Util\Inflector;
 use Doctrine\DBAL\Types\Type;
 use Kevin3ssen\EntityGeneratorBundle\Generator\MetaData\Property\AbstractProperty;
 use Kevin3ssen\EntityGeneratorBundle\Generator\MetaData\Property\AbstractRelationshipProperty;
-use Kevin3ssen\EntityGeneratorBundle\Generator\MetaData\Property\MetaPropertyFactory;
+use Kevin3ssen\EntityGeneratorBundle\Generator\MetaData\MetaPropertyFactory;
 
 class FieldQuestionHelper
 {
@@ -20,16 +20,20 @@ class FieldQuestionHelper
     protected $fieldAttributesQuestionHelper;
     /** @var string */
     protected $guessedEntity;
+    /** @var ValidationQuestionHelper */
+    protected $validationQuestionHelper;
 
     public function __construct(
         EntityFinder $entityFinder,
         MetaPropertyFactory $metaPropertyFactory,
-        FieldAttributesQuestionHelper $fieldAttributesQuestionHelper
+        FieldAttributesQuestionHelper $fieldAttributesQuestionHelper,
+        ValidationQuestionHelper $validationQuestionHelper
 
     ) {
         $this->entityFinder = $entityFinder;
         $this->metaPropertyFactory = $metaPropertyFactory;
         $this->fieldAttributesQuestionHelper = $fieldAttributesQuestionHelper;
+        $this->validationQuestionHelper = $validationQuestionHelper;
     }
 
     public function makeField(CommandInfo $commandInfo, AbstractProperty $metaProperty = null): ?AbstractProperty
@@ -46,8 +50,10 @@ class FieldQuestionHelper
             }
         }
         $metaProperty = $this->askFieldType($fieldName, $metaProperty);
+        $metaProperty->getMetaAttribute('name')->setValueIsSetByUserInput();
 
         $this->fieldAttributesQuestionHelper->setAttributes($commandInfo, $metaProperty);
+        $this->validationQuestionHelper->validationAction($commandInfo, $metaProperty);
 
         return $metaProperty;
     }
@@ -68,7 +74,7 @@ class FieldQuestionHelper
             $metaProperty->getMetaEntity()->removeProperty($metaProperty);
         }
 
-        $metaProperty = $this->metaPropertyFactory->getMetaPropertyByType($this->commandInfo->metaEntity, $type, $fieldName);
+        $metaProperty = $this->metaPropertyFactory->getMetaProperty($this->commandInfo->metaEntity, $type, $fieldName);
 
         if ($metaProperty instanceof AbstractRelationshipProperty && $this->guessedEntity) {
             $metaProperty->setTargetEntity($this->guessedEntity);

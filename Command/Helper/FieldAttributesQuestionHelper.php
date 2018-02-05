@@ -3,148 +3,103 @@ declare(strict_types=1);
 
 namespace Kevin3ssen\EntityGeneratorBundle\Command\Helper;
 
-use Kevin3ssen\EntityGeneratorBundle\Generator\MetaData\Property\AbstractPrimitiveProperty;
+use Kevin3ssen\EntityGeneratorBundle\Generator\MetaData\MetaAttribute;
+use Kevin3ssen\EntityGeneratorBundle\Generator\MetaData\MetaAttributeFactory;
 use Kevin3ssen\EntityGeneratorBundle\Generator\MetaData\Property\AbstractProperty;
-use Kevin3ssen\EntityGeneratorBundle\Generator\MetaData\Property\AbstractRelationshipProperty;
-use Kevin3ssen\EntityGeneratorBundle\Generator\MetaData\Property\DecimalProperty;
-use Kevin3ssen\EntityGeneratorBundle\Generator\MetaData\Property\HasLengthInterface;
-use Kevin3ssen\EntityGeneratorBundle\Generator\MetaData\Property\ManyToManyProperty;
-use Kevin3ssen\EntityGeneratorBundle\Generator\MetaData\Property\ManyToOneProperty;
-use Kevin3ssen\EntityGeneratorBundle\Generator\MetaData\Property\OneToManyProperty;
-use Symfony\Component\Console\Question\Question;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 
 class FieldAttributesQuestionHelper
 {
     use QuestionTrait;
 
-    /** @var EntityFinder */
-    protected $entityFinder;
+    /** @var MetaAttributeFactory */
+    protected $metaAttributeFactory;
 
-    /** @var ValidationQuestionHelper */
-    protected $validationQuestionHelper;
+    /** @var ExpressionLanguage */
+    protected $expressionLanguage;
 
-    public function __construct(EntityFinder $entityFinder, ValidationQuestionHelper $validationQuestionHelper)
-    {
-        $this->entityFinder = $entityFinder;
-        $this->validationQuestionHelper = $validationQuestionHelper;
+    /** @var ContainerInterface */
+    protected $container;
+
+    public function __construct(
+        MetaAttributeFactory $metaAttributeFactory,
+        AttributesExpressionLanguageProvider $attributesExpressionLanguageProvider,
+        ContainerInterface $container
+    ) {
+        $this->metaAttributeFactory = $metaAttributeFactory;
+        $this->container = $container;
+        $this->expressionLanguage = new ExpressionLanguage(null, [$attributesExpressionLanguageProvider]);
     }
 
     public function setAttributes(CommandInfo $commandInfo, AbstractProperty $metaProperty)
     {
         $this->commandInfo = $commandInfo;
-        $this->askId($metaProperty);
-        $this->askNullable($metaProperty);
-        $this->askUnique($metaProperty);
-        $this->askLength($metaProperty);
-        $this->askPrecision($metaProperty);
-        $this->askScale($metaProperty);
-        $this->askTargetEntity($metaProperty);
-        $this->askInversedBy($metaProperty);
-        $this->askMappedBy($metaProperty);
-        $this->validationQuestionHelper->validationAction($commandInfo, $metaProperty);
+
+        foreach ($metaProperty->getMetaAttributes() as $metaAttribute) {
+            if ($metaAttribute->getValueIsSetByUserInput()) {
+                continue;
+            }
+            if ($condition = $metaAttribute->getCondition()) {
+                $conditionResult = $this->evaluate($metaAttribute, $condition);
+                if ($conditionResult === false) {
+                    continue;
+                }
+            }
+
+            if ($serviceClass = $metaAttribute->getQuestionService()) {
+                $this->doQuestionService($commandInfo, $metaAttribute, $serviceClass);
+            } elseif ($metaAttribute->isBool()) {
+                $value = $this->confirm($metaAttribute->getQuestion(), $metaAttribute->getValue() !== false);
+                $metaAttribute->setValue($value);
+            } else {
+                $this->doQuestion($metaAttribute);
+            }
+        }
     }
 
-    protected function askNullable(AbstractProperty $metaProperty)
+    protected function doQuestionService(CommandInfo $commandInfo, MetaAttribute $metaAttribute, string $serviceClass)
     {
-        if (!$this->commandInfo->generatorConfig->askNullable()
-            || $metaProperty instanceof OneToManyProperty
-            || $metaProperty instanceof ManyToManyProperty
-            || $this->commandInfo->metaEntity->getIdProperty() === $metaProperty
-        ) {
-            return;
+        $questionService = $this->container->get($serviceClass);
+        if (!$questionService instanceof AttributeQuestionInterface) {
+            throw new \RuntimeException(sprintf('Service "%s" does not implement "%s"', $questionService, AttributeQuestionInterface::class));
         }
-        $nullable = $this->confirm('Nullable', $metaProperty->isNullable() ? true : false);
-        $metaProperty->setNullable($nullable);
+        $questionService->doQuestion($commandInfo, $metaAttribute);
     }
 
-    protected function askUnique(AbstractProperty $metaProperty)
+    protected function doQuestion(MetaAttribute $metaAttribute)
     {
-        if (!$this->commandInfo->generatorConfig->askUnique()
-            || $metaProperty instanceof OneToManyProperty
-            || $metaProperty instanceof ManyToManyProperty
-            || $this->commandInfo->metaEntity->getIdProperty() === $metaProperty
-        ) {
-            return;
-        }
-        $unique = $this->confirm('Unique', $metaProperty->isUnique() ? true : false);
-        $metaProperty->setUnique($unique);
+        $question = $metaAttribute->getQuestion() . ($metaAttribute->isNullable() ? ' (optional)': '');
+
+        $value = $this->ask($question, $metaAttribute->getValue(), function ($value) use ($metaAttribute) {
+            if (!$metaAttribute->isNullable() && $value === null) {
+                throw new \InvalidArgumentException('This value cannot be null');
+            }
+            if ($metaAttribute->isInt()) {
+                if ($value !== null && !is_numeric($value)) {
+                    throw new \InvalidArgumentException('This value must be a number');
+                }
+                $value = (int) $value;
+            }
+
+            if ($validation = $metaAttribute->getValidation()) {
+                $validationResult = $this->evaluate($metaAttribute, $validation);
+                if (!$validationResult) {
+                    throw new \InvalidArgumentException(sprintf('Value evaluated false by validation expression "%s"', $metaAttribute->getValidation()));
+                }
+            }
+            return $value;
+        });
+        $metaAttribute->setValue($value);
     }
 
-    protected function askId(AbstractProperty $metaProperty)
+    protected function evaluate(MetaAttribute $metaAttribute, string $expression)
     {
-        $currentId = $this->commandInfo->metaEntity->getIdProperty();
-        if (!$this->commandInfo->generatorConfig->askId()
-            || !$metaProperty instanceof AbstractPrimitiveProperty
-            || ($currentId !== null && $currentId !== $metaProperty)
-        ) {
-            return;
-        }
-        $id = $this->confirm('Id', $metaProperty->isId() ? true : false);
-        $metaProperty->setId($id);
-    }
-
-    protected function askLength(AbstractProperty $metaProperty)
-    {
-        if (!$this->commandInfo->generatorConfig->askLength() || !$metaProperty instanceof HasLengthInterface) {
-            return;
-        }
-        $length = $this->ask('Length (optional)', $metaProperty->getLength());
-        $metaProperty->setLength($length ? (int) $length : null);
-    }
-
-    protected function askPrecision(AbstractProperty $metaProperty)
-    {
-        if (!$this->commandInfo->generatorConfig->askPrecision() || !$metaProperty instanceof DecimalProperty) {
-            return;
-        }
-        $precision = $this->ask('Precision (optional)', $metaProperty->getPrecision());
-        $metaProperty->setPrecision($precision ? (int) $precision : null);
-    }
-
-    protected function askScale(AbstractProperty $metaProperty)
-    {
-        if (!$this->commandInfo->generatorConfig->askScale() || !$metaProperty instanceof DecimalProperty) {
-            return;
-        }
-        $scale = $this->ask('Scale (optional)', $metaProperty->getScale());
-        $metaProperty->setScale($scale ? (int) $scale : null);
-    }
-
-    protected function askTargetEntity(AbstractProperty $metaProperty)
-    {
-        if (!$this->commandInfo->generatorConfig->askTargetEntity() || !$metaProperty instanceof AbstractRelationshipProperty) {
-            return;
-        }
-        $options = $this->entityFinder->getExistingEntities();
-        $this->outputOptions($options);
-        $question = new Question('Target entity', $metaProperty->getTargetEntity());
-        $question->setAutocompleterValues($options);
-        $targetEntity = $this->askQuestion($question);
-        $metaProperty->setTargetEntity($targetEntity);
-    }
-
-    protected function askInversedBy(AbstractProperty $metaProperty)
-    {
-        if (!$this->commandInfo->generatorConfig->askInversedBy()
-            || !$metaProperty instanceof AbstractRelationshipProperty
-            || $metaProperty instanceof OneToManyProperty
-        ) {
-            return;
-        }
-        $inversedBy = $this->ask('Inversed by', $metaProperty->getInversedBy());
-        $metaProperty->setInversedBy($inversedBy);
-    }
-
-    protected function askMappedBy(AbstractProperty $metaProperty)
-    {
-        if (!$this->commandInfo->generatorConfig->askMappedBy()
-            || !$metaProperty instanceof AbstractRelationshipProperty
-            || $metaProperty->getInversedBy()
-            || $metaProperty instanceof ManyToOneProperty
-        ) {
-            return;
-        }
-        $mappedBy = $this->ask('Mapped by', $metaProperty->getMappedBy());
-        $metaProperty->setMappedBy($mappedBy);
+        return $this->expressionLanguage->evaluate($expression, [
+            'this' => $metaAttribute,
+            'metaProperty' => $metaAttribute->getMetaProperty(),
+            'metaEntity' => $metaAttribute->getMetaProperty()->getMetaEntity(),
+            'generatorConfig' => $this->commandInfo->generatorConfig,
+        ]);
     }
 }

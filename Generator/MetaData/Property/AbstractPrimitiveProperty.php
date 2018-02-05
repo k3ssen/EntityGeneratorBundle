@@ -7,26 +7,22 @@ use Doctrine\Common\Inflector\Inflector;
 
 abstract class AbstractPrimitiveProperty extends AbstractProperty
 {
-    /** @var bool */
-    protected $id = false;
-
     /** @var mixed */
     protected $default;
 
     public function isId(): ?bool
     {
-        return $this->id;
+        return $this->getAttribute('id');
     }
 
     public function setId(bool $id)
     {
-        $this->id = $id;
-        return $this;
+        return $this->setAttribute('id', $id);
     }
 
     public function getDefault()
     {
-        return $this->default;
+        return $this->getAttribute('default');
     }
 
     /**
@@ -35,8 +31,7 @@ abstract class AbstractPrimitiveProperty extends AbstractProperty
      */
     public function setDefault($default)
     {
-        $this->default = $default;
-        return $this;
+        return $this->setAttribute('default', $default);
     }
 
     public function getAnnotationLines(): array
