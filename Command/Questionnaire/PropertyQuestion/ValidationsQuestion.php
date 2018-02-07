@@ -1,8 +1,9 @@
 <?php
 declare(strict_types=1);
 
-namespace Kevin3ssen\EntityGeneratorBundle\Command\Helper;
+namespace Kevin3ssen\EntityGeneratorBundle\Command\Questionnaire\PropertyQuestion;
 
+use Kevin3ssen\EntityGeneratorBundle\Command\Helper\CommandInfo;
 use Kevin3ssen\EntityGeneratorBundle\Generator\MetaData\MetaValidation;
 use Kevin3ssen\EntityGeneratorBundle\Generator\MetaData\MetaValidationFactory;
 use Kevin3ssen\EntityGeneratorBundle\Generator\MetaData\Property\AbstractProperty;
@@ -21,12 +22,11 @@ use Kevin3ssen\EntityGeneratorBundle\Generator\MetaData\Property\TimeProperty;
 use Symfony\Component\Console\Question\Question;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Constraints;
+use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 use Symfony\Component\Validator\Exception\MissingOptionsException;
 
-class ValidationQuestionHelper
+class ValidationsQuestion implements PropertyQuestionInterface
 {
-    use QuestionTrait;
-
     protected const ACTION_VALIDATION_STOP = 0;
     protected const ACTION_VALIDATION_ADD = 1;
     protected const ACTION_VALIDATION_EDIT = 2;
@@ -40,11 +40,9 @@ class ValidationQuestionHelper
         $this->metaValidationFactory = $metaValidationFactory;
     }
 
-    public function validationAction(CommandInfo $commandInfo, AbstractProperty $metaProperty)
+    public function doQuestion(CommandInfo $commandInfo, AbstractProperty $metaProperty)
     {
-        $this->commandInfo = $commandInfo;
-
-        if (!$commandInfo->generatorConfig->askValidations()) {
+        if (!$commandInfo->getGeneratorConfig()->askValidations()) {
             return;
         }
 
@@ -57,27 +55,27 @@ class ValidationQuestionHelper
         if (!$metaProperty->getValidations()->count()) {
             unset($actionChoices[static::ACTION_VALIDATION_EDIT], $actionChoices[static::ACTION_VALIDATION_REMOVE]);
         }
-        $nextAction = $this->getIo()->choice('Validations' , $actionChoices);
+        $nextAction = $commandInfo->getIo()->choice('Validations' , $actionChoices);
         $nextAction = array_search($nextAction, $actionChoices);
 
         if ($nextAction === static::ACTION_VALIDATION_STOP) {
             return;
         }
         if ($nextAction === static::ACTION_VALIDATION_REMOVE) {
-            $metaValidation = $this->askMetaPropertyValidationChoice($metaProperty);
+            $metaValidation = $this->askMetaPropertyValidationChoice($commandInfo, $metaProperty);
             $metaValidation->getMetaProperty()->removeValidation($metaValidation);
             unset($metaValidation);
-            $this->validationAction($commandInfo, $metaProperty);
+            $this->doQuestion($commandInfo, $metaProperty);
             return;
         }
         if ($nextAction === static::ACTION_VALIDATION_EDIT) {
-            $metaValidation = $this->askMetaPropertyValidationChoice($metaProperty);
+            $metaValidation = $this->askMetaPropertyValidationChoice($commandInfo, $metaProperty);
             $validationOptions = get_class_vars($metaValidation->getClassName());
             $requiredOptions = $metaValidation->getOptions();
         } else {
-            $validationClass = $this->askValidationChoice($metaProperty);
+            $validationClass = $this->askValidationChoice($commandInfo, $metaProperty);
             if (!$validationClass) {
-                $this->validationAction($commandInfo, $metaProperty);
+                $this->doQuestion($commandInfo, $metaProperty);
             }
             $validationOptions = get_class_vars($validationClass);
             $requiredOptions = $this->getValidationRequiredOptions($validationClass);
@@ -87,13 +85,13 @@ class ValidationQuestionHelper
                 if (!array_key_exists($requiredOption, $validationOptions)) {
                     throw new \RuntimeException(sprintf('Something unexpected went wrong: the required option %s does not exist in validationOptions: %s', $requiredOption, implode(',', array_keys($validationOptions))));
                 }
-                $customValidationOptions[$requiredOption] = $this->askValidationOptionValue($requiredOption, $validationOptions[$requiredOption]);
+                $customValidationOptions[$requiredOption] = $this->askValidationOptionValue($commandInfo, $requiredOption, $validationOptions[$requiredOption]);
             }
             $metaValidation = $this->metaValidationFactory->createMetaValidation($metaProperty, $validationClass, $customValidationOptions);
-            $this->saveTemporaryFile();
+            $commandInfo->saveTemporaryFile();
         }
 
-        if (!$commandInfo->generatorConfig->showAllValidationOptions()) {
+        if (!$commandInfo->getGeneratorConfig()->showAllValidationOptions()) {
             foreach ($validationOptions as $key => $validationOption) {
                 if (!array_key_exists($key, $requiredOptions)) {
                     unset($validationOptions[$key]);
@@ -102,22 +100,22 @@ class ValidationQuestionHelper
         }
         if (count($validationOptions)) {
             do {
-                $editValidationOptionChoice = $this->getIo()->choice('Choose option to edit (optional)', array_merge([null], array_keys($validationOptions)));
+                $editValidationOptionChoice = $commandInfo->getIo()->choice('Choose option to edit (optional)', array_merge([null], array_keys($validationOptions)));
                 if ($editValidationOptionChoice) {
                     $defaultValidationOptionValue = $metaValidation->getOptions()[$editValidationOptionChoice] ?? $validationOptions[$editValidationOptionChoice];
-                    $customValidationOptions[$editValidationOptionChoice] = $this->askValidationOptionValue($editValidationOptionChoice, $defaultValidationOptionValue);
+                    $customValidationOptions[$editValidationOptionChoice] = $this->askValidationOptionValue($commandInfo, $editValidationOptionChoice, $defaultValidationOptionValue);
                     $metaValidation->setOptions($customValidationOptions);
-                    $this->saveTemporaryFile();
+                    $commandInfo->saveTemporaryFile();
                 }
             } while ($editValidationOptionChoice);
         }
-        $this->validationAction($commandInfo, $metaProperty);
+        $this->doQuestion($commandInfo, $metaProperty);
     }
 
-    protected function askMetaPropertyValidationChoice(AbstractProperty $metaProperty): MetaValidation
+    protected function askMetaPropertyValidationChoice(CommandInfo $commandInfo, AbstractProperty $metaProperty): MetaValidation
     {
         $validations = $metaProperty->getValidations();
-        $validationChoice = $this->getIo()->choice('Edit validation', $validations->toArray());
+        $validationChoice = $commandInfo->getIo()->choice('Edit validation', $validations->toArray());
         foreach ($validations as $validation) {
             if ($validation->getClassName() === $validationChoice) {
                 return $validation;
@@ -126,9 +124,9 @@ class ValidationQuestionHelper
         throw new \RuntimeException(sprintf('No property found for choice %s', $validationChoice));
     }
 
-    protected function askValidationOptionValue($validationOption, $defaultValue)
+    protected function askValidationOptionValue(CommandInfo $commandInfo, $validationOption, $defaultValue)
     {
-        return $this->ask($validationOption, $defaultValue, function ($value) {
+        return $commandInfo->getIo()->ask($validationOption, $defaultValue, function ($value) {
             if (is_numeric($value)) {
                 return (int) $value;
             }
@@ -153,14 +151,16 @@ class ValidationQuestionHelper
             $requiredOptions = $validation->getRequiredOptions();
         } catch (MissingOptionsException $exception) {
             $requiredOptions = $exception->getOptions();
+        } catch(ConstraintDefinitionException $exception) {
+            $requiredOptions = ['value'];
         }
         return $requiredOptions;
     }
 
-    protected function askValidationChoice(AbstractProperty $metaProperty = null)
+    protected function askValidationChoice(CommandInfo $commandInfo, AbstractProperty $metaProperty = null)
     {
         $options = $this->getConstraintOptions($metaProperty);
-        $this->outputOptions($options);
+        $commandInfo->getIo()->listing($options);
         $question = new Question('Add validation (optional)');
         $optionValues = array_values($options);
         $question->setAutocompleterValues(array_merge($optionValues, array_map('lcfirst', $optionValues), array_map('strtolower', $optionValues)));
@@ -172,7 +172,7 @@ class ValidationQuestionHelper
             }
             return $choice;
         });
-        $validationChoice = $this->askQuestion($question);
+        $validationChoice = $commandInfo->getIo()->askQuestion($question);
         return array_search($validationChoice, $options);
     }
 
@@ -274,5 +274,4 @@ class ValidationQuestionHelper
 
         return $blackList;
     }
-
 }

@@ -1,18 +1,19 @@
 <?php
 declare(strict_types=1);
 
-namespace Kevin3ssen\EntityGeneratorBundle\Command\Helper;
+namespace Kevin3ssen\EntityGeneratorBundle\Command\Questionnaire\PropertyQuestion;
 
+use Kevin3ssen\EntityGeneratorBundle\Command\Helper\AttributesExpressionLanguageProvider;
+use Kevin3ssen\EntityGeneratorBundle\Command\Helper\CommandInfo;
+use Kevin3ssen\EntityGeneratorBundle\Command\Questionnaire\AttributeQuestion\AttributeQuestionInterface;
 use Kevin3ssen\EntityGeneratorBundle\Generator\MetaData\MetaAttribute;
 use Kevin3ssen\EntityGeneratorBundle\Generator\MetaData\MetaAttributeFactory;
 use Kevin3ssen\EntityGeneratorBundle\Generator\MetaData\Property\AbstractProperty;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 
-class FieldAttributesQuestionHelper
+class AttributesQuestion implements PropertyQuestionInterface
 {
-    use QuestionTrait;
-
     /** @var MetaAttributeFactory */
     protected $metaAttributeFactory;
 
@@ -30,18 +31,17 @@ class FieldAttributesQuestionHelper
         $this->metaAttributeFactory = $metaAttributeFactory;
         $this->container = $container;
         $this->expressionLanguage = new ExpressionLanguage(null, [$attributesExpressionLanguageProvider]);
+
     }
 
-    public function setAttributes(CommandInfo $commandInfo, AbstractProperty $metaProperty)
+    public function doQuestion(CommandInfo $commandInfo, AbstractProperty $metaProperty = null)
     {
-        $this->commandInfo = $commandInfo;
-
         foreach ($metaProperty->getMetaAttributes() as $metaAttribute) {
             if ($metaAttribute->getValueIsSetByUserInput()) {
                 continue;
             }
             if ($condition = $metaAttribute->getCondition()) {
-                $conditionResult = $this->evaluate($metaAttribute, $condition);
+                $conditionResult = $this->evaluate($commandInfo, $metaAttribute, $condition);
                 if ($conditionResult === false) {
                     continue;
                 }
@@ -50,10 +50,10 @@ class FieldAttributesQuestionHelper
             if ($serviceClass = $metaAttribute->getQuestionService()) {
                 $this->doQuestionService($commandInfo, $metaAttribute, $serviceClass);
             } elseif ($metaAttribute->isBool()) {
-                $value = $this->confirm($metaAttribute->getQuestion(), $metaAttribute->getValue() !== false);
+                $value = $commandInfo->getIo()->confirm($metaAttribute->getQuestion(), $metaAttribute->getValue() !== false);
                 $metaAttribute->setValue($value);
             } else {
-                $this->doQuestion($metaAttribute);
+                $this->doSingleAttributeQuestion($commandInfo, $metaAttribute);
             }
         }
     }
@@ -67,11 +67,11 @@ class FieldAttributesQuestionHelper
         $questionService->doQuestion($commandInfo, $metaAttribute);
     }
 
-    protected function doQuestion(MetaAttribute $metaAttribute)
+    protected function doSingleAttributeQuestion(CommandInfo $commandInfo, MetaAttribute $metaAttribute)
     {
         $question = $metaAttribute->getQuestion() . ($metaAttribute->isNullable() ? ' (optional)': '');
 
-        $value = $this->ask($question, $metaAttribute->getValue(), function ($value) use ($metaAttribute) {
+        $value = $commandInfo->getIo()->ask($question, $metaAttribute->getValue(), function ($value) use ($metaAttribute, $commandInfo) {
             if (!$metaAttribute->isNullable() && $value === null) {
                 throw new \InvalidArgumentException('This value cannot be null');
             }
@@ -83,7 +83,7 @@ class FieldAttributesQuestionHelper
             }
 
             if ($validation = $metaAttribute->getValidation()) {
-                $validationResult = $this->evaluate($metaAttribute, $validation);
+                $validationResult = $this->evaluate($commandInfo, $metaAttribute, $validation);
                 if (!$validationResult) {
                     throw new \InvalidArgumentException(sprintf('Value evaluated false by validation expression "%s"', $metaAttribute->getValidation()));
                 }
@@ -93,13 +93,13 @@ class FieldAttributesQuestionHelper
         $metaAttribute->setValue($value);
     }
 
-    protected function evaluate(MetaAttribute $metaAttribute, string $expression)
+    protected function evaluate(CommandInfo $commandInfo, MetaAttribute $metaAttribute, string $expression)
     {
         return $this->expressionLanguage->evaluate($expression, [
             'this' => $metaAttribute,
             'metaProperty' => $metaAttribute->getMetaProperty(),
             'metaEntity' => $metaAttribute->getMetaProperty()->getMetaEntity(),
-            'generatorConfig' => $this->commandInfo->generatorConfig,
+            'generatorConfig' => $commandInfo->getGeneratorConfig(),
         ]);
     }
 }

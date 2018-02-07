@@ -1,80 +1,65 @@
 <?php
 declare(strict_types=1);
 
-namespace Kevin3ssen\EntityGeneratorBundle\Command\Helper;
+namespace Kevin3ssen\EntityGeneratorBundle\Command\Questionnaire\PropertyQuestion;
 
 use Doctrine\Common\Util\Inflector;
 use Doctrine\DBAL\Types\Type;
+use Kevin3ssen\EntityGeneratorBundle\Command\Helper\CommandInfo;
+use Kevin3ssen\EntityGeneratorBundle\Command\Helper\EntityFinder;
+use Kevin3ssen\EntityGeneratorBundle\Generator\MetaData\MetaPropertyFactory;
 use Kevin3ssen\EntityGeneratorBundle\Generator\MetaData\Property\AbstractProperty;
 use Kevin3ssen\EntityGeneratorBundle\Generator\MetaData\Property\AbstractRelationshipProperty;
-use Kevin3ssen\EntityGeneratorBundle\Generator\MetaData\MetaPropertyFactory;
 
-class FieldQuestionHelper
+class NameAndTypeQuestion implements PropertyQuestionInterface
 {
-    use QuestionTrait;
     /** @var EntityFinder */
     protected $entityFinder;
     /** @var MetaPropertyFactory */
     protected $metaPropertyFactory;
-    /** @var FieldAttributesQuestionHelper */
-    protected $fieldAttributesQuestionHelper;
     /** @var string */
     protected $guessedEntity;
-    /** @var ValidationQuestionHelper */
-    protected $validationQuestionHelper;
 
     public function __construct(
         EntityFinder $entityFinder,
-        MetaPropertyFactory $metaPropertyFactory,
-        FieldAttributesQuestionHelper $fieldAttributesQuestionHelper,
-        ValidationQuestionHelper $validationQuestionHelper
-
+        MetaPropertyFactory $metaPropertyFactory
     ) {
-        $this->entityFinder = $entityFinder;
         $this->metaPropertyFactory = $metaPropertyFactory;
-        $this->fieldAttributesQuestionHelper = $fieldAttributesQuestionHelper;
-        $this->validationQuestionHelper = $validationQuestionHelper;
+        $this->entityFinder = $entityFinder;
     }
 
-    public function makeField(CommandInfo $commandInfo, AbstractProperty $metaProperty = null): ?AbstractProperty
+    public function doQuestion(CommandInfo $commandInfo, AbstractProperty $metaProperty = null)
     {
-        $this->commandInfo = $commandInfo;
         if ($metaProperty) {
-            $this->getIo()->text(sprintf('<info>Edit field:</info> %s', $metaProperty->getName()));
-            $fieldName = $this->ask('Field name', $metaProperty->getName());
+            $fieldName = $commandInfo->getIo()->ask('Field name', $metaProperty->getName());
             $metaProperty->setName($fieldName);
         } else {
-            $fieldName = $this->ask('New field name (optional)');
+            $fieldName = $commandInfo->getIo()->ask('New field name (optional)');
             if (!$fieldName) {
                 return null;
             }
         }
-        $metaProperty = $this->askFieldType($fieldName, $metaProperty);
+        $metaProperty = $this->askFieldType($commandInfo, $fieldName, $metaProperty);
         $metaProperty->getMetaAttribute('name')->setValueIsSetByUserInput();
-
-        $this->fieldAttributesQuestionHelper->setAttributes($commandInfo, $metaProperty);
-        $this->validationQuestionHelper->validationAction($commandInfo, $metaProperty);
-
-        return $metaProperty;
     }
 
-    protected function askFieldType(string $fieldName, AbstractProperty $metaProperty = null): AbstractProperty
+    protected function askFieldType(CommandInfo $commandInfo, string $fieldName, AbstractProperty $metaProperty = null): AbstractProperty
     {
         $typeOptions = $this->metaPropertyFactory->getAliasedTypeOptions();
         $defaultType = $metaProperty ? $metaProperty->getOrmType() : $this->guessFieldType($fieldName);
-        $type = $this->getIo()->choice('Field type', $typeOptions, $defaultType);
+        $type = $commandInfo->getIo()->choice('Field type', $typeOptions, $defaultType);
         $type = $typeOptions[$type] ?? $type;
         if ($metaProperty) {
             if ($metaProperty->getOrmType() === $type) {
                 return $metaProperty;
             }
-            if ($this->commandInfo->metaEntity->getDisplayProperty() === $metaProperty) {
-                $this->commandInfo->metaEntity->setDisplayProperty(null);
+            if ($commandInfo->getMetaEntity()->getDisplayProperty() === $metaProperty) {
+                $commandInfo->getMetaEntity()->setDisplayProperty(null);
             }
             $metaProperty->getMetaEntity()->removeProperty($metaProperty);
         }
 
-        $metaProperty = $this->metaPropertyFactory->getMetaProperty($this->commandInfo->metaEntity, $type, $fieldName);
+        $metaProperty = $this->metaPropertyFactory->getMetaProperty($commandInfo->getMetaEntity(), $type, $fieldName);
 
         if ($metaProperty instanceof AbstractRelationshipProperty && $this->guessedEntity) {
             $metaProperty->setTargetEntity($this->guessedEntity);
@@ -108,7 +93,7 @@ class FieldQuestionHelper
         } if ($this->guessFieldIsOneToMany($columnName)) {
             return MetaPropertyFactory::ONE_TO_MANY;
         }
-        return Type::STRING;
+            return Type::STRING;
     }
 
     protected function guessFieldIsOneToMany(string $name): bool

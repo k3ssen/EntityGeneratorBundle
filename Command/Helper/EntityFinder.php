@@ -10,7 +10,6 @@ use Doctrine\ORM\Mapping\ClassMetadataFactory;
 
 class EntityFinder
 {
-    use QuestionTrait;
     /** @var ClassMetadataFactory */
     protected $classMetadataFactory;
 

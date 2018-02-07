@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace Kevin3ssen\EntityGeneratorBundle\Generator\MetaData;
 
-use Kevin3ssen\EntityGeneratorBundle\Command\Helper\AttributeQuestionInterface;
+use Kevin3ssen\EntityGeneratorBundle\Command\Questionnaire\AttributeQuestion\AttributeQuestionInterface;
 
 class MetaAttributeFactory
 {
