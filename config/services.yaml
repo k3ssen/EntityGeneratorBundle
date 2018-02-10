@@ -2,118 +2,125 @@ parameters:
     attributes:
         name: {}
         id:
-            class: 'Kevin3ssen\EntityGeneratorBundle\Generator\MetaData\Property\AbstractPrimitiveProperty'
+            meta_properties: 'Kevin3ssen\EntityGeneratorBundle\MetaData\Property\AbstractPrimitiveProperty'
             type: 'bool'
             default: false
-            condition: 'metaEntity.getIdProperty() == null or metaEntity.getIdProperty() != metaProperty'
         unique:
-            class: 'Kevin3ssen\EntityGeneratorBundle\Generator\MetaData\Property\AbstractPrimitiveProperty'
+            meta_properties: 'Kevin3ssen\EntityGeneratorBundle\MetaData\Property\AbstractPrimitiveProperty'
             type: 'bool'
             default: false
-            condition: 'metaProperty.isId() == false'
         nullable:
             type: 'bool'
             default: false
         length:
-            class: 'Kevin3ssen\EntityGeneratorBundle\Generator\MetaData\Property\HasLengthInterface'
+            meta_properties: 'Kevin3ssen\EntityGeneratorBundle\MetaData\Property\HasLengthInterface'
             type: 'int'
         precision:
-            class: 'Kevin3ssen\EntityGeneratorBundle\Generator\MetaData\Property\DecimalProperty'
+            meta_properties: 'Kevin3ssen\EntityGeneratorBundle\MetaData\Property\DecimalProperty'
             type: 'int'
         scale:
-            class: 'Kevin3ssen\EntityGeneratorBundle\Generator\MetaData\Property\DecimalProperty'
+            meta_properties: 'Kevin3ssen\EntityGeneratorBundle\MetaData\Property\DecimalProperty'
             type: 'int'
         targetEntity:
-            class: 'Kevin3ssen\EntityGeneratorBundle\Generator\MetaData\Property\AbstractRelationshipProperty'
-            service: 'Kevin3ssen\EntityGeneratorBundle\Command\Questionnaire\AttributeQuestion\TargetEntityQuestion'
+            meta_properties: 'Kevin3ssen\EntityGeneratorBundle\MetaData\Property\AbstractRelationshipProperty'
         targetEntityNamespace:
-            class: 'Kevin3ssen\EntityGeneratorBundle\Generator\MetaData\Property\AbstractRelationshipProperty'
-            condition: 'false' #effectively this attribute won't be asked
+            meta_properties: 'Kevin3ssen\EntityGeneratorBundle\MetaData\Property\AbstractRelationshipProperty'
         referencedColumnName:
-            class: 'Kevin3ssen\EntityGeneratorBundle\Generator\MetaData\Property\AbstractRelationshipProperty'
+            meta_properties: 'Kevin3ssen\EntityGeneratorBundle\MetaData\Property\AbstractRelationshipProperty'
             default: 'id'
-            condition: 'false' #effectively this attribute won't be asked
         orphanRemoval:
-            class:
-                - 'Kevin3ssen\EntityGeneratorBundle\Generator\MetaData\Property\ManyToManyProperty'
-                - 'Kevin3ssen\EntityGeneratorBundle\Generator\MetaData\Property\OneToManyProperty'
+            meta_properties:
+                - 'Kevin3ssen\EntityGeneratorBundle\MetaData\Property\ManyToManyProperty'
+                - 'Kevin3ssen\EntityGeneratorBundle\MetaData\Property\OneToManyProperty'
             default: false
-            condition: 'false' #effectively this attribute won't be asked
         inversedBy:
-            class:
-                - 'Kevin3ssen\EntityGeneratorBundle\Generator\MetaData\Property\ManyToOneProperty'
-                - 'Kevin3ssen\EntityGeneratorBundle\Generator\MetaData\Property\OneToOneProperty'
-                - 'Kevin3ssen\EntityGeneratorBundle\Generator\MetaData\Property\ManyToManyProperty'
-            condition: 'metaProperty.getMappedBy() == null'
+            meta_properties:
+                - 'Kevin3ssen\EntityGeneratorBundle\MetaData\Property\ManyToOneProperty'
+                - 'Kevin3ssen\EntityGeneratorBundle\MetaData\Property\OneToOneProperty'
+                - 'Kevin3ssen\EntityGeneratorBundle\MetaData\Property\ManyToManyProperty'
         mappedBy:
-            class:
-                - 'Kevin3ssen\EntityGeneratorBundle\Generator\MetaData\Property\OneToManyProperty'
-                - 'Kevin3ssen\EntityGeneratorBundle\Generator\MetaData\Property\OneToOneProperty'
-                - 'Kevin3ssen\EntityGeneratorBundle\Generator\MetaData\Property\ManyToManyProperty'
-            condition: 'metaProperty.getInversedBy() == null'
+            meta_properties:
+                - 'Kevin3ssen\EntityGeneratorBundle\MetaData\Property\OneToManyProperty'
+                - 'Kevin3ssen\EntityGeneratorBundle\MetaData\Property\OneToOneProperty'
+                - 'Kevin3ssen\EntityGeneratorBundle\MetaData\Property\ManyToManyProperty'
 
 services:
     _defaults:
         autowire: true
         autoconfigure: true
         public: false
+        bind:
+            $attributes: '%attributes%'
+            $entityQuestions: !tagged entity_generator.entity_question
+            $propertyQuestions: !tagged entity_generator.property_question
+            $attributeQuestions: !tagged entity_generator.attribute_question
+            $overrideSkeletonPath: '%entity_generator.override_skeleton_path%'
+            $autoGenerateRepository: '%entity_generator.auto_generate_repository%'
 
     Kevin3ssen\EntityGeneratorBundle\:
         resource: '../*'
         exclude: '../{Entity,Migrations,Tests}'
 
-    Kevin3ssen\EntityGeneratorBundle\Command\Questionnaire\EntityQuestionnaire:
-        arguments:
-            $entityQuestions: !tagged entity_generator.entity_question
-
     #Entity questions
-    Kevin3ssen\EntityGeneratorBundle\Command\Questionnaire\EntityQuestion\EntityNameQuestion:
+    Kevin3ssen\EntityGeneratorBundle\Command\EntityQuestion\EntityNameQuestion:
         tags: [{ name: entity_generator.entity_question, priority: 99 }]  #MUST be called before any other question!
-    Kevin3ssen\EntityGeneratorBundle\Command\Questionnaire\EntityQuestion\BundleQuestion:
+    Kevin3ssen\EntityGeneratorBundle\Command\EntityQuestion\BundleQuestion:
         tags: [{ name: entity_generator.entity_question, priority: 80 }]
-    Kevin3ssen\EntityGeneratorBundle\Command\Questionnaire\EntityQuestion\SubDirQuestion:
+    Kevin3ssen\EntityGeneratorBundle\Command\EntityQuestion\SubDirQuestion:
         tags: [{ name: entity_generator.entity_question, priority: 70 }]
-    Kevin3ssen\EntityGeneratorBundle\Command\Questionnaire\EntityQuestion\FieldsQuestion:
+    Kevin3ssen\EntityGeneratorBundle\Command\EntityQuestion\FieldsQuestion:
         tags: [{ name: entity_generator.entity_question, priority: 50 }]
-        arguments:
-            $propertyQuestions: !tagged entity_generator.property_question
-    Kevin3ssen\EntityGeneratorBundle\Command\Questionnaire\EntityQuestion\DisplayFieldQuestion:
+    Kevin3ssen\EntityGeneratorBundle\Command\EntityQuestion\DisplayFieldQuestion:
         tags: [{ name: entity_generator.entity_question, priority: 40 }] #Only makes sense to call AFTER FieldsQuestion
-    Kevin3ssen\EntityGeneratorBundle\Command\Questionnaire\EntityQuestion\StatusQuestion:
+    Kevin3ssen\EntityGeneratorBundle\Command\EntityQuestion\StatusQuestion:
         tags: [{ name: entity_generator.entity_question, priority: 10 }]
 
     #Property/Field questions
-    Kevin3ssen\EntityGeneratorBundle\Command\Questionnaire\PropertyQuestion\NameAndTypeQuestion:
+    Kevin3ssen\EntityGeneratorBundle\Command\PropertyQuestion\NameAndTypeQuestion:
         tags: [{ name: entity_generator.property_question, priority: 99 }] #MUST be called before other propertyQuestions
-    Kevin3ssen\EntityGeneratorBundle\Command\Questionnaire\PropertyQuestion\AttributesQuestion:
+    Kevin3ssen\EntityGeneratorBundle\Command\PropertyQuestion\AttributesQuestion:
         tags: [{ name: entity_generator.property_question, priority: 50 }]
-    Kevin3ssen\EntityGeneratorBundle\Command\Questionnaire\PropertyQuestion\ValidationsQuestion:
+    Kevin3ssen\EntityGeneratorBundle\Command\PropertyQuestion\ValidationsQuestion:
         tags: [{ name: entity_generator.property_question, priority: 30 }]
 
     #Attribute question-services
-    Kevin3ssen\EntityGeneratorBundle\Command\Questionnaire\AttributeQuestion\TargetEntityQuestion:
-        public: true
-
-    Kevin3ssen\EntityGeneratorBundle\Generator\GeneratorConfig:
+    Kevin3ssen\EntityGeneratorBundle\Command\AttributeQuestion\TargetEntityQuestion:
+        tags: [{ name: entity_generator.attribute_question  }]
+        arguments: { $attributeName: 'targetEntity' }
+    attribute_question.id:
+        class: 'Kevin3ssen\EntityGeneratorBundle\Command\AttributeQuestion\BasicAttributeQuestion'
+        tags: [{ name: entity_generator.attribute_question}]
         arguments:
-            $config:
-                attributes: '%attributes%'
+            $attributeName: 'id'
+            $requirementExpression: 'metaEntity.getIdProperty() == null or metaEntity.getIdProperty() != metaProperty'
 
-                traits: '%entity_generator.traits%'
-                override_skeleton_path: '%entity_generator.override_skeleton_path%'
-                auto_generate_repository: '%entity_generator.auto_generate_repository%'
-                use_default_validations: '%entity_generator.use_default_validations%'
-                ask_bundle: '%entity_generator.ask_bundle%'
-                ask_sub_dir: '%entity_generator.ask_sub_dir%'
-                ask_display_field: '%entity_generator.ask_display_field%'
-                ask_id: '%entity_generator.ask_id%'
-                ask_nullable: '%entity_generator.ask_nullable%'
-                ask_unique: '%entity_generator.ask_unique%'
-                ask_length: '%entity_generator.ask_length%'
-                ask_precision: '%entity_generator.ask_precision%'
-                ask_scale: '%entity_generator.ask_scale%'
-                ask_target_entity: '%entity_generator.ask_target_entity%'
-                ask_inversed_by: '%entity_generator.ask_inversed_by%'
-                ask_mapped_by: '%entity_generator.ask_mapped_by%'
-                ask_validations: '%entity_generator.ask_validations%'
-                show_all_validation_options: '%entity_generator.show_all_validation_options%'
+    # NOTE: attribute 'name' won't need an attribute_question service, since this is already handled by property_question 'NameAndTypeQuestion'
+
+    attribute_question.unique:
+        class: 'Kevin3ssen\EntityGeneratorBundle\Command\AttributeQuestion\BasicAttributeQuestion'
+        tags: [{ name: entity_generator.attribute_question  }]
+        arguments: { $attributeName: 'unique'}
+    attribute_question.nullable:
+        class: 'Kevin3ssen\EntityGeneratorBundle\Command\AttributeQuestion\BasicAttributeQuestion'
+        tags: [{ name: entity_generator.attribute_question  }]
+        arguments: { $attributeName: 'nullable'}
+    attribute_question.length:
+        class: 'Kevin3ssen\EntityGeneratorBundle\Command\AttributeQuestion\BasicAttributeQuestion'
+        tags: [{ name: entity_generator.attribute_question  }]
+        arguments: { $attributeName: 'length'}
+    attribute_question.precision:
+        class: 'Kevin3ssen\EntityGeneratorBundle\Command\AttributeQuestion\BasicAttributeQuestion'
+        tags: [{ name: entity_generator.attribute_question  }]
+        arguments: { $attributeName: 'precision'}
+    attribute_question.scale:
+        class: 'Kevin3ssen\EntityGeneratorBundle\Command\AttributeQuestion\BasicAttributeQuestion'
+        tags: [{ name: entity_generator.attribute_question  }]
+        arguments: { $attributeName: 'scale'}
+    attribute_question.inversed_by:
+        class: 'Kevin3ssen\EntityGeneratorBundle\Command\AttributeQuestion\BasicAttributeQuestion'
+        tags: [{ name: entity_generator.attribute_question  }]
+        arguments: { $attributeName: 'inversedBy', $requirementExpression: 'metaProperty.getMappedBy() == null'}
+    attribute_question.mapped_by:
+        class: 'Kevin3ssen\EntityGeneratorBundle\Command\AttributeQuestion\BasicAttributeQuestion'
+        tags: [{ name: entity_generator.attribute_question  }]
+        arguments: { $attributeName: 'mappedBy', $requirementExpression: 'metaProperty.getMappedBy() == null'}

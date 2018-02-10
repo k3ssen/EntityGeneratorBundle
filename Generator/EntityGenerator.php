@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace Kevin3ssen\EntityGeneratorBundle\Generator;
 
-use Kevin3ssen\EntityGeneratorBundle\Generator\MetaData\MetaEntity;
+use Kevin3ssen\EntityGeneratorBundle\MetaData\MetaEntity;
 use Kevin3ssen\EntityGeneratorBundle\Twig\IndentLexer;
 use Kevin3ssen\EntityGeneratorBundle\Twig\InflectorExtension;
 use Symfony\Component\Config\Exception\FileLocatorFileNotFoundException;
@@ -14,13 +14,13 @@ class EntityGenerator
 {
     /** @var FileLocator */
     protected $fileLocator;
-    /** @var GeneratorConfig */
-    protected $generatorConfig;
 
-    public function __construct(FileLocator $fileLocator, GeneratorConfig $generatorConfig)
+    protected $overrideSkeletonPath;
+
+    public function __construct(FileLocator $fileLocator, ?string $overrideSkeletonPath)
     {
         $this->fileLocator = $fileLocator;
-        $this->generatorConfig = $generatorConfig;
+        $this->overrideSkeletonPath = $overrideSkeletonPath;
     }
 
     protected function getTargetFile(MetaEntity $metaEntity): string
@@ -40,7 +40,7 @@ class EntityGenerator
     protected function getSkeletonDirs(): array
     {
         $dirs = [];
-        if ($skeletonPath = $this->generatorConfig->getOverrideSkeletonPath()) {
+        if ($skeletonPath = $this->overrideSkeletonPath) {
             try {
                 $dirs[$this->fileLocator->locate($skeletonPath)] = 'App';
             } catch (FileLocatorFileNotFoundException $e) {}

@@ -6,7 +6,7 @@ namespace Kevin3ssen\EntityGeneratorBundle\Tests;
 use Kevin3ssen\EntityGeneratorBundle\Generator\EntityGenerator;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpKernel\Config\FileLocator;
-use Kevin3ssen\EntityGeneratorBundle\Generator\MetaData;
+use Kevin3ssen\EntityGeneratorBundle\MetaData;
 
 class EntityGeneratorTest extends TestCase
 {
