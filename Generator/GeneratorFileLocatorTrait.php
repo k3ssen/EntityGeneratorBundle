@@ -9,7 +9,7 @@ use Kevin3ssen\EntityGeneratorBundle\Twig\InflectorExtension;
 use Symfony\Component\Config\Exception\FileLocatorFileNotFoundException;
 use Symfony\Component\HttpKernel\Config\FileLocator;
 
-trait GeneratorTrait
+trait GeneratorFileLocatorTrait
 {
     /** @var FileLocator */
     protected $fileLocator;

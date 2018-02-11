@@ -47,8 +47,7 @@ class TargetEntityQuestion implements AttributeQuestionInterface
         $targetEntity = $commandInfo->getIo()->askQuestion($question);
 
         if ($namespace = array_search($targetEntity, $options, true)) {
-            $namespaceWithoutEntityName = str_replace('\\'.$targetEntity, '', $namespace);
-            $metaProperty->setTargetEntityNamespace($namespaceWithoutEntityName);
+            $metaProperty->setTargetEntityNamespace($namespace);
             $metaProperty->setTargetEntity($targetEntity);
         } else {
             $this->setTargetEntityAndNamespace($commandInfo, $metaAttribute, $targetEntity);

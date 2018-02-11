@@ -22,7 +22,9 @@ abstract class AbstractRelationshipProperty extends AbstractProperty
 
     public function setTargetEntity(string $targetEntity): self
     {
-        return $this->setAttribute('targetEntity', $targetEntity);
+        $this->setAttribute('targetEntity', $targetEntity);
+        $this->setTargetEntityNamespace($this->getTargetEntityNamespace());
+        return $this;
     }
 
     public function getTargetEntityNamespace(): ?string
@@ -41,6 +43,7 @@ abstract class AbstractRelationshipProperty extends AbstractProperty
 
     public function setTargetEntityNamespace(string $targetEntityNamespace): self
     {
+        $targetEntityNamespace = preg_replace('/\\\\'.$this->getTargetEntity().'$/', '', $targetEntityNamespace);
         $this->setAttribute('targetEntityNamespace', $targetEntityNamespace);
         if ($targetEntityNamespace !== $this->getMetaEntity()->getNamespace()) {
             $this->getMetaEntity()->addUsage($this->getTargetEntityFullClassName());

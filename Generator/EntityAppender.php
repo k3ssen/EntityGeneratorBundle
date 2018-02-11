@@ -3,39 +3,22 @@ declare(strict_types=1);
 
 namespace Kevin3ssen\EntityGeneratorBundle\Generator;
 
-use Doctrine\ORM\Mapping\ManyToOne;
-use Doctrine\ORM\Mapping\OneToMany;
-use Kevin3ssen\EntityGeneratorBundle\Command\Helper\EntityFinder;
 use Kevin3ssen\EntityGeneratorBundle\MetaData\MetaEntity;
-use Kevin3ssen\EntityGeneratorBundle\MetaData\MetaPropertyFactory;
-use Kevin3ssen\EntityGeneratorBundle\MetaData\Property\AbstractRelationshipProperty;
-use Kevin3ssen\EntityGeneratorBundle\MetaData\Property\ManyToManyProperty;
 use Symfony\Component\HttpKernel\Config\FileLocator;
 
 class EntityAppender
 {
-    use GeneratorTrait;
-
-    /** @var EntityFinder */
-    protected $entityFinder;
+    use GeneratorFileLocatorTrait;
 
     /** @var EntityGenerator */
     protected $entityGenerator;
 
-    /** @var MetaPropertyFactory */
-    protected $metaPropertyFactory;
-
     public function __construct(
-        MetaPropertyFactory $metaPropertyFactory,
-        EntityFinder $entityFinder,
-        EntityGenerator $entityGenerator,
+        EntityGenerator $missingTargetEntityGenerator,
         FileLocator $fileLocator,
         ?string $overrideSkeletonPath
     ) {
-        $this->metaPropertyFactory = $metaPropertyFactory;
-        //TODO: entityFinder is located in 'command' namespace, which isn't logical
-        $this->entityFinder = $entityFinder;
-        $this->entityGenerator = $entityGenerator;
+        $this->entityGenerator = $missingTargetEntityGenerator;
         $this->fileLocator = $fileLocator;
         $this->overrideSkeletonPath = $overrideSkeletonPath;
     }
@@ -49,52 +32,10 @@ class EntityAppender
         $this->addConstructorContent($pseudoMetaEntity, $currentContent);
         $this->addProperties($pseudoMetaEntity, $currentContent);
         $this->getAddedMethods($pseudoMetaEntity, $currentContent);
-        $addedFiles = $this->createMissingTargetEntities($pseudoMetaEntity);
+        $addedFiles = $this->entityGenerator->generateMissingTargetEntities($pseudoMetaEntity);
 
         file_put_contents($targetFile, $currentContent);
         return array_merge([$targetFile], $addedFiles);
-    }
-
-    protected function createMissingTargetEntities(MetaEntity $pseudoMetaEntity)
-    {
-        $addedFiles = [];
-        foreach ($pseudoMetaEntity->getProperties() as $property) {
-            if (!$property instanceof AbstractRelationshipProperty) {
-                continue;
-            }
-            if (class_exists($property->getTargetEntityFullClassName())) {
-                continue;
-            }
-            $entityNamespace = $property->getTargetEntityFullClassName();
-            $entityName = $property->getTargetEntity();
-            $bundleName = $this->entityFinder->getBundleNameFromEntityNamespace($entityNamespace);
-            $subDir = $this->entityFinder->getSubDirectoryFromEntityNamespace($entityNamespace);
-
-            $metaTargetEntity = new MetaEntity($entityName, $bundleName, $subDir);
-
-            $inversedBy = $property->getInversedBy();
-            $mappedBy = $property->getMappedBy();
-            if ($newPropertyName = $mappedBy ?: $inversedBy) {
-                $inversedType = MetaPropertyFactory::getInversedType($property->getOrmType());
-                /** @var AbstractRelationshipProperty $newProperty */
-                $newProperty = $this->metaPropertyFactory->getMetaProperty(
-                    $metaTargetEntity,
-                    $inversedType,
-                    $newPropertyName
-                );
-                if ($inversedBy) {
-                    $newProperty->setMappedBy($property->getName());
-                } else {
-                    $newProperty->setInversedBy($property->getName());
-                }
-            }
-            $addedFiles[] = $this->entityGenerator->createEntity($metaTargetEntity);
-
-            if ($metaTargetEntity->hasCustomRepository()) {
-                $addedFiles[] = $this->entityGenerator->createRepository($metaTargetEntity);
-            }
-        }
-        return $addedFiles;
     }
 
     protected function addUsages(MetaEntity $pseudoMetaEntity, string &$currentContent)

@@ -13,7 +13,6 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Style\SymfonyStyle;
 
 class EntityCommand extends Command
 {
@@ -48,24 +47,18 @@ class EntityCommand extends Command
     {
         $commandInfo = new CommandInfo($input, $output);
 
-        if ($input->getOption('savepoint')) {
-            $commandInfo->loadMetaEntityFromTemporaryFile();
-        }
         $metaEntity = $this->makeEntity($commandInfo);
 
-        $entityFile = $this->entityGenerator->createEntity($metaEntity);
-        $commandInfo->getIo()->success(sprintf('Generated entity in file %s', $entityFile));
-
-        if ($metaEntity->hasCustomRepository()) {
-            $repoFile = $this->entityGenerator->createRepository($metaEntity);
-            $commandInfo->getIo()->success(sprintf('Generated repository in file %s', $repoFile));
+        $createdFiles = $this->entityGenerator->createEntity($metaEntity);
+        foreach ($createdFiles as $fileName) {
+            $commandInfo->getIo()->success(sprintf('Generated file %s', $fileName));
         }
     }
 
-    public function makeEntity(CommandInfo $commandInfo): ?MetaEntity
+    protected function makeEntity(CommandInfo $commandInfo): ?MetaEntity
     {
-        $useSavePoint = $commandInfo->getMetaEntity() !== null;
-        if ($useSavePoint) {
+        if ($useSavePoint = $commandInfo->getInput()->getOption('savepoint')) {
+            $commandInfo->loadMetaEntityFromTemporaryFile();
             $commandInfo->getIo()->title(sprintf('Use savepoint entity "%s"', (string) $commandInfo->getMetaEntity()));
         }
         $actions = [];
