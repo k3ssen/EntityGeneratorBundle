@@ -1,8 +1,8 @@
 {# @var meta_entity \Kevin3ssen\EntityGeneratorBundle\MetaData\MetaEntity #}
 {# @var property \Kevin3ssen\EntityGeneratorBundle\MetaData\Property\AbstractProperty #}
+{% use '_magic_method_construct.php.twig' %}
 {% block magic_methods %}
-{% block __construct %}{% endblock %}
-{# TODO: bespreken met RUUD: we hebben __toString altijd onderaan. ik vind dit hinderlijk, omdat ik elke keer na generen code handmatig moet verplaatsen #}
+{% block __construct %}{{ parent() }}{% endblock %}
 {% block __toString %}
 {%- if meta_entity.displayProperty %}
 

@@ -1,0 +1,17 @@
+{# @var meta_entity \Kevin3ssen\EntityGeneratorBundle\MetaData\MetaEntity #}
+{# @var property \Kevin3ssen\EntityGeneratorBundle\MetaData\Property\AbstractProperty #}
+{% block __construct %}
+{% for property in meta_entity.collectionProperties %}
+{%- if loop.first and (inner_content_only is not defined or inner_content_only == false) %}
+
+    public function __construct()
+    {
+{%- endif %}
+
+        $this->{{ property.name }} = new ArrayCollection();
+{%- if loop.last and (inner_content_only is not defined or inner_content_only == false) %}
+
+    }
+{% endif %}
+{% endfor %}
+{% endblock %}

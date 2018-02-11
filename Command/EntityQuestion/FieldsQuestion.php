@@ -55,12 +55,14 @@ class FieldsQuestion implements EntityQuestionInterface
         } while(true);
     }
 
-    public function editField(CommandInfo $commandInfo)
+    public function editField(CommandInfo $commandInfo, AbstractProperty $metaProperty = null)
     {
-        $commandInfo->getIo()->section('Edit field');
-        $metaProperty = $this->chooseField($commandInfo);
         if (!$metaProperty) {
-            return;
+            $commandInfo->getIo()->section('Edit field');
+            $metaProperty = $this->chooseField($commandInfo);
+            if (!$metaProperty) {
+                return;
+            }
         }
         foreach ($this->propertyQuestions as $propertyQuestion) {
             $propertyQuestion->doQuestion($commandInfo, $metaProperty);
@@ -68,12 +70,14 @@ class FieldsQuestion implements EntityQuestionInterface
         }
     }
 
-    public function removeField(CommandInfo $commandInfo)
+    public function removeField(CommandInfo $commandInfo, AbstractProperty $metaProperty = null)
     {
-        $commandInfo->getIo()->section('Remove field');
-        $metaProperty = $this->chooseField($commandInfo);
         if (!$metaProperty) {
-            return;
+            $commandInfo->getIo()->section('Remove field');
+            $metaProperty = $this->chooseField($commandInfo);
+            if (!$metaProperty) {
+                return;
+            }
         }
         if ($commandInfo->getMetaEntity()->getDisplayProperty() === $metaProperty) {
             $commandInfo->getMetaEntity()->setDisplayProperty(null);

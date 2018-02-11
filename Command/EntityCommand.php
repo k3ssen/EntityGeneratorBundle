@@ -46,8 +46,6 @@ class EntityCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $io = new SymfonyStyle($input, $output);
-
         $commandInfo = new CommandInfo($input, $output);
 
         if ($input->getOption('savepoint')) {
@@ -56,11 +54,11 @@ class EntityCommand extends Command
         $metaEntity = $this->makeEntity($commandInfo);
 
         $entityFile = $this->entityGenerator->createEntity($metaEntity);
-        $io->success(sprintf('Generated entity in file %s', $entityFile));
+        $commandInfo->getIo()->success(sprintf('Generated entity in file %s', $entityFile));
 
         if ($metaEntity->hasCustomRepository()) {
             $repoFile = $this->entityGenerator->createRepository($metaEntity);
-            $io->success(sprintf('Generated repository in file %s', $repoFile));
+            $commandInfo->getIo()->success(sprintf('Generated repository in file %s', $repoFile));
         }
     }
 

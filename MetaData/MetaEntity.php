@@ -77,6 +77,11 @@ class MetaEntity
         }
     }
 
+    public function getFullClassName(): string
+    {
+        return $this->getNamespace().'\\'.$this->getName();
+    }
+
     public function setBundle(?string $bundle)
     {
         $this->bundle = $bundle;
@@ -109,6 +114,13 @@ class MetaEntity
     public function addUsage($namespace, $alias = null)
     {
         $this->usages[$namespace] = $alias;
+        return $this;
+    }
+
+    public function removeUsage($namespace)
+    {
+        unset($this->usages[$namespace]);
+        return $this;
     }
 
     /**
@@ -175,6 +187,13 @@ class MetaEntity
             $this->getProperties()->removeElement($property);
         }
         return $this;
+    }
+
+    public function getCollectionProperties(): ArrayCollection
+    {
+        return $this->getProperties()->filter(function(AbstractProperty $property){
+            return $property->getReturnType() === 'Collection';
+        });
     }
 
     public function getDisplayProperty(): ?AbstractPrimitiveProperty
