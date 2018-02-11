@@ -69,7 +69,7 @@ class TargetEntityQuestion implements AttributeQuestionInterface
 
             foreach ($this->bundles as $bundleName => $bundleNamespace) {
                 if ($entityBundleName === $bundleName) {
-                    $namespace = $bundleNamespace;
+                    $namespace = $bundleNamespace.'\\Entity';
                 }
             }
             //The default 'App' namespace isn't a bundle, but if you're currently creating an entity in a different bundle

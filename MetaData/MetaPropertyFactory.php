@@ -49,6 +49,22 @@ class MetaPropertyFactory
         ];
     }
 
+    public static function getInversedType($type): string
+    {
+        switch ($type) {
+            case static::MANY_TO_ONE:
+                return static::ONE_TO_MANY;
+            case static::ONE_TO_MANY:
+                return static::MANY_TO_ONE;
+            case static::MANY_TO_MANY:
+                return static::MANY_TO_MANY;
+            case static::ONE_TO_ONE:
+                return static::ONE_TO_ONE;
+            default:
+                throw new \InvalidArgumentException(sprintf('Type "%s" has no inversed type.', $type));
+        }
+    }
+
     public function getAliasedTypeOptions(): array
     {
         return [

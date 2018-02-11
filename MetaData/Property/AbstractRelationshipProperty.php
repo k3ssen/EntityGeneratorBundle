@@ -28,7 +28,7 @@ abstract class AbstractRelationshipProperty extends AbstractProperty
     public function getTargetEntityNamespace(): ?string
     {
         $metaAttribute = $this->getMetaAttributes()->get('targetEntityNamespace');
-        if ($metaAttribute) {
+        if ($metaAttribute && $metaAttribute->getValue()) {
             return $metaAttribute->getValue();
         }
         return $this->getMetaEntity()->getNamespace();

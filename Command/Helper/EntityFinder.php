@@ -13,9 +13,12 @@ class EntityFinder
     /** @var ClassMetadataFactory */
     protected $classMetadataFactory;
 
-    public function __construct(EntityManagerInterface $entityManager)
+    protected $bundles;
+
+    public function __construct(EntityManagerInterface $entityManager, array $bundles)
     {
         $this->classMetadataFactory = $entityManager->getMetadataFactory();
+        $this->bundles = $bundles;
     }
 
     public function findEntityClass(string $name, bool $includeNamespace = false): ?string
@@ -42,5 +45,40 @@ class EntityFinder
             $entities[$meta->getName()] = $meta->reflClass->getShortName();;
         }
         return $this->existingEntities = $entities;
+    }
+
+    public function getEntityNameFromEntityNamespace(string $entityNamespace): string
+    {
+        $parts = explode('\\', $entityNamespace);
+        return array_pop($parts);
+    }
+
+    public function getBundleNameFromEntityNamespace(string $entityNamespace): ?string
+    {
+        $entityBundleNamespace = $this->getBundleNamespaceFromEntityNamespace($entityNamespace);
+        foreach ($this->bundles as $bundleName => $bundleNamespace) {
+            if ($entityBundleNamespace === $bundleNamespace) {
+                return $bundleName;
+            }
+        }
+        return null;
+    }
+
+    public function getBundleNamespaceFromEntityNamespace(string $entityNamespace): ?string
+    {
+        $parts = explode('\\Entity\\', $entityNamespace);
+        return $parts[0];
+    }
+
+    public function getSubDirectoryFromEntityNamespace(string $entityNamespace): ?string
+    {
+        $parts = explode('\\Entity\\', $entityNamespace);
+        $subDirAndEntityName = $parts[1];
+        if (strpos('\\', $subDirAndEntityName) !== false) {
+            $subDirAndEntityNameParts = explode('\\', $subDirAndEntityName);
+            array_pop($subDirAndEntityNameParts);
+            return implode(DIRECTORY_SEPARATOR, $subDirAndEntityNameParts);
+        }
+        return null;
     }
 }

@@ -75,8 +75,11 @@ class EntityAppendCommand extends Command
         $this->checkExistingFields($commandInfo);
         $commandInfo->saveTemporaryFile();
         $this->backupFile($pseudoMetaEntity);
-        $entityFile = $this->entityAppender->appendFields($pseudoMetaEntity);
-        $commandInfo->getIo()->success(sprintf('Updated entity in file %s', $entityFile));
+        $filePaths = $this->entityAppender->appendFields($pseudoMetaEntity);
+        $commandInfo->getIo()->success(sprintf('Updated entity in file %s', array_shift($filePaths)));
+        foreach ($filePaths as $filePath) {
+            $commandInfo->getIo()->success(sprintf('Generated file %s', $filePath));
+        }
         $commandInfo->getIo()->note('If the result is not what you wanted, you can revert this change by using the command "entity:append --revert"');
     }
 
