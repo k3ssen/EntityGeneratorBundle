@@ -7,7 +7,9 @@ use Kevin3ssen\EntityGeneratorBundle\Command\EntityQuestion\FieldsQuestion;
 use Kevin3ssen\EntityGeneratorBundle\Command\Helper\CommandInfo;
 use Kevin3ssen\EntityGeneratorBundle\Command\Helper\EntityFinder;
 use Kevin3ssen\EntityGeneratorBundle\Generator\EntityAppender;
+use Kevin3ssen\EntityGeneratorBundle\Generator\EntityGenerator;
 use Kevin3ssen\EntityGeneratorBundle\MetaData\MetaEntity;
+use Kevin3ssen\EntityGeneratorBundle\MetaData\MetaEntityFactory;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -27,20 +29,26 @@ class EntityAppendCommand extends Command
     /** @var $fieldQuestion */
     protected $fieldsQuestion;
 
-    protected $bundles;
+    /** @var EntityGenerator */
+    protected $entityGenerator;
+
+    /** @var MetaEntityFactory */
+    protected $metaEntityFactory;
 
     public function __construct(
         ?string $name = null,
+        MetaEntityFactory $metaEntityFactory,
         EntityAppender $entityReader,
+        EntityGenerator $entityGenerator,
         EntityFinder $entityFinder,
-        FieldsQuestion $fieldsQuestion,
-        array $bundles
+        FieldsQuestion $fieldsQuestion
     ) {
         parent::__construct($name);
+        $this->metaEntityFactory = $metaEntityFactory;
         $this->entityAppender = $entityReader;
+        $this->entityGenerator = $entityGenerator;
         $this->entityFinder = $entityFinder;
         $this->fieldsQuestion = $fieldsQuestion;
-        $this->bundles = $bundles;
     }
 
     protected function configure()
@@ -68,18 +76,21 @@ class EntityAppendCommand extends Command
             $choices = $this->entityFinder->getExistingEntities();
             $entityFullClassName = $commandInfo->getIo()->choice('Entity', $choices);
 
-            $pseudoMetaEntity = $this->createPseudoMetaEntity($entityFullClassName);
+            $pseudoMetaEntity = $this->metaEntityFactory->createPseudoMetaEntity($entityFullClassName);
             $commandInfo->setMetaEntity($pseudoMetaEntity);
         }
         $this->fieldsQuestion->doQuestion($commandInfo);
         $this->checkExistingFields($commandInfo);
         $commandInfo->saveTemporaryFile();
         $this->backupFile($pseudoMetaEntity);
-        $filePaths = $this->entityAppender->appendFields($pseudoMetaEntity);
-        $commandInfo->getIo()->success(sprintf('Updated entity in file %s', array_shift($filePaths)));
-        foreach ($filePaths as $filePath) {
+
+        $updatedFile = $this->entityAppender->appendFields($pseudoMetaEntity);
+        $commandInfo->getIo()->success(sprintf('Updated entity in file %s', $updatedFile));
+        $addedFiles = $this->entityGenerator->generateMissingTargetEntities($pseudoMetaEntity);
+        foreach ($addedFiles as $filePath) {
             $commandInfo->getIo()->success(sprintf('Generated file %s', $filePath));
         }
+        //TODO: generated files currently cannot be reverted
         $commandInfo->getIo()->note('If the result is not what you wanted, you can revert this change by using the command "entity:append --revert"');
     }
 
@@ -121,37 +132,5 @@ class EntityAppendCommand extends Command
                 }
             }
         };
-    }
-
-    protected function createPseudoMetaEntity(string $entityFullClassName): MetaEntity
-    {
-        $reflector = new \ReflectionClass($entityFullClassName);
-        $pseudoMetaEntity = new MetaEntity($reflector->getShortName());
-
-        $namespaceParts = explode('\\Entity\\', $entityFullClassName);
-        $pseudoMetaEntity->setBundle($this->getBundleName($namespaceParts[0]));
-
-        if (strpos('\\', $namespaceParts[1])) {
-            $dirAndNameParts = explode('\\', $namespaceParts[1]);
-            $entityName = array_pop($dirAndNameParts);
-            if ($entityName !== $pseudoMetaEntity->getName()) {
-                throw new \LogicException(sprintf('
-                    Tried to retrieve bundle, subdirectory and entityName from "%s", but result is incorrect
-                    Expected entity name "%s", but got "%s"
-                ', $entityFullClassName, $pseudoMetaEntity->getName(), $entityName));
-            }
-            $pseudoMetaEntity->setSubDir(implode('/', $dirAndNameParts));
-        }
-        return $pseudoMetaEntity;
-    }
-
-    protected function getBundleName(string $namespaceBeforeEntity): ?string
-    {
-        foreach ($this->bundles as $bundleName => $bundleNamespace) {
-            if ($namespaceBeforeEntity === $bundleNamespace) {
-                return $bundleName;
-            }
-        }
-        return null;
     }
 }

@@ -5,6 +5,7 @@ namespace Kevin3ssen\EntityGeneratorBundle\Generator;
 
 use Kevin3ssen\EntityGeneratorBundle\MetaData\MetaEntity;
 use Kevin3ssen\EntityGeneratorBundle\MetaData\MetaEntityFactory;
+use Kevin3ssen\EntityGeneratorBundle\MetaData\Property\AbstractRelationshipProperty;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpKernel\Config\FileLocator;
 
@@ -15,12 +16,17 @@ class EntityGenerator
     /** @var MetaEntityFactory */
     protected $metaEntityFactory;
 
+    /** @var EntityAppender */
+    protected $entityAppender;
+
     public function __construct(
-        MetaEntityFactory $missingTargetEntityGenerator,
+        MetaEntityFactory $metaEntityFactory,
+        EntityAppender $entityAppender,
         FileLocator $fileLocator,
         ?string $overrideSkeletonPath
     ) {
-        $this->metaEntityFactory = $missingTargetEntityGenerator;
+        $this->entityAppender = $entityAppender;
+        $this->metaEntityFactory = $metaEntityFactory;
         $this->fileLocator = $fileLocator;
         $this->overrideSkeletonPath = $overrideSkeletonPath;
     }
@@ -58,6 +64,19 @@ class EntityGenerator
             }
         }
         return $addedFiles;
+    }
+
+    public function appendMissingInversionsToTargetEntities(MetaEntity $metaEntity): array
+    {
+        $alteredFiles = [];
+        foreach ($metaEntity->getProperties() as $property) {
+            $pseudoMetaEntity = $this->metaEntityFactory->createPseudoMetaEntityForMissingTargetEntityProperty($property);
+            if (!$pseudoMetaEntity) {
+                continue;
+            }
+            $alteredFiles[] =$this->entityAppender->appendFields($pseudoMetaEntity);
+        }
+        return $alteredFiles;
     }
 
     public function createRepository(MetaEntity $metaEntity): string

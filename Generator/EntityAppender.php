@@ -10,20 +10,15 @@ class EntityAppender
 {
     use GeneratorFileLocatorTrait;
 
-    /** @var EntityGenerator */
-    protected $entityGenerator;
-
     public function __construct(
-        EntityGenerator $missingTargetEntityGenerator,
         FileLocator $fileLocator,
         ?string $overrideSkeletonPath
     ) {
-        $this->entityGenerator = $missingTargetEntityGenerator;
         $this->fileLocator = $fileLocator;
         $this->overrideSkeletonPath = $overrideSkeletonPath;
     }
 
-    public function appendFields(MetaEntity $pseudoMetaEntity): array
+    public function appendFields(MetaEntity $pseudoMetaEntity): string
     {
         $targetFile = $this->getTargetFile($pseudoMetaEntity);
         $currentContent = file_get_contents($targetFile);
@@ -32,10 +27,9 @@ class EntityAppender
         $this->addConstructorContent($pseudoMetaEntity, $currentContent);
         $this->addProperties($pseudoMetaEntity, $currentContent);
         $this->getAddedMethods($pseudoMetaEntity, $currentContent);
-        $addedFiles = $this->entityGenerator->generateMissingTargetEntities($pseudoMetaEntity);
 
         file_put_contents($targetFile, $currentContent);
-        return array_merge([$targetFile], $addedFiles);
+        return $targetFile;
     }
 
     protected function addUsages(MetaEntity $pseudoMetaEntity, string &$currentContent)
