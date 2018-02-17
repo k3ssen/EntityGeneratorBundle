@@ -13,7 +13,7 @@ class ManyToManyProperty extends AbstractRelationshipProperty
     public function __construct(MetaEntity $metaEntity, ArrayCollection $metaAttributes, string $name)
     {
         parent::__construct($metaEntity, $metaAttributes, $name);
-        $this->getMetaAttribute('targetEntity')->setDefaultValue(ucfirst(Inflector::singularize($name)));
+        $this->getMetaAttribute('targetEntity')->setDefaultValue(new MetaEntity($metaEntity->getNamespace().'\\'.Inflector::classify(Inflector::singularize($name))));
         $this->getMetaAttribute('inversedBy')->setDefaultValue(lcfirst($metaEntity->getName()));
 
         $metaEntity->addUsage('Doctrine\Common\Collections\Collection');
@@ -35,7 +35,7 @@ class ManyToManyProperty extends AbstractRelationshipProperty
 
     public function getAnnotationLines(): array
     {
-        $manyToManyOptions = 'targetEntity="'.$this->getTargetEntityFullClassName().'"';
+        $manyToManyOptions = 'targetEntity="'.$this->getTargetEntity()->getFullClassName().'"';
         $manyToManyOptions .= $this->getInversedBy() ? ', inversedBy="'.$this->getInversedBy().'"' : '';
         $manyToManyOptions .= $this->getMappedBy() ? ', mappedBy="'.$this->getMappedBy().'"' : '';
         $manyToManyOptions .= $this->getOrphanRemoval() ? ', orphanRemoval=true' : '';
@@ -46,13 +46,13 @@ class ManyToManyProperty extends AbstractRelationshipProperty
         ];
 
         if (!$this->getMappedBy()) {
-            $tableName = Inflector::pluralize(Inflector::tableize($this->getName())).'_'.Inflector::pluralize(Inflector::tableize($this->getTargetEntity()));
+            $tableName = Inflector::pluralize(Inflector::tableize($this->getName())).'_'.Inflector::pluralize(Inflector::tableize($this->getTargetEntity()->getName()));
             $annotationLines[] = '@ORM\JoinTable(name="'.$tableName.'",';
             $annotationLines[] = '  joinColumns={';
             $annotationLines[] = '    @ORM\JoinColumn(name="'.Inflector::tableize($this->getName()).'_id", referencedColumnName="id", onDelete="CASCADE")';
             $annotationLines[] = '  }';
             $annotationLines[] = '  inverseJoinColumns={';
-            $annotationLines[] = '    @ORM\JoinColumn(name="'.Inflector::tableize($this->getTargetEntity()).'_'.$this->getReferencedColumnName().'" , referencedColumnName="'.$this->getReferencedColumnName().'", onDelete="CASCADE")';
+            $annotationLines[] = '    @ORM\JoinColumn(name="'.Inflector::tableize($this->getTargetEntity()->getName()).'_'.$this->getReferencedColumnName().'" , referencedColumnName="'.$this->getReferencedColumnName().'", onDelete="CASCADE")';
             $annotationLines[] = '  }';
         }
 

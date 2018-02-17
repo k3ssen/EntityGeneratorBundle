@@ -18,7 +18,7 @@ trait GeneratorFileLocatorTrait
 
     protected function getTargetFile(MetaEntity $metaEntity): string
     {
-        $targetBundlePrefix = $metaEntity->getBundle() ? '@'.$metaEntity->getBundle().DIRECTORY_SEPARATOR : '';
+        $targetBundlePrefix = $metaEntity->getBundleNamespace() ? '@'.$metaEntity->getBundleNamespace().DIRECTORY_SEPARATOR : '';
         if ($targetBundlePrefix) {
             $bundlePath = $this->fileLocator->locate($targetBundlePrefix);
             if (!file_exists($bundlePath . DIRECTORY_SEPARATOR . 'Entity')) {

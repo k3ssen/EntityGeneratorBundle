@@ -23,8 +23,7 @@ parameters:
             type: 'int'
         targetEntity:
             meta_properties: 'Kevin3ssen\EntityGeneratorBundle\MetaData\Property\AbstractRelationshipProperty'
-        targetEntityNamespace:
-            meta_properties: 'Kevin3ssen\EntityGeneratorBundle\MetaData\Property\AbstractRelationshipProperty'
+            type: 'object'
         referencedColumnName:
             meta_properties: 'Kevin3ssen\EntityGeneratorBundle\MetaData\Property\AbstractRelationshipProperty'
             default: 'id'
@@ -57,7 +56,7 @@ services:
             $attributeQuestions: !tagged entity_generator.attribute_question
             $overrideSkeletonPath: '%entity_generator.override_skeleton_path%'
             $autoGenerateRepository: '%entity_generator.auto_generate_repository%'
-            $bundles: '%kernel.bundles%'
+            $bundlesMetaData: '%kernel.bundles_metadata%'
 
     Kevin3ssen\EntityGeneratorBundle\:
         resource: '../*'

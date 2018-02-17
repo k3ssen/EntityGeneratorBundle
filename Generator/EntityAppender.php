@@ -55,7 +55,7 @@ class EntityAppender
             'inner_content_only' => $hasConstructor,
         ]);
         if ($hasConstructor) {
-            $this->insertStrAfterLastMatch($currentContent, $propertyContent, '/public function __construct\(.*\)\{/');
+            $this->insertStrAfterLastMatch($currentContent, $propertyContent, '/public function __construct\(.*\)\n    /');
         } else {
             $this->insertStrAfterLastMatch($currentContent, $propertyContent, '/(protected|private|public) \$\w+;/');
         }
@@ -87,7 +87,9 @@ class EntityAppender
     {
         preg_match_all($pattern, $baseString, $matches, PREG_OFFSET_CAPTURE);
         $lastMatch = array_pop($matches[0]);
-        $position = $lastMatch[1] + strlen($lastMatch[0]) + 1;
-        $baseString = substr_replace($baseString, $insertString, $position, 0);
+        if (is_array($lastMatch) && count($lastMatch) > 1) {
+            $position = $lastMatch[1] + strlen($lastMatch[0]) + 1;
+            $baseString = substr_replace($baseString, $insertString, $position, 0);
+        }
     }
 }

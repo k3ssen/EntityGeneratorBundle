@@ -5,7 +5,6 @@ namespace Kevin3ssen\EntityGeneratorBundle\Command;
 
 use Kevin3ssen\EntityGeneratorBundle\Command\EntityQuestion\FieldsQuestion;
 use Kevin3ssen\EntityGeneratorBundle\Command\Helper\CommandInfo;
-use Kevin3ssen\EntityGeneratorBundle\Command\Helper\EntityFinder;
 use Kevin3ssen\EntityGeneratorBundle\Generator\EntityAppender;
 use Kevin3ssen\EntityGeneratorBundle\Generator\EntityGenerator;
 use Kevin3ssen\EntityGeneratorBundle\MetaData\MetaEntity;
@@ -23,9 +22,6 @@ class EntityAppendCommand extends Command
     /** @var EntityAppender */
     protected $entityAppender;
 
-    /** @var EntityFinder */
-    protected $entityFinder;
-
     /** @var $fieldQuestion */
     protected $fieldsQuestion;
 
@@ -40,20 +36,18 @@ class EntityAppendCommand extends Command
         MetaEntityFactory $metaEntityFactory,
         EntityAppender $entityReader,
         EntityGenerator $entityGenerator,
-        EntityFinder $entityFinder,
         FieldsQuestion $fieldsQuestion
     ) {
         parent::__construct($name);
         $this->metaEntityFactory = $metaEntityFactory;
         $this->entityAppender = $entityReader;
         $this->entityGenerator = $entityGenerator;
-        $this->entityFinder = $entityFinder;
         $this->fieldsQuestion = $fieldsQuestion;
     }
 
     protected function configure()
     {
-        $this->setDescription('Read an entity')
+        $this->setDescription('Append fields to an existing entity')
             ->addOption('savepoint', 's', InputOption::VALUE_NONE, false)
             ->addOption('revert', 'r', InputOption::VALUE_NONE, false)
         ;
@@ -62,10 +56,13 @@ class EntityAppendCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $commandInfo = new CommandInfo($input, $output);
+
+        $commandInfo->getIo()->title('Append fields to entity');
+
         if ($input->getOption('revert')) {
             $commandInfo->loadMetaEntityFromTemporaryFile();
             $metaEntity = $commandInfo->getMetaEntity();
-            $this->revertFileMetaEntity($metaEntity);
+            $this->revertFileByMetaEntity($metaEntity);
             $commandInfo->getIo()->success(sprintf('File for entity "%s" has been reverted', $metaEntity));
             return;
         }
@@ -73,10 +70,13 @@ class EntityAppendCommand extends Command
             $commandInfo->loadMetaEntityFromTemporaryFile();
             $pseudoMetaEntity = $commandInfo->getMetaEntity();
         } else {
-            $choices = $this->entityFinder->getExistingEntities();
-            $entityFullClassName = $commandInfo->getIo()->choice('Entity', $choices);
+            $choices = $this->metaEntityFactory->getEntityOptions();
+            if (count($choices) === 0) {
+                $commandInfo->getIo()->error('No entities found; Use \'entity:generate\' instead to add new entities.');
+            }
+            $choice = $commandInfo->getIo()->choice('Entity', $choices);
 
-            $pseudoMetaEntity = $this->metaEntityFactory->createPseudoMetaEntity($entityFullClassName);
+            $pseudoMetaEntity = $this->metaEntityFactory->getMetaEntityByChosenOption($choice);
             $commandInfo->setMetaEntity($pseudoMetaEntity);
         }
         $this->fieldsQuestion->doQuestion($commandInfo);
@@ -84,14 +84,10 @@ class EntityAppendCommand extends Command
         $commandInfo->saveTemporaryFile();
         $this->backupFile($pseudoMetaEntity);
 
-        $updatedFile = $this->entityAppender->appendFields($pseudoMetaEntity);
-        $commandInfo->getIo()->success(sprintf('Updated entity in file %s', $updatedFile));
-        $addedFiles = $this->entityGenerator->generateMissingTargetEntities($pseudoMetaEntity);
-        foreach ($addedFiles as $filePath) {
-            $commandInfo->getIo()->success(sprintf('Generated file %s', $filePath));
+        $affectedFiles = $this->entityGenerator->updateEntity($pseudoMetaEntity);
+        foreach ($affectedFiles as $filePath) {
+            $commandInfo->getIo()->success(sprintf('Created/Updated file %s', $filePath));
         }
-        //TODO: generated files currently cannot be reverted
-        $commandInfo->getIo()->note('If the result is not what you wanted, you can revert this change by using the command "entity:append --revert"');
     }
 
     protected function backupFile(MetaEntity $metaEntity)
@@ -102,7 +98,7 @@ class EntityAppendCommand extends Command
         file_put_contents($temp, $content);
     }
 
-    protected function revertFileMetaEntity(MetaEntity $metaEntity)
+    protected function revertFileByMetaEntity(MetaEntity $metaEntity)
     {
         $reflector = new \ReflectionClass($metaEntity->getFullClassName());
         $temp = sys_get_temp_dir(). '/entity_backup';

@@ -13,7 +13,7 @@ class ManyToOneProperty extends AbstractRelationshipProperty
     public function __construct(MetaEntity $metaEntity, ArrayCollection $metaAttributes, string $name)
     {
         parent::__construct($metaEntity, $metaAttributes, $name);
-        $this->getMetaAttribute('inversedBy')->setDefaultValue(lcfirst($metaEntity->getName()));
+        $this->getMetaAttribute('inversedBy')->setDefaultValue(lcfirst(Inflector::pluralize($metaEntity->getName())));
     }
 
     public function setMappedBy(?string $mappedBy): AbstractRelationshipProperty
@@ -21,14 +21,9 @@ class ManyToOneProperty extends AbstractRelationshipProperty
         throw new \RuntimeException(sprintf('Cannot call setMappedBy on "%s"; A ManyToOne property always is the mapping side', static::class));
     }
 
-    public function getReturnType(): string
-    {
-        return $this->getTargetEntity();
-    }
-
     public function getAnnotationLines(): array
     {
-        $manyToOneOptions = 'targetEntity="'.$this->getTargetEntityFullClassName().'"';
+        $manyToOneOptions = 'targetEntity="'.$this->getTargetEntity()->getFullClassName().'"';
         $manyToOneOptions .= $this->getInversedBy() ? ', inversedBy="'.$this->getInversedBy().'"' : '';
 
         $joinColumnOptions = 'name="'. Inflector::tableize($this->getName()) . ($this->getReferencedColumnName() === 'id' ? '_id"': '');

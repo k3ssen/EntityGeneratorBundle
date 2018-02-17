@@ -3,13 +3,16 @@ declare(strict_types=1);
 
 namespace Kevin3ssen\EntityGeneratorBundle\MetaData;
 
-use Kevin3ssen\EntityGeneratorBundle\Command\Helper\EntityFinder;
+use Doctrine\ORM\EntityManagerInterface;
 use Kevin3ssen\EntityGeneratorBundle\Generator\EntityGenerator;
 use Kevin3ssen\EntityGeneratorBundle\MetaData\Property\AbstractRelationshipProperty;
+use Doctrine\ORM\Mapping\ClassMetadata;
+use Doctrine\ORM\Mapping\ClassMetadataFactory;
 
 class MetaEntityFactory
 {
-    protected $bundles;
+    /** @var BundleProvider */
+    protected $bundleProvider;
 
     /** @var EntityGenerator */
     protected $entityGenerator;
@@ -20,61 +23,106 @@ class MetaEntityFactory
     /** @var bool */
     protected $autoGenerateRepository;
 
+    /** @var ClassMetadataFactory */
+    protected $classMetadataFactory;
+
     public function __construct(
-        array $bundles,
+        BundleProvider $bundleProvider,
         ?bool $autoGenerateRepository,
         MetaPropertyFactory $metaPropertyFactory,
-        EntityFinder $entityFinder
+        EntityManagerInterface $em
     )
     {
-        $this->bundles = $bundles;
+        $this->bundleProvider = $bundleProvider;
         $this->autoGenerateRepository = $autoGenerateRepository;
         $this->metaPropertyFactory = $metaPropertyFactory;
-        //TODO: entityFinder is located in 'command' namespace, which isn't logical
-        $this->entityFinder = $entityFinder;
+        $this->classMetadataFactory = $em->getMetadataFactory();
     }
 
-    public function createMetaEntity(string $name, string $bundle = null, string $subDir = null): ?MetaEntity
+    /**
+     * Creates a MetaEntity by the provided ClassName.
+     * Preferably the fullClassName is provided, so that bundle and subdirectory can be automatically subtracted.
+     * If only a name (without namespace) is provided, defaults will be used.
+     */
+    public function createByClassName(string $nameOrFullClassName): MetaEntity
     {
-        return (new MetaEntity($name, $bundle, $subDir))
+        return (new MetaEntity($nameOrFullClassName))
             ->setUseCustomRepository($this->autoGenerateRepository)
         ;
     }
 
-    public function createMetaEntityForMissingTargetEntity(AbstractRelationshipProperty $property): ?MetaEntity
+    /**
+     * Creates a MetaEntity by shortcutNotation rather than (full)ClassName.
+     * Unlike with the fullClassName, you'd only need to provide the bundleName rather than its namespace.
+     *
+     * Possible notations are:
+     *  - BundleName:Subdirectory/MetaEntityName    to specify bundle, subdir and entityName
+     *  - BundleName:MetaEntityName                 to specify bundle and entityName, but no subdir
+     *  - SubDirectory/EntityName                   to specify subDir and entityName, but no bundle
+     *  - EntityName                                to specify entityName, but no subDir and no bundle
+     */
+    public function createByShortcutNotation(string $shortcutNotation): MetaEntity
     {
-        $entityNamespace = $property->getTargetEntityFullClassName();
-        if (!$property instanceof AbstractRelationshipProperty || class_exists($entityNamespace)) {
-            return null;
+        $entityName = $shortcutNotation;
+        $bundleName = $subDir = null;
+        if (strpos($shortcutNotation, ':') !== false) {
+            $parts = explode(':', $shortcutNotation);
+            $bundleName = array_shift($parts);
+            $entityName =  implode('/', $parts);
         }
-        $entityName = $property->getTargetEntity();
-        $bundleName = $this->entityFinder->getBundleNameFromEntityNamespace($entityNamespace);
-        $subDir = $this->entityFinder->getSubDirectoryFromEntityNamespace($entityNamespace);
-
-        $targetMetaEntity = new MetaEntity($entityName, $bundleName, $subDir);
-        $this->addMissingProperty($targetMetaEntity, $property);
-        return $targetMetaEntity;
+        if (strpos($shortcutNotation, '/') !== false) {
+            $parts = explode('/', $shortcutNotation);
+            $entityName = array_pop($parts);
+            $subDir = implode('/', $parts);
+        }
+        $bundleNamespace = $this->bundleProvider->getBundleNamespaceByName($bundleName);
+        $fullClassName = $bundleNamespace . '\\Entity\\' . ($subDir ? $subDir.'\\' : '') . $entityName;
+        return $this->createByClassName($fullClassName);
     }
 
-    public function createPseudoMetaEntityForMissingTargetEntityProperty(AbstractRelationshipProperty $property): ?MetaEntity
+    /**
+     * Retrieves list of existing entities as MetaEntities (only fullClassName is set on these MetaEntities)
+     * @return array|MetaEntity[]
+     */
+    public function getEntityOptions(): array
     {
-        $targetEntityFullClassName = $property->getTargetEntityFullClassName();
-        if (!$property instanceof AbstractRelationshipProperty || !class_exists($targetEntityFullClassName)) {
-            return null;
+        if (isset($this->existingEntities)) {
+            return $this->existingEntities;
         }
-        $reflector = new \ReflectionClass($targetEntityFullClassName);
-        foreach ($reflector->getProperties() as $reflectionProperty) {
-            //If the property name is already defined, then nothing needs to be done
-            if ($reflectionProperty->getName() === $property->getName()) {
-                return null;
+        /** @var ClassMetadata[] $entityMetadata */
+        $entityMetadata = $this->classMetadataFactory->getAllMetadata();
+
+        $entities = [];
+        foreach ($entityMetadata as $meta) {
+            $entities[] = new MetaEntity($meta->getName());
+        }
+        return $this->existingEntities = $entities;
+    }
+
+    public function getMetaEntityByChosenOption($choice): ?MetaEntity
+    {
+        $options = $this->getEntityOptions();
+        foreach ($options as $key => $metaEntity) {
+            if ((string) $metaEntity === $choice) {
+                return $metaEntity;
             }
         }
-        $pseudoMetaEntity = $this->createPseudoMetaEntity($targetEntityFullClassName);
-        $this->addMissingProperty($pseudoMetaEntity, $property);
-        return $pseudoMetaEntity;
+        return null;
     }
 
-    protected function addMissingProperty(MetaEntity $metaEntity, AbstractRelationshipProperty $property)
+    public function getDoctrineOrmClassMetadata(string $entityFullClassName): ClassMetadata
+    {
+        $classMetaData = $this->classMetadataFactory->getMetadataFor($entityFullClassName);
+        return $classMetaData instanceof ClassMetadata ? $classMetaData : null;
+    }
+
+    /**
+     * Adds missing field for inversedBy or mappedBy
+     *
+     * @param MetaEntity $metaEntity
+     * @param AbstractRelationshipProperty $property
+     */
+    public function addMissingProperty(MetaEntity $metaEntity, AbstractRelationshipProperty $property)
     {
         $inversedBy = $property->getInversedBy();
         $mappedBy = $property->getMappedBy();
@@ -92,37 +140,5 @@ class MetaEntityFactory
                 $newProperty->setInversedBy($property->getName());
             }
         }
-    }
-
-    public function createPseudoMetaEntity(string $entityFullClassName): MetaEntity
-    {
-        $reflector = new \ReflectionClass($entityFullClassName);
-        $pseudoMetaEntity = new MetaEntity($reflector->getShortName());
-
-        $namespaceParts = explode('\\Entity\\', $entityFullClassName);
-        $pseudoMetaEntity->setBundle($this->getBundleName($namespaceParts[0]));
-
-        if (strpos('\\', $namespaceParts[1])) {
-            $dirAndNameParts = explode('\\', $namespaceParts[1]);
-            $entityName = array_pop($dirAndNameParts);
-            if ($entityName !== $pseudoMetaEntity->getName()) {
-                throw new \LogicException(sprintf('
-                    Tried to retrieve bundle, subdirectory and entityName from "%s", but result is incorrect
-                    Expected entity name "%s", but got "%s"
-                ', $entityFullClassName, $pseudoMetaEntity->getName(), $entityName));
-            }
-            $pseudoMetaEntity->setSubDir(implode('/', $dirAndNameParts));
-        }
-        return $pseudoMetaEntity;
-    }
-
-    protected function getBundleName(string $namespaceBeforeEntity): ?string
-    {
-        foreach ($this->bundles as $bundleName => $bundleNamespace) {
-            if ($namespaceBeforeEntity === $bundleNamespace) {
-                return $bundleName;
-            }
-        }
-        return null;
     }
 }

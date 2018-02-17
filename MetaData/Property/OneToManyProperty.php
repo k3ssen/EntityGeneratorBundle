@@ -13,7 +13,7 @@ class OneToManyProperty extends AbstractRelationshipProperty
     public function __construct(MetaEntity $metaEntity, ArrayCollection $metaAttributes, string $name)
     {
         parent::__construct($metaEntity, $metaAttributes, $name);
-        $this->setTargetEntity(Inflector::classify(Inflector::singularize($name)));
+        $this->setTargetEntity(new MetaEntity($metaEntity->getNamespace().'\\'.Inflector::classify(Inflector::singularize($name))));
         $this->setMappedBy(lcfirst(Inflector::classify($metaEntity->getName())));
         $this->setOrphanRemoval(false);
 
@@ -36,7 +36,7 @@ class OneToManyProperty extends AbstractRelationshipProperty
 
     public function getAnnotationLines(): array
     {
-        $OneToManyOptions = 'targetEntity="'.$this->getTargetEntityFullClassName().'"';
+        $OneToManyOptions = 'targetEntity="'.$this->getTargetEntity()->getFullClassName().'"';
         $OneToManyOptions .= ', mappedBy="'.$this->getMappedBy().'"';
         $OneToManyOptions .= $this->getOrphanRemoval() ? ', orphanRemoval=true' : '';
         //TODO: what about cascade delete?

@@ -8,17 +8,18 @@ use Kevin3ssen\EntityGeneratorBundle\MetaData\EntityAnnotation\OrmEntityAnnotati
 use Kevin3ssen\EntityGeneratorBundle\MetaData\EntityAnnotation\OrmTableAnnotation;
 use Kevin3ssen\EntityGeneratorBundle\MetaData\Property\AbstractPrimitiveProperty;
 use Kevin3ssen\EntityGeneratorBundle\MetaData\Property\AbstractProperty;
+use Kevin3ssen\EntityGeneratorBundle\MetaData\Property\AbstractRelationshipProperty;
 use Kevin3ssen\EntityGeneratorBundle\MetaData\Traits\MetaTraitInterface;
 use Doctrine\Common\Inflector\Inflector;
 use Doctrine\Common\Collections\ArrayCollection;
 
 class MetaEntity
 {
+    public const NO_BUNDLE_NAMESPACE = 'App';
+
     protected $name;
 
-    protected $namespace;
-
-    protected $bundle;
+    protected $bundleNamespace;
 
     protected $subDir;
 
@@ -36,12 +37,15 @@ class MetaEntity
 
     protected $customRepository = true;
 
-    public function __construct(string $name, $bundle = null, $subDir = null)
+    public function __construct(string $nameOrFullClassName)
     {
-        $this->setName($name);
-
-        $this->setBundle($bundle);
-        $this->setSubDir($subDir);
+        if (strpos($nameOrFullClassName, ':') !== false) {
+            throw new \InvalidArgumentException(sprintf('Cannot set metaEntity by shortcutNotation. Provide fullClassName instead; "%s" given', $nameOrFullClassName));
+        } elseif (strpos($nameOrFullClassName, '\\') !== false) {
+            $this->setFullClassName($nameOrFullClassName);
+        } else {
+            $this->setName($nameOrFullClassName);
+        }
 
         $this->properties = new ArrayCollection();
 
@@ -60,21 +64,46 @@ class MetaEntity
         return $this;
     }
 
-    public function getBundle(): ?string
+    public function getShortcutNotation()
     {
-        return $this->bundle;
+        return ($this->getBundleNamespace() ? $this->getBundleNamespace().':' : '') . ($this->getSubDir() ? $this->getSubDir() .'/' : ''). $this->getName();
     }
 
-    protected function setNamespace()
+    public function getBundleNamespace(): ?string
     {
-        if ($bundle = $this->getBundle()) {
-            $this->namespace = $bundle.'\Entity';
-        } else {
-            $this->namespace = 'App\Entity';
+        return $this->bundleNamespace;
+    }
+
+    /**
+     * Gets bundle name by retrieving the last part of the bundleNamespace
+     * @return string
+     */
+    public function getBundleName(): string
+    {
+        if (strpos('\\', $this->getBundleNamespace()) !== false) {
+            $parts = explode('\\', $this->getBundleNamespace());
+            return array_pop($parts);
         }
-        if ($subDir = $this->getSubDir()) {
-            $this->namespace .= '\\'.$subDir;
+        return $this->getBundleNamespace();
+    }
+
+    public function setFullClassName($fullClassName)
+    {
+        $parts = explode('\\Entity\\', $fullClassName);
+        if (count($parts) === 0) {
+            throw new \InvalidArgumentException(sprintf('Please make sure the entity has \\Entity\\ in its namespace. Got "%s"', $fullClassName));
         }
+        $entityName = array_pop($parts);
+        if ($bundleNamespace = implode('\\', $parts) !== static::NO_BUNDLE_NAMESPACE) {
+            $this->setBundleNamespace(implode('\\', $parts));
+        }
+        if (strpos('\\', $entityName) !== false) {
+            $subDirAndEntityParts = explode('\\', $entityName);
+            $entityName = array_pop($subDirAndEntityParts);
+            $this->setSubDir(implode(DIRECTORY_SEPARATOR, $subDirAndEntityParts));
+        }
+        $this->setName($entityName);
+        return $this;
     }
 
     public function getFullClassName(): string
@@ -82,10 +111,19 @@ class MetaEntity
         return $this->getNamespace().'\\'.$this->getName();
     }
 
-    public function setBundle(?string $bundle)
+    /**
+     * Retrieve the namespace the entity resides in (= namespace without entityName)
+     */
+    public function getNamespace(): string
     {
-        $this->bundle = $bundle;
-        $this->setNamespace();
+        return ($this->getBundleNamespace() ? $this->getBundleNamespace() : static::NO_BUNDLE_NAMESPACE) . '\\Entity'.
+            ($this->getSubDir() ? '\\'. $this->getSubDir() : '')
+        ;
+    }
+
+    public function setBundleNamespace(?string $bundleNamespace)
+    {
+        $this->bundleNamespace = $bundleNamespace;
         return $this;
     }
 
@@ -96,14 +134,8 @@ class MetaEntity
 
     public function setSubDir(?string $subDir)
     {
-        $this->subDir = $subDir;
-        $this->setNamespace();
+        $this->subDir = $subDir ? Inflector::classify($subDir) : null;
         return $this;
-    }
-
-    public function getNamespace(): string
-    {
-        return $this->namespace;
     }
 
     public function getUsages(): ?array
@@ -196,6 +228,14 @@ class MetaEntity
         });
     }
 
+    /** @return ArrayCollection|AbstractRelationshipProperty[] */
+    public function getRelationshipProperties(): ArrayCollection
+    {
+        return $this->getProperties()->filter(function (AbstractProperty $property) {
+            return $property instanceof AbstractRelationshipProperty;
+        });
+    }
+
     public function getDisplayProperty(): ?AbstractPrimitiveProperty
     {
         return $this->displayProperty;
@@ -233,6 +273,6 @@ class MetaEntity
 
     public function __toString()
     {
-        return $this->getName();
+        return $this->getShortcutNotation();
     }
 }

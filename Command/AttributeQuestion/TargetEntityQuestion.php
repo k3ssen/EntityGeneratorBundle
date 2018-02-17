@@ -4,28 +4,26 @@ declare(strict_types=1);
 namespace Kevin3ssen\EntityGeneratorBundle\Command\AttributeQuestion;
 
 use Kevin3ssen\EntityGeneratorBundle\Command\Helper\CommandInfo;
-use Kevin3ssen\EntityGeneratorBundle\Command\Helper\EntityFinder;
 use Kevin3ssen\EntityGeneratorBundle\MetaData\MetaAttribute;
+use Kevin3ssen\EntityGeneratorBundle\MetaData\MetaEntity;
+use Kevin3ssen\EntityGeneratorBundle\MetaData\MetaEntityFactory;
 use Kevin3ssen\EntityGeneratorBundle\MetaData\Property\AbstractRelationshipProperty;
 use Symfony\Component\Console\Question\Question;
 
 class TargetEntityQuestion implements AttributeQuestionInterface
 {
-    /** @var EntityFinder */
-    protected $entityFinder;
+    /** @var MetaEntityFactory */
+    protected $metaEntityFactory;
 
     protected $attributeName;
 
-    protected $bundles;
-
-    public function __construct(array $bundles, array $attributes, string $attributeName, EntityFinder $entityFinder)
+    public function __construct(array $attributes, string $attributeName, MetaEntityFactory $metaEntityFactory)
     {
         if (!array_key_exists($attributeName, $attributes)) {
             throw new \InvalidArgumentException(sprintf('attribute name "%s" has not been defined in the "attributes" configuration', $attributeName));
         }
-        $this->bundles = $bundles;
         $this->attributeName = $attributeName;
-        $this->entityFinder = $entityFinder;
+        $this->metaEntityFactory = $metaEntityFactory;
     }
 
     public function getAttributeName(): string
@@ -40,55 +38,21 @@ class TargetEntityQuestion implements AttributeQuestionInterface
         if (!$metaProperty) {
             return;
         }
-        $options = $this->entityFinder->getExistingEntities();
+        $options = $this->metaEntityFactory->getEntityOptions();
         $commandInfo->getIo()->listing($options);
         $question = new Question('Target entity', $metaProperty->getTargetEntity());
         $question->setAutocompleterValues($options);
-        $targetEntity = $commandInfo->getIo()->askQuestion($question);
+        $targetEntityChoice = $commandInfo->getIo()->askQuestion($question);
 
-        if ($namespace = array_search($targetEntity, $options, true)) {
-            $metaProperty->setTargetEntityNamespace($namespace);
-            $metaProperty->setTargetEntity($targetEntity);
+        //'targetEntityChoice' might be MetaEntity because of the default value on metaAttribute.
+        if ($targetEntityChoice instanceof MetaEntity) {
+            $metaProperty->setTargetEntity($targetEntityChoice);
+        //If one of the options was chosen, then we can derive the metaEntity from that.
+        } elseif($targetMetaEntity = $this->metaEntityFactory->getMetaEntityByChosenOption($targetEntityChoice)) {
+            $metaProperty->setTargetEntity($targetMetaEntity);
+        //Otherwise, if something new was entered, we compose the targetEntity by using the shortcutNotation
         } else {
-            $this->setTargetEntityAndNamespace($commandInfo, $metaAttribute, $targetEntity);
+            $metaProperty->setTargetEntity($this->metaEntityFactory->createByShortcutNotation($targetEntityChoice));
         }
-    }
-
-    protected function setTargetEntityAndNamespace(CommandInfo $commandInfo, MetaAttribute $metaAttribute, string $targetEntity)
-    {
-        /** @var AbstractRelationshipProperty $metaProperty */
-        $metaProperty = $metaAttribute->getMetaProperty();
-        $namespace = null;
-
-        //Check for bundle
-        if(strpos($targetEntity, ':') !== false) {
-            $entityParts = explode(':', str_replace('::', ':', $targetEntity));
-            $entityBundleName = array_shift($entityParts);
-            $targetEntity =  implode('/', $entityParts);
-
-            foreach ($this->bundles as $bundleName => $bundleNamespace) {
-                if ($entityBundleName === $bundleName) {
-                    $namespace = $bundleNamespace.'\\Entity';
-                }
-            }
-            //The default 'App' namespace isn't a bundle, but if you're currently creating an entity in a different bundle
-            //You might want to specify 'App' to prevent using that same bundle instead of the App-namespace
-            if (!$namespace && $entityBundleName === 'App') {
-                $namespace = 'App\\Entity';
-            } elseif (!$namespace) {
-                $commandInfo->getIo()->error(sprintf('No bundle with name "%s" could be found.', $entityBundleName));
-                $this->doQuestion($commandInfo, $metaAttribute);
-            }
-        }
-        //Check for subdirectory
-        if(strpos($targetEntity, '/') !== false) {
-            $entityParts = explode('/', $targetEntity);
-            $targetEntity = array_pop($entityParts);
-            $namespace = ($namespace ?: $commandInfo->getMetaEntity()->getNamespace()) . '\\' . implode('\\', $entityParts);
-        }
-        if ($namespace) {
-            $metaProperty->setTargetEntityNamespace($namespace);
-        }
-        $metaProperty->setTargetEntity($targetEntity);
     }
 }

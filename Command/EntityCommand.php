@@ -63,9 +63,11 @@ class EntityCommand extends Command
 
     protected function makeEntity(CommandInfo $commandInfo): ?MetaEntity
     {
+        $commandInfo->getIo()->title('Create new entity');
+
         if ($useSavePoint = $commandInfo->getInput()->getOption('savepoint')) {
             $commandInfo->loadMetaEntityFromTemporaryFile();
-            $commandInfo->getIo()->title(sprintf('Use savepoint entity "%s"', (string) $commandInfo->getMetaEntity()));
+            $commandInfo->getIo()->text(sprintf('Use savepoint entity "%s"', (string) $commandInfo->getMetaEntity()));
         }
         $actions = [];
         foreach ($this->entityQuestions as $entityQuestion) {

@@ -20,7 +20,7 @@ class DisplayFieldQuestion implements EntityQuestionInterface
             }
         }
         if (count($propertyOptions) === 1) {
-            $commandInfo->getIo()->warning('There are no properties suitable for using as display field automatically.');
+            $commandInfo->getIo()->note('Currently, there are no properties suitable for using as display field.');
             return;
         }
         $defaultDisplayField = $commandInfo->getMetaEntity()->getDisplayProperty();

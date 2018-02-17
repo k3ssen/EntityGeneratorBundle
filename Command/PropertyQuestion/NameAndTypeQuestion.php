@@ -7,25 +7,25 @@ use Doctrine\Common\Util\Inflector;
 use Doctrine\DBAL\Types\Type;
 use Kevin3ssen\EntityGeneratorBundle\Command\Helper\CommandInfo;
 use Kevin3ssen\EntityGeneratorBundle\Command\Helper\EntityFinder;
+use Kevin3ssen\EntityGeneratorBundle\MetaData\MetaEntity;
+use Kevin3ssen\EntityGeneratorBundle\MetaData\MetaEntityFactory;
 use Kevin3ssen\EntityGeneratorBundle\MetaData\MetaPropertyFactory;
 use Kevin3ssen\EntityGeneratorBundle\MetaData\Property\AbstractProperty;
 use Kevin3ssen\EntityGeneratorBundle\MetaData\Property\AbstractRelationshipProperty;
 
 class NameAndTypeQuestion implements PropertyQuestionInterface
 {
-    /** @var EntityFinder */
-    protected $entityFinder;
+    /** @var MetaEntityFactory */
+    protected $metaEntityFactory;
     /** @var MetaPropertyFactory */
     protected $metaPropertyFactory;
-    /** @var string */
-    protected $guessedEntity;
 
     public function __construct(
-        EntityFinder $entityFinder,
+        MetaEntityFactory $metaEntityFactory,
         MetaPropertyFactory $metaPropertyFactory
     ) {
         $this->metaPropertyFactory = $metaPropertyFactory;
-        $this->entityFinder = $entityFinder;
+        $this->metaEntityFactory = $metaEntityFactory;
     }
 
     public function doQuestion(CommandInfo $commandInfo, AbstractProperty $metaProperty = null)
@@ -40,7 +40,6 @@ class NameAndTypeQuestion implements PropertyQuestionInterface
             }
         }
         $metaProperty = $this->askFieldType($commandInfo, $fieldName, $metaProperty);
-        $metaProperty->getMetaAttribute('name')->setValueIsSetByUserInput();
     }
 
     protected function askFieldType(CommandInfo $commandInfo, string $fieldName, AbstractProperty $metaProperty = null): AbstractProperty
@@ -60,12 +59,11 @@ class NameAndTypeQuestion implements PropertyQuestionInterface
         }
 
         $metaProperty = $this->metaPropertyFactory->getMetaProperty($commandInfo->getMetaEntity(), $type, $fieldName);
-
-        if ($metaProperty instanceof AbstractRelationshipProperty && $this->guessedEntity) {
-            $metaProperty->setTargetEntity($this->guessedEntity);
-            $metaProperty->setTargetEntityNamespace(array_search($this->guessedEntity, $this->entityFinder->getExistingEntities()));
-            $this->guessedEntity = null;
-        }
+//
+//        if ($metaProperty instanceof AbstractRelationshipProperty && $this->guessedEntity) {
+//            $metaProperty->setTargetEntity($this->guessedEntity);
+//            $this->guessedEntity = null;
+//        }
 
         return $metaProperty;
     }
@@ -108,6 +106,12 @@ class NameAndTypeQuestion implements PropertyQuestionInterface
 
     protected function guessEntity(string $name): ?string
     {
-        return $this->guessedEntity = $this->entityFinder->findEntityClass($name);
+        $columnName = Inflector::tableize($name);
+        foreach ($this->metaEntityFactory->getEntityOptions() as $metaEntityOption) {
+            if ($columnName === Inflector::tableize($metaEntityOption->getName())) {
+                return (string) $metaEntityOption;
+            }
+        }
+        return null;
     }
 }

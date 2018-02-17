@@ -16,14 +16,9 @@ class OneToOneProperty extends AbstractRelationshipProperty
         $this->getMetaAttribute('inversedBy')->setDefaultValue(lcfirst($metaEntity->getName()));
     }
 
-    public function getReturnType(): string
-    {
-        return $this->getTargetEntity();
-    }
-
     public function getAnnotationLines(): array
     {
-        $oneToOneOptions = 'targetEntity="'.$this->getTargetEntityFullClassName().'"';
+        $oneToOneOptions = 'targetEntity="'.$this->getTargetEntity()->getFullClassName().'"';
         $oneToOneOptions .= $this->getInversedBy() ? ', inversedBy="'.$this->getInversedBy().'"' : '';
         $oneToOneOptions .= $this->getMappedBy() ? ', mappedBy="'.$this->getMappedBy().'"' : '';
         $oneToOneOptions .= ', cascade={"persist"}';

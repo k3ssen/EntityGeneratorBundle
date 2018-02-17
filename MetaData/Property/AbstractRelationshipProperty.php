@@ -4,7 +4,6 @@ declare(strict_types=1);
 namespace Kevin3ssen\EntityGeneratorBundle\MetaData\Property;
 
 use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Util\Inflector;
 use Kevin3ssen\EntityGeneratorBundle\MetaData\MetaEntity;
 
 abstract class AbstractRelationshipProperty extends AbstractProperty
@@ -12,43 +11,26 @@ abstract class AbstractRelationshipProperty extends AbstractProperty
     public function __construct(MetaEntity $metaEntity, ArrayCollection $metaAttributes, string $name)
     {
         parent::__construct($metaEntity, $metaAttributes, $name);
-        $this->getMetaAttribute('targetEntity')->setDefaultValue(Inflector::classify($name));
+        $this->getMetaAttribute('targetEntity')->setDefaultValue(new MetaEntity($metaEntity->getNamespace().'\\'.ucfirst($name)));
     }
 
-    public function getTargetEntity(): ?string
+    public function getTargetEntity(): ?MetaEntity
     {
         return $this->getAttribute('targetEntity');
     }
 
-    public function setTargetEntity(string $targetEntity): self
+    public function setTargetEntity(MetaEntity $targetEntity)
     {
         $this->setAttribute('targetEntity', $targetEntity);
-        $this->setTargetEntityNamespace($this->getTargetEntityNamespace());
-        return $this;
-    }
-
-    public function getTargetEntityNamespace(): ?string
-    {
-        $metaAttribute = $this->getMetaAttributes()->get('targetEntityNamespace');
-        if ($metaAttribute && $metaAttribute->getValue()) {
-            return $metaAttribute->getValue();
-        }
-        return $this->getMetaEntity()->getNamespace();
-    }
-
-    public function getTargetEntityFullClassName(): string
-    {
-        return $this->getTargetEntityNamespace().'\\'.$this->getTargetEntity();
-    }
-
-    public function setTargetEntityNamespace(string $targetEntityNamespace): self
-    {
-        $targetEntityNamespace = preg_replace('/\\\\'.$this->getTargetEntity().'$/', '', $targetEntityNamespace);
-        $this->setAttribute('targetEntityNamespace', $targetEntityNamespace);
-        if ($targetEntityNamespace !== $this->getMetaEntity()->getNamespace()) {
-            $this->getMetaEntity()->addUsage($this->getTargetEntityFullClassName());
+        if ($targetEntity->getNamespace() !== $this->getMetaEntity()->getNamespace()) {
+            $this->getMetaEntity()->addUsage($targetEntity->getFullClassName());
         }
         return $this;
+    }
+
+    public function getReturnType(): string
+    {
+        return $this->getTargetEntity()->getName();
     }
 
     public function getReferencedColumnName(): ?string

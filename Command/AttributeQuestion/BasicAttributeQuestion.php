@@ -4,12 +4,8 @@ declare(strict_types=1);
 namespace Kevin3ssen\EntityGeneratorBundle\Command\AttributeQuestion;
 
 use Kevin3ssen\EntityGeneratorBundle\Command\Helper\CommandInfo;
-use Kevin3ssen\EntityGeneratorBundle\Command\Helper\EntityFinder;
 use Kevin3ssen\EntityGeneratorBundle\Command\Helper\EvaluationTrait;
 use Kevin3ssen\EntityGeneratorBundle\MetaData\MetaAttribute;
-use Kevin3ssen\EntityGeneratorBundle\MetaData\Property\AbstractRelationshipProperty;
-use Symfony\Component\Console\Question\Question;
-use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 
 class BasicAttributeQuestion implements AttributeQuestionInterface
 {
@@ -20,7 +16,6 @@ class BasicAttributeQuestion implements AttributeQuestionInterface
     protected $validationExpression;
 
     public function __construct(
-        EntityFinder $entityFinder,
         array $attributes,
         string $attributeName,
         string $requirementExpression = null,
@@ -42,12 +37,12 @@ class BasicAttributeQuestion implements AttributeQuestionInterface
     public function doQuestion(CommandInfo $commandInfo, MetaAttribute $metaAttribute)
     {
         if ($metaAttribute->isBool()) {
-            $value = $commandInfo->getIo()->confirm($metaAttribute->getQuestion(), $metaAttribute->getValue() !== false);
+            $value = $commandInfo->getIo()->confirm(ucfirst($metaAttribute->getName()), $metaAttribute->getValue() !== false);
             $metaAttribute->setValue($value);
             return;
         }
 
-        $question = $metaAttribute->getQuestion() . ($metaAttribute->isNullable() ? ' (optional)': '');
+        $question = ucfirst($metaAttribute->getName()) . ($metaAttribute->isNullable() ? ' (optional)': '');
         $value = $commandInfo->getIo()->ask($question, $metaAttribute->getValue(), function ($value) use ($metaAttribute, $commandInfo) {
             if (!$metaAttribute->isNullable() && $value === null) {
                 throw new \InvalidArgumentException('This value cannot be null');

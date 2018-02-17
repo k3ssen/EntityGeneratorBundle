@@ -11,12 +11,14 @@ class MetaAttribute
     protected const TYPE_INT = 'int';
     protected const TYPE_BOOL = 'bool';
     protected const TYPE_ARRAY = 'array';
+    protected const TYPE_OBJECT = 'object';
 
     protected const ALLOWED_TYPES = [
         self::TYPE_STRING,
         self::TYPE_INT,
         self::TYPE_BOOL,
         self::TYPE_ARRAY,
+        self::TYPE_OBJECT,
     ];
 
     /** @var AbstractProperty */
@@ -31,9 +33,6 @@ class MetaAttribute
     /** @var string */
     protected $type = 'string';
 
-    //(optional) question to be displayed in the interface (name will be used if no question is set)
-    protected $question;
-
     //(optional) value that will be used if no value has been set yet.
     protected $defaultValue;
 
@@ -43,13 +42,9 @@ class MetaAttribute
     //Helps us know that the value has been set and that we should not use the default value
     protected $valueIsSet = false;
 
-    //Helps us know that the user has set this value (which can be used to determine if a(nother) question should be asked or not)
-    protected $valueIsSetByUserInput = false;
-
     public function __construct(string $name)
     {
         $this->name = $name;
-        $this->setQuestion(ucfirst($name));
     }
 
     public function getMetaProperty(): ?AbstractProperty
@@ -107,17 +102,6 @@ class MetaAttribute
         return $this;
     }
 
-    public function getQuestion(): ?string
-    {
-        return $this->question;
-    }
-
-    public function setQuestion(string $question): self
-    {
-        $this->question = $question;
-        return $this;
-    }
-
     public function getDefaultValue()
     {
         return $this->defaultValue;
@@ -139,7 +123,7 @@ class MetaAttribute
 
     public function setValue($value)
     {
-        if ($this->isNullable() && in_array(strtolower((string) $value), ['null', '~'])) {
+        if ($this->isNullable() && !is_array($value) && in_array(strtolower((string) $value), ['null', '~'])) {
             $this->value = null;
             return $this;
         }
@@ -156,11 +140,14 @@ class MetaAttribute
                 $value = (int) $value;
                 break;
             case static::TYPE_ARRAY:
-                $value = str_replace([' ,',' , ',', '], ',', (string) $value);
-                $value = explode(',', $value);
+                if (!is_array($value)) {
+                    $value = str_replace([' ,', ' , ', ', '], ',', (string)$value);
+                    $value = explode(',', $value);
+                }
                 break;
-            default:
+            case static::TYPE_STRING:
                 $value = (string) $value;
+                break;
         }
         $this->value = $value;
         $this->setValueIsSet(true);
@@ -175,17 +162,6 @@ class MetaAttribute
     public function setValueIsSet(bool $valueIsSet = true)
     {
         $this->valueIsSet = $valueIsSet;
-        return $this;
-    }
-
-    public function getValueIsSetByUserInput(): ?bool
-    {
-        return $this->valueIsSetByUserInput;
-    }
-
-    public function setValueIsSetByUserInput(bool $valueIsSetByUserInput = true)
-    {
-        $this->valueIsSetByUserInput = $valueIsSetByUserInput;
         return $this;
     }
 }

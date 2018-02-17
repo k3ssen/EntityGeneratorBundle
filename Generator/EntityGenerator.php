@@ -39,44 +39,53 @@ class EntityGenerator
 
         $fs = new Filesystem();
         $fs->dumpFile($targetFile, $entityFileData);
-        $createdFiles[] = $targetFile;
+        $affectedFiles[] = $targetFile;
 
         if ($metaEntity->hasCustomRepository()) {
-            $createdFiles[] = $this->createRepository($metaEntity);
+            $affectedFiles[] = $this->createRepository($metaEntity);
         }
 
-        $createdFiles = array_merge($createdFiles, $this->generateMissingTargetEntities($metaEntity));
+        $affectedFiles = array_merge($affectedFiles, $this->generateMissingInversedOrMappedBy($metaEntity));
 
-        return $createdFiles;
+        return $affectedFiles;
     }
 
-    public function generateMissingTargetEntities(MetaEntity $metaEntity): array
+    public function updateEntity(MetaEntity $pseudoMetaEntity): array
     {
-        $addedFiles = [];
-        foreach ($metaEntity->getProperties() as $property) {
-            $targetMetaEntity = $this->metaEntityFactory->createMetaEntityForMissingTargetEntity($property);
-            if (!$targetMetaEntity) {
-                continue;
-            }
-            $addedFiles[] = $this->createEntity($targetMetaEntity);
-            if ($targetMetaEntity->hasCustomRepository()) {
-                $addedFiles[] = $this->createRepository($targetMetaEntity);
-            }
-        }
-        return $addedFiles;
+        return array_merge(
+            [$this->entityAppender->appendFields($pseudoMetaEntity)],
+            $this->generateMissingInversedOrMappedBy($pseudoMetaEntity)
+        );
     }
 
-    public function appendMissingInversionsToTargetEntities(MetaEntity $metaEntity): array
+    protected function generateMissingInversedOrMappedBy(MetaEntity $metaEntity): array
     {
-        $alteredFiles = [];
-        foreach ($metaEntity->getProperties() as $property) {
-            $pseudoMetaEntity = $this->metaEntityFactory->createPseudoMetaEntityForMissingTargetEntityProperty($property);
-            if (!$pseudoMetaEntity) {
+        $affectedFiles = [];
+        foreach ($metaEntity->getRelationshipProperties() as $property) {
+            $targetMetaEntity = $property->getTargetEntity();
+            $fullClassName = $targetMetaEntity ? $targetMetaEntity->getFullClassName() : null;
+            $existingClass = $fullClassName ? class_exists($fullClassName) : false;
+            if (!$targetMetaEntity || ($existingClass && $this->checkEntityHasProperty($fullClassName, $property))) {
                 continue;
             }
-            $alteredFiles[] =$this->entityAppender->appendFields($pseudoMetaEntity);
+            $this->metaEntityFactory->addMissingProperty($targetMetaEntity, $property);
+            if ($existingClass) {
+                $affectedFiles[] = $this->entityAppender->appendFields($targetMetaEntity);
+            } else {
+                $affectedFiles[] = $this->createEntity($targetMetaEntity);
+            }
         }
-        return $alteredFiles;
+        return $affectedFiles;
+    }
+
+    protected function checkEntityHasProperty($fullClassName, AbstractRelationshipProperty $property): bool
+    {
+        foreach ((new \ReflectionClass($fullClassName))->getProperties() as $reflectionProperty) {
+            if (\in_array($reflectionProperty->getName(), [$property->getMappedBy(), $property->getInversedBy()])) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public function createRepository(MetaEntity $metaEntity): string
@@ -90,14 +99,14 @@ class EntityGenerator
         return $targetFile;
     }
 
-    public function getRepositoryContent(MetaEntity $metaEntity)
+    protected function getRepositoryContent(MetaEntity $metaEntity)
     {
         return $this->getTwigEnvironment()->render('repository.php.twig', [
             'meta_entity' => $metaEntity,
         ]);
     }
 
-    public function getEntityContent(MetaEntity $metaEntity)
+    protected function getEntityContent(MetaEntity $metaEntity)
     {
         return $this->getTwigEnvironment()->render('entity.php.twig', [
             'meta_entity' => $metaEntity,

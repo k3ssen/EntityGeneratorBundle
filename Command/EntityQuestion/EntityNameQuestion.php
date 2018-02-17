@@ -8,12 +8,11 @@ use Kevin3ssen\EntityGeneratorBundle\MetaData\MetaEntityFactory;
 
 class EntityNameQuestion implements EntityQuestionInterface
 {
-    use NameExtractionTrait;
-
     /** @var MetaEntityFactory */
     protected $metaEntityFactory;
 
-    public function __construct(MetaEntityFactory $metaEntityFactory) {
+    public function __construct(MetaEntityFactory $metaEntityFactory)
+    {
         $this->metaEntityFactory = $metaEntityFactory;
     }
 
@@ -23,14 +22,11 @@ class EntityNameQuestion implements EntityQuestionInterface
 
     public function doQuestion(CommandInfo $commandInfo)
     {
-        $commandInfo->getIo()->title('Create new entity');
-
         try {
             $metaEntity = $commandInfo->getMetaEntity();
             $entityName = $metaEntity->getName();
         } catch (\RuntimeException $exception) {
-            [$bundle, $subDir, $entityName] = $this->extractFromArgument($commandInfo);
-            $metaEntity = $entityName ? $this->metaEntityFactory->createMetaEntity($entityName, $bundle, $subDir) : null;
+            $entityName = $commandInfo->getInput()->getArgument('entity');
         }
         $nameAnswer = $commandInfo->getIo()->ask('Entity name', $entityName, function ($value) {
             if (!$value) {
@@ -38,18 +34,16 @@ class EntityNameQuestion implements EntityQuestionInterface
             }
             return $value;
         });
-        [$bundle, $subDir, $entityName] = $this->extractFromEntityNameAnswer($nameAnswer);
-        if (!$metaEntity) {
-            $metaEntity = $this->metaEntityFactory->createMetaEntity($entityName, $bundle, $subDir);
-        } else {
-            $metaEntity->setName($entityName);
-            if ($bundle) {
-                $metaEntity->setBundle($bundle);
-            }
-            if ($subDir) {
-                $metaEntity->setSubDir($subDir);
-            }
+        if (isset($metaEntity)) {
+            $metaEntity->setName($nameAnswer);
+            return;
         }
-        $commandInfo->setMetaEntity($metaEntity);
+        try {
+            $metaEntity = $this->metaEntityFactory->createByShortcutNotation($nameAnswer);
+            $commandInfo->setMetaEntity($metaEntity);
+        } catch (\InvalidArgumentException $exception) {
+            $commandInfo->getIo()->error($exception->getMessage());
+            $this->doQuestion($commandInfo);
+        }
     }
 }
