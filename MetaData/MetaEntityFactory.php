@@ -134,6 +134,7 @@ class MetaEntityFactory
                 $inversedType,
                 $newPropertyName
             );
+            $newProperty->setTargetEntity($property->getMetaEntity());
             if ($inversedBy) {
                 $newProperty->setMappedBy($property->getName());
             } else {

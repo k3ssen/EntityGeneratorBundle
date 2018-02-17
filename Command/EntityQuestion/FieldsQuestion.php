@@ -10,8 +10,6 @@ use Kevin3ssen\EntityGeneratorBundle\MetaData\Property\AbstractProperty;
 
 class FieldsQuestion implements EntityQuestionInterface
 {
-    use NameExtractionTrait;
-
     /** @var MetaEntityFactory */
     protected $metaEntityFactory;
 

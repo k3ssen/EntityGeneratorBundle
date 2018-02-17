@@ -28,14 +28,14 @@
 {% block property_collection_methods %}
 {# @var property \Kevin3ssen\EntityGeneratorBundle\MetaData\Property\AbstractRelationshipProperty #}
     /**
-     * @return Collection|ArrayCollection|{{ property.targetEntity }}[]
+     * @return Collection|ArrayCollection|{{ property.targetEntity.name }}[]
      */
     public function get{{ property.name | classify }}(): ?Collection
     {
         return $this->{{ property.name }};
     }
 
-    public function add{{ property.name | singularize | classify }}({{ property.targetEntity }} ${{ property.name | singularize }}): self
+    public function add{{ property.name | singularize | classify }}({{ property.targetEntity.name }} ${{ property.name | singularize }}): self
     {
         $this->{{ property.name }}->add(${{ property.name | singularize }});
 {% if property.mappedBy %}
@@ -44,7 +44,7 @@
         return $this;
     }
 
-    public function remove{{ property.name | singularize | classify }}({{ property.targetEntity }} ${{ property.name | singularize }}): self
+    public function remove{{ property.name | singularize | classify }}({{ property.targetEntity.name }} ${{ property.name | singularize }}): self
     {
         $this->{{ property.name }}->removeElement(${{ property.name | singularize }});
         return $this;

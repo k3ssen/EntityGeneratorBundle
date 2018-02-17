@@ -14,7 +14,7 @@
 {%- for property in meta_entity.properties %}
 
     /**
-     * @var {{ property.returnType }}{{ property.returnType == 'Collection' ? '|ArrayCollection|'~property.targetEntity~'[]' }}
+     * @var {{ property.returnType }}{{ property.returnType == 'Collection' ? '|ArrayCollection|'~property.targetEntity.name~'[]' }}
      {%- for annotation_line in property.annotationLines %}
 
      * {{ annotation_line | raw }}

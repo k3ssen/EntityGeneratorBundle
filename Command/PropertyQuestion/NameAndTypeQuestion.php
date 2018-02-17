@@ -6,7 +6,6 @@ namespace Kevin3ssen\EntityGeneratorBundle\Command\PropertyQuestion;
 use Doctrine\Common\Util\Inflector;
 use Doctrine\DBAL\Types\Type;
 use Kevin3ssen\EntityGeneratorBundle\Command\Helper\CommandInfo;
-use Kevin3ssen\EntityGeneratorBundle\Command\Helper\EntityFinder;
 use Kevin3ssen\EntityGeneratorBundle\MetaData\MetaEntity;
 use Kevin3ssen\EntityGeneratorBundle\MetaData\MetaEntityFactory;
 use Kevin3ssen\EntityGeneratorBundle\MetaData\MetaPropertyFactory;
@@ -19,6 +18,8 @@ class NameAndTypeQuestion implements PropertyQuestionInterface
     protected $metaEntityFactory;
     /** @var MetaPropertyFactory */
     protected $metaPropertyFactory;
+    /** @var MetaEntity */
+    protected $guessedEntity;
 
     public function __construct(
         MetaEntityFactory $metaEntityFactory,
@@ -39,10 +40,10 @@ class NameAndTypeQuestion implements PropertyQuestionInterface
                 return;
             }
         }
-        $metaProperty = $this->askFieldType($commandInfo, $fieldName, $metaProperty);
+        $this->askFieldType($commandInfo, $fieldName, $metaProperty);
     }
 
-    protected function askFieldType(CommandInfo $commandInfo, string $fieldName, AbstractProperty $metaProperty = null): AbstractProperty
+    protected function askFieldType(CommandInfo $commandInfo, string $fieldName, AbstractProperty $metaProperty = null)
     {
         $typeOptions = $this->metaPropertyFactory->getAliasedTypeOptions();
         $defaultType = $metaProperty ? $metaProperty->getOrmType() : $this->guessFieldType($fieldName);
@@ -50,7 +51,7 @@ class NameAndTypeQuestion implements PropertyQuestionInterface
         $type = $typeOptions[$type] ?? $type;
         if ($metaProperty) {
             if ($metaProperty->getOrmType() === $type) {
-                return $metaProperty;
+                return;
             }
             if ($commandInfo->getMetaEntity()->getDisplayProperty() === $metaProperty) {
                 $commandInfo->getMetaEntity()->setDisplayProperty(null);
@@ -59,13 +60,11 @@ class NameAndTypeQuestion implements PropertyQuestionInterface
         }
 
         $metaProperty = $this->metaPropertyFactory->getMetaProperty($commandInfo->getMetaEntity(), $type, $fieldName);
-//
-//        if ($metaProperty instanceof AbstractRelationshipProperty && $this->guessedEntity) {
-//            $metaProperty->setTargetEntity($this->guessedEntity);
-//            $this->guessedEntity = null;
-//        }
 
-        return $metaProperty;
+        if ($metaProperty instanceof AbstractRelationshipProperty && $this->guessedEntity) {
+            $metaProperty->setTargetEntity($this->guessedEntity);
+            $this->guessedEntity = null;
+        }
     }
 
     protected function guessFieldType(string $fieldName): string
@@ -104,12 +103,12 @@ class NameAndTypeQuestion implements PropertyQuestionInterface
         return $this->guessEntity($name) !== null;
     }
 
-    protected function guessEntity(string $name): ?string
+    protected function guessEntity(string $name): ?MetaEntity
     {
         $columnName = Inflector::tableize($name);
         foreach ($this->metaEntityFactory->getEntityOptions() as $metaEntityOption) {
             if ($columnName === Inflector::tableize($metaEntityOption->getName())) {
-                return (string) $metaEntityOption;
+                return $this->guessedEntity = $metaEntityOption;
             }
         }
         return null;

@@ -119,6 +119,8 @@ class ExistingEntityToMetaEntityReader
             if (!$metaProperty->hasAttribute($attributeName)) {
                 $attribute = $this->metaAttributeFactory->createMetaAttribute($attributeName, ['value' => $value]);
                 $metaProperty->addMetaAttribute($attribute);
+            } else {
+                $metaProperty->setAttribute($attributeName, $value);
             }
         }
     }
@@ -180,9 +182,9 @@ class ExistingEntityToMetaEntityReader
                 $options = [];
                 if ($optionsString) {
                     //For for things like choices={"a","b","c"} OR message="somemessage" OR required=true
-                    preg_match_all('/(\w+)="?((\{[^}]+\})|([^"]+))"?/', substr($optionsString, 1, -1), $optionMatches);
+                    preg_match_all('/(\w+)=((\w+)|("[^"]+")|(\{[^}]+\}))/', substr($optionsString, 1, -1), $optionMatches);
                     foreach ($optionMatches[1] as $optionIndex => $optionName) {
-                        $options[$optionName] = $optionMatches[2][$optionIndex];
+                        $options[$optionName] = trim($optionMatches[2][$optionIndex], '"');
                     }
                 }
                 $this->metaValidationFactory->createMetaValidation($metaProperty, $validationName, $options);

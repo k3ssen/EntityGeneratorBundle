@@ -5,7 +5,6 @@ namespace Kevin3ssen\EntityGeneratorBundle\Command;
 
 use Kevin3ssen\EntityGeneratorBundle\Command\EntityQuestion\EntityQuestionInterface;
 use Kevin3ssen\EntityGeneratorBundle\Command\Helper\CommandInfo;
-use Kevin3ssen\EntityGeneratorBundle\Command\Helper\EntityFinder;
 use Kevin3ssen\EntityGeneratorBundle\Generator\EntityGenerator;
 use Kevin3ssen\EntityGeneratorBundle\MetaData\ExistingEntityToMetaEntityReader;
 use Kevin3ssen\EntityGeneratorBundle\MetaData\MetaEntity;
