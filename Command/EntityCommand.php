@@ -49,15 +49,10 @@ class EntityCommand extends Command
 
         $metaEntity = $this->makeEntity($commandInfo);
 
-        $createdFiles = $this->entityGenerator->createEntity($metaEntity);
+        $affectedFiles = $this->entityGenerator->createEntity($metaEntity);
 
-        foreach ($createdFiles as $fileName) {
-            $commandInfo->getIo()->success(sprintf('Generated file %s', $fileName));
-        }
-
-        $changedFiles = $this->entityGenerator->appendMissingInversionsToTargetEntities($metaEntity);
-        foreach ($changedFiles as $fileName) {
-            $commandInfo->getIo()->success(sprintf('Updated file %s', $fileName));
+        foreach ($affectedFiles as $fileName) {
+            $commandInfo->getIo()->success(sprintf('Created/updated file %s', $fileName));
         }
     }
 

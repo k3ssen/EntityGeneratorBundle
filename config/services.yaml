@@ -1,5 +1,5 @@
 parameters:
-    attributes:
+    default_attributes:
         name: {}
         id:
             meta_properties: 'Kevin3ssen\EntityGeneratorBundle\MetaData\Property\AbstractPrimitiveProperty'
@@ -50,7 +50,7 @@ services:
         autoconfigure: true
         public: false
         bind:
-            $attributes: '%attributes%'
+            $attributes: '%entity_generator.attributes%'
             $entityQuestions: !tagged entity_generator.entity_question
             $propertyQuestions: !tagged entity_generator.property_question
             $attributeQuestions: !tagged entity_generator.attribute_question
@@ -74,7 +74,7 @@ services:
     Kevin3ssen\EntityGeneratorBundle\Command\EntityQuestion\DisplayFieldQuestion:
         tags: [{ name: entity_generator.entity_question, priority: 40 }] #Only makes sense to call AFTER FieldsQuestion
     Kevin3ssen\EntityGeneratorBundle\Command\EntityQuestion\StatusQuestion:
-        tags: [{ name: entity_generator.entity_question, priority: 10 }]
+        tags: [{ name: entity_generator.entity_question }]
 
     #Property/Field questions
     Kevin3ssen\EntityGeneratorBundle\Command\PropertyQuestion\NameAndTypeQuestion:

@@ -1,21 +1,43 @@
 EntityGeneratorBundle
 =====================
 
-Bundle to interactively generate entities in Symfony4. 
+**WORK IN PROGRESS: major changes are constantly being made at this moment**
 
-**WORK IN PROGRESS: currently not suitable for any usage**
 
+Bundle to interactively generate entities in Symfony 4. 
+
+This generator allows you to create entities and update existing
+entities.
+
+Features:
+
+- Three console commands:
+    - `entity:generate` to create a new entity.
+    - `entity:append` to safely add fields to an existing entity without overwriting anything else.
+    - `entity:alter` command to load content of an existing entity and allows you to
+    edit that very content.
+- Supports lots of ORM types, including 
+ManyToOne, OneToMany, ManyToMany and OneToOne relationships.
+- Automatically creates or updates targetEntity when mappedBy or InversedBy
+is being used.
+- Optionally add validation to fields.
+- Supports multiple bundles, as well the bundleless 'App' namespace.
+- Optionally specify subdirectories.
+- Interactive command allows you to edit your choices to easily fix
+mistakes or typos.
+- Extensible: override twig files, disable questions or add your own
+questions without too much effort.
 
 
 ## Extensibility
-One that fits all. Such generator probably won't exist. 
+This generator is created to support what is expected to
+be useful for entities. 
 
-There are quite a few generators created for symfony projects, but 
-every project or developer has different needs, 
-so there won't be any generator that will fit everyone's needs. 
-
-With that in mind this generator is created to be extensible: many components
-are used as services, enabling you to extend or overwrite them.
+Because it is hard to predict what could be useful to others,
+ this generator is created to be extensible: many components
+are created as services or configurable classes, 
+enabling you to extend or overwrite nearly everything without needing
+to rewrite the whole codebase.
 
 
 `TODO: documentation for examples`

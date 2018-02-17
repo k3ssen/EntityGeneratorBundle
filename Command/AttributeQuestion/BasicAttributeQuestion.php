@@ -6,6 +6,7 @@ namespace Kevin3ssen\EntityGeneratorBundle\Command\AttributeQuestion;
 use Kevin3ssen\EntityGeneratorBundle\Command\Helper\CommandInfo;
 use Kevin3ssen\EntityGeneratorBundle\Command\Helper\EvaluationTrait;
 use Kevin3ssen\EntityGeneratorBundle\MetaData\MetaAttribute;
+use Kevin3ssen\EntityGeneratorBundle\MetaData\MetaAttributeFactory;
 
 class BasicAttributeQuestion implements AttributeQuestionInterface
 {
@@ -16,12 +17,12 @@ class BasicAttributeQuestion implements AttributeQuestionInterface
     protected $validationExpression;
 
     public function __construct(
-        array $attributes,
+        MetaAttributeFactory $metaAttributeFactory,
         string $attributeName,
         string $requirementExpression = null,
         string $validationExpression = null
     ) {
-        if (!array_key_exists($attributeName, $attributes)) {
+        if (!$metaAttributeFactory->attributeExists($attributeName)) {
             throw new \InvalidArgumentException(sprintf('attribute name "%s" has not been defined in the "attributes" configuration', $attributeName));
         }
         $this->attributeName = $attributeName;

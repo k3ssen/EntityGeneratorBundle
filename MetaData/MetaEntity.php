@@ -78,7 +78,7 @@ class MetaEntity
      * Gets bundle name by retrieving the last part of the bundleNamespace
      * @return string
      */
-    public function getBundleName(): string
+    public function getBundleName(): ?string
     {
         if (strpos('\\', $this->getBundleNamespace()) !== false) {
             $parts = explode('\\', $this->getBundleNamespace());

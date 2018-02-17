@@ -24,5 +24,11 @@ class EntityGeneratorExtension extends Extension
         foreach ($config as $key => $value) {
             $container->setParameter('entity_generator.'.$key, $value);
         }
+
+        $attributes = array_merge_recursive(
+            $container->getParameter('default_attributes'),
+            $container->getParameter('entity_generator.attributes')
+        );
+        $container->setParameter('entity_generator.attributes', $attributes);
     }
 }

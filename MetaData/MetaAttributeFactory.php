@@ -5,6 +5,24 @@ namespace Kevin3ssen\EntityGeneratorBundle\MetaData;
 
 class MetaAttributeFactory
 {
+    /** @var array */
+    protected $attributes;
+
+    public function __construct(array $attributes)
+    {
+        $this->attributes = $attributes;
+    }
+
+    public function attributeExists(string $attributeName): bool
+    {
+        return array_key_exists($attributeName, $this->getAttributesList());
+    }
+
+    public function getAttributesList(): array
+    {
+        return $this->attributes;
+    }
+
     public function createMetaAttribute(string $name, array $attributeInfo): MetaAttribute
     {
         $metaAttribute = new MetaAttribute($name);

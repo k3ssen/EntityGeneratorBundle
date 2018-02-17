@@ -14,15 +14,11 @@ class MetaPropertyFactory
     public const MANY_TO_ONE = 'ManyToOne';
     public const ONE_TO_ONE = 'OneToOne';
 
-    /** @var array */
-    protected $attributes;
-
     /** @var MetaAttributeFactory */
     protected $metaAttributeFactory;
 
     public function __construct(array $attributes, MetaAttributeFactory $metaAttributeFactory)
     {
-        $this->attributes = $attributes;
         $this->metaAttributeFactory = $metaAttributeFactory;
     }
 
@@ -96,7 +92,7 @@ class MetaPropertyFactory
             /** @var MetaAttribute[] $metaAttributes */
             $metaAttributes = new ArrayCollection();
 
-            foreach ($this->attributes as $attributeName => $attributeInfo) {
+            foreach ($this->metaAttributeFactory->getAttributesList() as $attributeName => $attributeInfo) {
                 $classes = $attributeInfo['meta_properties'] ?? [];
                 if (is_string($classes)) {
                     $classes = [$classes];
