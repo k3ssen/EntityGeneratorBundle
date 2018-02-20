@@ -7,6 +7,8 @@ use Kevin3ssen\EntityGeneratorBundle\Command\Helper\CommandInfo;
 
 class DisplayFieldQuestion implements EntityQuestionInterface
 {
+    public const PRIORITY = 40;
+
     public function addActions(CommandInfo $commandInfo, array &$actions) {
         $actions['Edit display field'] = function() use($commandInfo) { $this->doQuestion($commandInfo); };
     }

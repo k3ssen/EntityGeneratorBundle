@@ -10,6 +10,8 @@ use Kevin3ssen\EntityGeneratorBundle\MetaData\Property\AbstractProperty;
 
 class FieldsQuestion implements EntityQuestionInterface
 {
+    public const PRIORITY = 50;
+
     /** @var MetaEntityFactory */
     protected $metaEntityFactory;
 

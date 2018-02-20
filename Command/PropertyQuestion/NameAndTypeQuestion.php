@@ -14,6 +14,8 @@ use Kevin3ssen\EntityGeneratorBundle\MetaData\Property\AbstractRelationshipPrope
 
 class NameAndTypeQuestion implements PropertyQuestionInterface
 {
+    public const PRIORITY = 99;
+
     /** @var MetaEntityFactory */
     protected $metaEntityFactory;
     /** @var MetaPropertyFactory */

@@ -8,6 +8,8 @@ use Kevin3ssen\EntityGeneratorBundle\MetaData\MetaEntityFactory;
 
 class EntityNameQuestion implements EntityQuestionInterface
 {
+    public const PRIORITY = 99;
+
     /** @var MetaEntityFactory */
     protected $metaEntityFactory;
 

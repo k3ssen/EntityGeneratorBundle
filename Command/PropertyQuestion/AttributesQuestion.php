@@ -10,6 +10,8 @@ use Kevin3ssen\EntityGeneratorBundle\MetaData\Property\AbstractProperty;
 
 class AttributesQuestion implements PropertyQuestionInterface
 {
+    public const PRIORITY = 10;
+
     use EvaluationTrait;
 
     /** @var iterable|AttributeQuestionInterface[] */
@@ -24,7 +26,7 @@ class AttributesQuestion implements PropertyQuestionInterface
     {
         foreach ($metaProperty->getMetaAttributes() as $metaAttribute) {
             foreach ($this->attributeQuestions as $attributeQuestion) {
-                if ($metaAttribute->getName() === $attributeQuestion->getAttributeName()) {
+                if ($attributeQuestion->supportsAttribute($metaAttribute->getName())) {
                     $attributeQuestion->doQuestion($commandInfo, $metaAttribute);
                     $commandInfo->saveTemporaryFile();
                 }

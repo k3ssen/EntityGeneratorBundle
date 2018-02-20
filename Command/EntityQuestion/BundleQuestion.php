@@ -9,6 +9,8 @@ use Symfony\Component\Console\Question\Question;
 
 class BundleQuestion implements EntityQuestionInterface
 {
+    public const PRIORITY = 80;
+
     /** @var BundleProvider */
     protected $bundleProvider;
 

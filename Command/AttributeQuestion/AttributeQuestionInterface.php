@@ -10,5 +10,7 @@ interface AttributeQuestionInterface
 {
     public function doQuestion(CommandInfo $commandInfo, MetaAttribute $metaAttribute);
 
-    public function getAttributeName(): string;
+    public function addAttribute(string $attributeName, array $attributeInfo = []);
+
+    public function supportsAttribute(string $attributeName): bool;
 }

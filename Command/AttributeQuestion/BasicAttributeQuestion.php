@@ -6,37 +6,42 @@ namespace Kevin3ssen\EntityGeneratorBundle\Command\AttributeQuestion;
 use Kevin3ssen\EntityGeneratorBundle\Command\Helper\CommandInfo;
 use Kevin3ssen\EntityGeneratorBundle\Command\Helper\EvaluationTrait;
 use Kevin3ssen\EntityGeneratorBundle\MetaData\MetaAttribute;
-use Kevin3ssen\EntityGeneratorBundle\MetaData\MetaAttributeFactory;
 
 class BasicAttributeQuestion implements AttributeQuestionInterface
 {
     use EvaluationTrait;
 
-    protected $attributeName;
-    protected $requirementExpression;
-    protected $validationExpression;
+    protected $supportedAttributes;
 
-    public function __construct(
-        MetaAttributeFactory $metaAttributeFactory,
-        string $attributeName,
-        string $requirementExpression = null,
-        string $validationExpression = null
-    ) {
-        if (!$metaAttributeFactory->attributeExists($attributeName)) {
-            throw new \InvalidArgumentException(sprintf('attribute name "%s" has not been defined in the "attributes" configuration', $attributeName));
-        }
-        $this->attributeName = $attributeName;
-        $this->requirementExpression = $requirementExpression;
-        $this->validationExpression = $validationExpression;
+    public function addAttribute(string $attributeName, array $attributeInfo = [])
+    {
+        $this->supportedAttributes[$attributeName] = $attributeInfo;
     }
 
-    public function getAttributeName(): string
+    public function supportsAttribute(string $attributeName): bool
     {
-        return $this->attributeName;
+        return array_key_exists($attributeName, $this->supportedAttributes);
+    }
+
+    protected function getRequirementExpression(string $attributeName): ?string
+    {
+        return $this->supportedAttributes[$attributeName]['requirement_expression'] ?? null;
+    }
+
+    protected function getValidationExpression(string $attributeName): ?string
+    {
+        return $this->supportedAttributes[$attributeName]['validation_expression'] ?? null;
     }
 
     public function doQuestion(CommandInfo $commandInfo, MetaAttribute $metaAttribute)
     {
+        if ($requirement = $this->getValidationExpression($metaAttribute->getName())) {
+            $requirementResult = $this->evaluateMetaAttribute($metaAttribute, $requirement);
+            if ($requirementResult === false) {
+                return;
+            }
+        }
+
         if ($metaAttribute->isBool()) {
             $value = $commandInfo->getIo()->confirm(ucfirst($metaAttribute->getName()), $metaAttribute->getValue() !== false);
             $metaAttribute->setValue($value);
@@ -55,10 +60,10 @@ class BasicAttributeQuestion implements AttributeQuestionInterface
                 $value = (int) $value;
             }
 
-            if ($validation = $this->validationExpression) {
+            if ($validation = $this->getValidationExpression($metaAttribute->getName())) {
                 $validationResult = $this->evaluateMetaAttribute($metaAttribute, $validation);
                 if (!$validationResult) {
-                    throw new \InvalidArgumentException(sprintf('Value evaluated false by validation expression "%s"', $metaAttribute->getValidation()));
+                    throw new \InvalidArgumentException(sprintf('Value evaluated false by validation expression "%s"', $validation));
                 }
             }
             return $value;

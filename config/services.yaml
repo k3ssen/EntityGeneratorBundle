@@ -5,6 +5,7 @@ parameters:
             meta_properties: 'Kevin3ssen\EntityGeneratorBundle\MetaData\Property\AbstractPrimitiveProperty'
             type: 'bool'
             default: false
+            requirement_expression: 'metaEntity.getIdProperty() == null or metaEntity.getIdProperty() != metaProperty'
         unique:
             meta_properties: 'Kevin3ssen\EntityGeneratorBundle\MetaData\Property\AbstractPrimitiveProperty'
             type: 'bool'
@@ -24,9 +25,11 @@ parameters:
         targetEntity:
             meta_properties: 'Kevin3ssen\EntityGeneratorBundle\MetaData\Property\AbstractRelationshipProperty'
             type: 'object'
+            question: 'Kevin3ssen\EntityGeneratorBundle\Command\AttributeQuestion\TargetEntityQuestion'
         referencedColumnName:
             meta_properties: 'Kevin3ssen\EntityGeneratorBundle\MetaData\Property\AbstractRelationshipProperty'
             default: 'id'
+            question: null
         orphanRemoval:
             meta_properties:
                 - 'Kevin3ssen\EntityGeneratorBundle\MetaData\Property\ManyToManyProperty'
@@ -38,11 +41,13 @@ parameters:
                 - 'Kevin3ssen\EntityGeneratorBundle\MetaData\Property\ManyToOneProperty'
                 - 'Kevin3ssen\EntityGeneratorBundle\MetaData\Property\OneToOneProperty'
                 - 'Kevin3ssen\EntityGeneratorBundle\MetaData\Property\ManyToManyProperty'
+            requirement_expression: 'metaProperty.getMappedBy() == null'
         mappedBy:
             meta_properties:
                 - 'Kevin3ssen\EntityGeneratorBundle\MetaData\Property\OneToManyProperty'
                 - 'Kevin3ssen\EntityGeneratorBundle\MetaData\Property\OneToOneProperty'
                 - 'Kevin3ssen\EntityGeneratorBundle\MetaData\Property\ManyToManyProperty'
+            requirement_expression: 'metaProperty.getMappedBy() == null'
 
 services:
     _defaults:
@@ -61,76 +66,3 @@ services:
     Kevin3ssen\EntityGeneratorBundle\:
         resource: '../*'
         exclude: '../{Entity,Migrations,Tests}'
-
-    #Entity questions
-    Kevin3ssen\EntityGeneratorBundle\Command\EntityQuestion\EntityNameQuestion:
-        tags: [{ name: entity_generator.entity_question, priority: 99 }]  #MUST be called before any other question!
-    Kevin3ssen\EntityGeneratorBundle\Command\EntityQuestion\BundleQuestion:
-        tags: [{ name: entity_generator.entity_question, priority: 80 }]
-    Kevin3ssen\EntityGeneratorBundle\Command\EntityQuestion\SubDirQuestion:
-        tags: [{ name: entity_generator.entity_question, priority: 70 }]
-    Kevin3ssen\EntityGeneratorBundle\Command\EntityQuestion\FieldsQuestion:
-        tags: [{ name: entity_generator.entity_question, priority: 50 }]
-    Kevin3ssen\EntityGeneratorBundle\Command\EntityQuestion\DisplayFieldQuestion:
-        tags: [{ name: entity_generator.entity_question, priority: 40 }] #Only makes sense to call AFTER FieldsQuestion
-    Kevin3ssen\EntityGeneratorBundle\Command\EntityQuestion\StatusQuestion:
-        tags: [{ name: entity_generator.entity_question }]
-
-    #Property/Field questions
-    Kevin3ssen\EntityGeneratorBundle\Command\PropertyQuestion\NameAndTypeQuestion:
-        tags: [{ name: entity_generator.property_question, priority: 99 }] #MUST be called before other propertyQuestions
-    Kevin3ssen\EntityGeneratorBundle\Command\PropertyQuestion\AttributesQuestion:
-        tags: [{ name: entity_generator.property_question, priority: 50 }]
-    Kevin3ssen\EntityGeneratorBundle\Command\PropertyQuestion\ValidationsQuestion:
-        tags: [{ name: entity_generator.property_question, priority: 30 }]
-
-    #Attribute question-services
-    Kevin3ssen\EntityGeneratorBundle\Command\AttributeQuestion\TargetEntityQuestion:
-        tags: [{ name: entity_generator.attribute_question  }]
-        arguments: { $attributeName: 'targetEntity' }
-    attribute_question.id:
-        class: 'Kevin3ssen\EntityGeneratorBundle\Command\AttributeQuestion\BasicAttributeQuestion'
-        tags: [{ name: entity_generator.attribute_question}]
-        arguments:
-            $attributeName: 'id'
-            $requirementExpression: 'metaEntity.getIdProperty() == null or metaEntity.getIdProperty() != metaProperty'
-
-    # NOTE: attribute 'name' won't need an attribute_question service, since this is already handled by property_question 'NameAndTypeQuestion'
-
-    attribute_question.unique:
-        class: 'Kevin3ssen\EntityGeneratorBundle\Command\AttributeQuestion\BasicAttributeQuestion'
-        tags: [{ name: entity_generator.attribute_question  }]
-        arguments:
-            $attributeName: 'unique'
-    attribute_question.nullable:
-        class: 'Kevin3ssen\EntityGeneratorBundle\Command\AttributeQuestion\BasicAttributeQuestion'
-        tags: [{ name: entity_generator.attribute_question  }]
-        arguments:
-            $attributeName: 'nullable'
-    attribute_question.length:
-        class: 'Kevin3ssen\EntityGeneratorBundle\Command\AttributeQuestion\BasicAttributeQuestion'
-        tags: [{ name: entity_generator.attribute_question  }]
-        arguments:
-            $attributeName: 'length'
-    attribute_question.precision:
-        class: 'Kevin3ssen\EntityGeneratorBundle\Command\AttributeQuestion\BasicAttributeQuestion'
-        tags: [{ name: entity_generator.attribute_question  }]
-        arguments:
-            $attributeName: 'precision'
-    attribute_question.scale:
-        class: 'Kevin3ssen\EntityGeneratorBundle\Command\AttributeQuestion\BasicAttributeQuestion'
-        tags: [{ name: entity_generator.attribute_question  }]
-        arguments:
-            $attributeName: 'scale'
-    attribute_question.inversed_by:
-        class: 'Kevin3ssen\EntityGeneratorBundle\Command\AttributeQuestion\BasicAttributeQuestion'
-        tags: [{ name: entity_generator.attribute_question  }]
-        arguments:
-            $attributeName: 'inversedBy'
-            $requirementExpression: 'metaProperty.getMappedBy() == null'
-    attribute_question.mapped_by:
-        class: 'Kevin3ssen\EntityGeneratorBundle\Command\AttributeQuestion\BasicAttributeQuestion'
-        tags: [{ name: entity_generator.attribute_question  }]
-        arguments:
-            $attributeName: 'mappedBy'
-            $requirementExpression: 'metaProperty.getMappedBy() == null'

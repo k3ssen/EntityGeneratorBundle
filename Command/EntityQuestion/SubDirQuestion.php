@@ -7,6 +7,8 @@ use Kevin3ssen\EntityGeneratorBundle\Command\Helper\CommandInfo;
 
 class SubDirQuestion implements EntityQuestionInterface
 {
+    public const PRIORITY = 70;
+
     public function addActions(CommandInfo $commandInfo, array &$actions) {
         $actions['Edit sub directory'] = function() use($commandInfo) {
             $this->doQuestion($commandInfo);

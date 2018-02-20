@@ -15,20 +15,22 @@ class TargetEntityQuestion implements AttributeQuestionInterface
     /** @var MetaEntityFactory */
     protected $metaEntityFactory;
 
-    protected $attributeName;
+    /** @var array */
+    protected $supportedAttributes;
 
-    public function __construct(array $attributes, string $attributeName, MetaEntityFactory $metaEntityFactory)
+    public function __construct(MetaEntityFactory $metaEntityFactory)
     {
-        if (!array_key_exists($attributeName, $attributes)) {
-            throw new \InvalidArgumentException(sprintf('attribute name "%s" has not been defined in the "attributes" configuration', $attributeName));
-        }
-        $this->attributeName = $attributeName;
         $this->metaEntityFactory = $metaEntityFactory;
     }
 
-    public function getAttributeName(): string
+    public function addAttribute(string $attributeName, array $attributeInfo = [])
     {
-        return $this->attributeName;
+        $this->supportedAttributes[$attributeName] = $attributeInfo;
+    }
+
+    public function supportsAttribute(string $attributeName): bool
+    {
+        return array_key_exists($attributeName, $this->supportedAttributes);
     }
 
     public function doQuestion(CommandInfo $commandInfo, MetaAttribute $metaAttribute)

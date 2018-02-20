@@ -9,6 +9,8 @@ use Kevin3ssen\EntityGeneratorBundle\MetaData\Property\AbstractRelationshipPrope
 
 class StatusQuestion implements EntityQuestionInterface
 {
+    public const PRIORITY = 10;
+
     public function addActions(CommandInfo $commandInfo, array &$actions) {
         $actions['Show info'] = function() use($commandInfo) { $this->showInfo($commandInfo); };
     }
