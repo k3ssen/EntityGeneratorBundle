@@ -6,7 +6,7 @@ namespace Kevin3ssen\EntityGeneratorBundle\MetaData\Property;
 use Doctrine\Common\Collections\ArrayCollection;
 use Kevin3ssen\EntityGeneratorBundle\MetaData\MetaAttributeInterface;
 use Kevin3ssen\EntityGeneratorBundle\MetaData\MetaEntityInterface;
-use Kevin3ssen\EntityGeneratorBundle\MetaData\MetaValidation;
+use Kevin3ssen\EntityGeneratorBundle\MetaData\MetaValidationInterface;
 
 interface MetaPropertyInterface
 {
@@ -34,14 +34,14 @@ interface MetaPropertyInterface
 
     public function setUnique(?bool $unique);
 
-    /** @return ArrayCollection|MetaValidation[] */
+    /** @return ArrayCollection|MetaValidationInterface[] */
     public function getValidations(): ArrayCollection;
 
     public function setValidations(ArrayCollection $validations);
 
-    public function addValidation(MetaValidation $validation);
+    public function addValidation(MetaValidationInterface $validation);
 
-    public function removeValidation(MetaValidation $validation);
+    public function removeValidation(MetaValidationInterface $validation);
 
     public function isHasValidation(): bool;
 

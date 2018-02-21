@@ -12,12 +12,14 @@ use Kevin3ssen\EntityGeneratorBundle\MetaData\MetaAttributeInterface;
 use Kevin3ssen\EntityGeneratorBundle\MetaData\MetaEntityFactory;
 use Kevin3ssen\EntityGeneratorBundle\MetaData\MetaEntityInterface;
 use Kevin3ssen\EntityGeneratorBundle\MetaData\MetaPropertyFactory;
+use Kevin3ssen\EntityGeneratorBundle\MetaData\MetaValidationFactory;
+use Kevin3ssen\EntityGeneratorBundle\MetaData\MetaValidationInterface;
 use Kevin3ssen\EntityGeneratorBundle\MetaData\Property\MetaPropertyInterface;
 use Symfony\Component\Config\Definition\Exception\InvalidDefinitionException;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
-class QuestionPass implements CompilerPassInterface
+class EntityGeneratorCompilerPass implements CompilerPassInterface
 {
     public function process(ContainerBuilder $container)
     {
@@ -50,6 +52,10 @@ class QuestionPass implements CompilerPassInterface
                 }
                 if (is_subclass_of($definition->getClass(), MetaAttributeInterface::class, true)) {
                     $container->getDefinition(MetaAttributeFactory::class)->addMethodCall('setMetaAttributeClass', [$definition->getClass()]);
+                    continue;
+                }
+                if (is_subclass_of($definition->getClass(), MetaValidationInterface::class, true)) {
+                    $container->getDefinition(MetaValidationFactory::class)->addMethodCall('setMetaValidationClass', [$definition->getClass()]);
                     continue;
                 }
             }

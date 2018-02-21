@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace Kevin3ssen\EntityGeneratorBundle;
 
-use Kevin3ssen\EntityGeneratorBundle\DependencyInjection\Compiler\QuestionPass;
+use Kevin3ssen\EntityGeneratorBundle\DependencyInjection\Compiler\EntityGeneratorCompilerPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
@@ -13,6 +13,6 @@ class EntityGeneratorBundle extends Bundle
     {
         parent::build($container);
 
-        $container->addCompilerPass(new QuestionPass());
+        $container->addCompilerPass(new EntityGeneratorCompilerPass());
     }
 }

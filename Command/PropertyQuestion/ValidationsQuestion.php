@@ -4,8 +4,8 @@ declare(strict_types=1);
 namespace Kevin3ssen\EntityGeneratorBundle\Command\PropertyQuestion;
 
 use Kevin3ssen\EntityGeneratorBundle\Command\Helper\CommandInfo;
-use Kevin3ssen\EntityGeneratorBundle\MetaData\MetaValidation;
 use Kevin3ssen\EntityGeneratorBundle\MetaData\MetaValidationFactory;
+use Kevin3ssen\EntityGeneratorBundle\MetaData\MetaValidationInterface;
 use Kevin3ssen\EntityGeneratorBundle\MetaData\Property\MetaPropertyInterface;
 use Symfony\Component\Console\Question\Question;
 use Symfony\Component\Validator\Constraint;
@@ -94,7 +94,7 @@ class ValidationsQuestion implements PropertyQuestionInterface
         $this->doQuestion($commandInfo, $metaProperty);
     }
 
-    protected function askMetaPropertyValidationChoice(CommandInfo $commandInfo, MetaPropertyInterface $metaProperty): MetaValidation
+    protected function askMetaPropertyValidationChoice(CommandInfo $commandInfo, MetaPropertyInterface $metaProperty): MetaValidationInterface
     {
         $validations = $metaProperty->getValidations();
         $validationChoice = $commandInfo->getIo()->choice('Edit validation', $validations->toArray());

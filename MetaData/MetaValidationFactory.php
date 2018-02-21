@@ -3,30 +3,38 @@ declare(strict_types=1);
 
 namespace Kevin3ssen\EntityGeneratorBundle\MetaData;
 
+use Kevin3ssen\EntityGeneratorBundle\MetaData\Property\BooleanMetaPropertyInterface;
+use Kevin3ssen\EntityGeneratorBundle\MetaData\Property\DateMetaPropertyInterface;
+use Kevin3ssen\EntityGeneratorBundle\MetaData\Property\DateTimeMetaPropertyInterface;
+use Kevin3ssen\EntityGeneratorBundle\MetaData\Property\IntegerMetaPropertyInterface;
+use Kevin3ssen\EntityGeneratorBundle\MetaData\Property\JsonMetaPropertyInterface;
+use Kevin3ssen\EntityGeneratorBundle\MetaData\Property\ManyToManyMetaPropertyInterface;
 use Kevin3ssen\EntityGeneratorBundle\MetaData\Property\MetaPropertyInterface;
+use Kevin3ssen\EntityGeneratorBundle\MetaData\Property\OneToManyMetaPropertyInterface;
 use Kevin3ssen\EntityGeneratorBundle\MetaData\Property\RelationMetaPropertyInterface;
-use Kevin3ssen\EntityGeneratorBundle\MetaData\Property\BooleanMetaProperty;
-use Kevin3ssen\EntityGeneratorBundle\MetaData\Property\DateMetaProperty;
-use Kevin3ssen\EntityGeneratorBundle\MetaData\Property\DateTimeMetaProperty;
-use Kevin3ssen\EntityGeneratorBundle\MetaData\Property\IntegerMetaProperty;
-use Kevin3ssen\EntityGeneratorBundle\MetaData\Property\JsonMetaProperty;
-use Kevin3ssen\EntityGeneratorBundle\MetaData\Property\ManyToManyMetaProperty;
-use Kevin3ssen\EntityGeneratorBundle\MetaData\Property\OneToManyMetaProperty;
-use Kevin3ssen\EntityGeneratorBundle\MetaData\Property\SimpleArrayMetaProperty;
-use Kevin3ssen\EntityGeneratorBundle\MetaData\Property\StringMetaProperty;
-use Kevin3ssen\EntityGeneratorBundle\MetaData\Property\TextMetaProperty;
-use Kevin3ssen\EntityGeneratorBundle\MetaData\Property\TimeMetaProperty;
+use Kevin3ssen\EntityGeneratorBundle\MetaData\Property\SimpleArrayMetaPropertyInterface;
+use Kevin3ssen\EntityGeneratorBundle\MetaData\Property\StringMetaPropertyInterface;
+use Kevin3ssen\EntityGeneratorBundle\MetaData\Property\TextMetaPropertyInterface;
+use Kevin3ssen\EntityGeneratorBundle\MetaData\Property\TimeMetaPropertyInterface;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Constraints;
 
 class MetaValidationFactory
 {
-    public function createMetaValidation(MetaPropertyInterface $metaProperty, string $className, array $options = []): MetaValidation
+    /** @var string */
+    protected $metaValidationClass;
+
+    public function setMetaValidationClass(string $class)
+    {
+        $this->metaValidationClass = $class;
+    }
+
+    public function createMetaValidation(MetaPropertyInterface $metaProperty, string $className, array $options = []): MetaValidationInterface
     {
         if (strpos('\\', $className) === false) {
             $className = $this->getConstraintFullClassName($className);
         }
-        return new MetaValidation($metaProperty, $className, $options);
+        return new $this->metaValidationClass($metaProperty, $className, $options);
     }
 
     protected function getConstraintFullClassName($shortName): string
@@ -67,7 +75,7 @@ class MetaValidationFactory
             //What does traverse even do?
             Constraints\Traverse::class,
         ];
-        if (!$metaProperty instanceof StringMetaProperty) {
+        if (!$metaProperty instanceof StringMetaPropertyInterface) {
             $blackList[] = Constraints\Bic::class;
             $blackList[] = Constraints\Currency::class;
             $blackList[] = Constraints\Iban::class;
@@ -80,14 +88,14 @@ class MetaValidationFactory
             $blackList[] = Constraints\File::class;
             $blackList[] = Constraints\Image::class;
         }
-        if (!$metaProperty instanceof StringMetaProperty && !$metaProperty instanceof TextMetaProperty) {
+        if (!$metaProperty instanceof StringMetaPropertyInterface && !$metaProperty instanceof TextMetaPropertyInterface) {
             $blackList[] = Constraints\NotBlank::class;
             $blackList[] = Constraints\Regex::class;
             $blackList[] = Constraints\Url::class;
             $blackList[] = Constraints\Email::class;
         }
 
-        if (!$metaProperty instanceof StringMetaProperty && !$metaProperty instanceof IntegerMetaProperty) {
+        if (!$metaProperty instanceof StringMetaPropertyInterface && !$metaProperty instanceof IntegerMetaPropertyInterface) {
             //TODO: Not sure if these constraint would validate with only string or could work with integers as well
             $blackList[] = Constraints\CardScheme::class;
             $blackList[] = Constraints\Luhn::class;
@@ -95,37 +103,37 @@ class MetaValidationFactory
             $blackList[] = Constraints\Issn::class;
         }
 
-        if (!$metaProperty instanceof IntegerMetaProperty
-            && !$metaProperty instanceof DateTimeMetaProperty
-            && !$metaProperty instanceof TimeMetaProperty
-            && !$metaProperty instanceof DateMetaProperty
+        if (!$metaProperty instanceof IntegerMetaPropertyInterface
+            && !$metaProperty instanceof DateTimeMetaPropertyInterface
+            && !$metaProperty instanceof TimeMetaPropertyInterface
+            && !$metaProperty instanceof DateMetaPropertyInterface
             //TODO: not sure if range would work with string if decimal is used.
         ) {
             $blackList[] = Constraints\Range::class;
         }
 
-        if (!$metaProperty instanceof DateTimeMetaProperty) {
+        if (!$metaProperty instanceof DateTimeMetaPropertyInterface) {
             $blackList[] = Constraints\DateTime::class;
         }
-        if (!$metaProperty instanceof TimeMetaProperty) {
+        if (!$metaProperty instanceof TimeMetaPropertyInterface) {
             $blackList[] = Constraints\Time::class;
         }
-        if (!$metaProperty instanceof DateMetaProperty) {
+        if (!$metaProperty instanceof DateMetaPropertyInterface) {
             $blackList[] = Constraints\Date::class;
         }
 
         if (!$metaProperty instanceof RelationMetaPropertyInterface) {
             $blackList[] = Constraints\Valid::class;
         }
-        if (!$metaProperty instanceof BooleanMetaProperty) {
+        if (!$metaProperty instanceof BooleanMetaPropertyInterface) {
             $blackList[] = Constraints\IsTrue::class;
             $blackList[] = Constraints\IsFalse::class;
         }
 
-        if (!$metaProperty instanceof ManyToManyMetaProperty
-            && !$metaProperty instanceof OneToManyMetaProperty
-            && !$metaProperty instanceof SimpleArrayMetaProperty
-            && !$metaProperty instanceof JsonMetaProperty //TODO: Not sure if json can be used as collection
+        if (!$metaProperty instanceof ManyToManyMetaPropertyInterface
+            && !$metaProperty instanceof OneToManyMetaPropertyInterface
+            && !$metaProperty instanceof SimpleArrayMetaPropertyInterface
+            && !$metaProperty instanceof JsonMetaPropertyInterface //TODO: Not sure if json can be used as collection
         ) {
             $blackList[] = Constraints\Count::class;
         }

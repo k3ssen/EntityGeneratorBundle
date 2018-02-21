@@ -7,14 +7,14 @@ use Doctrine\Common\Util\Inflector;
 use Doctrine\Common\Collections\ArrayCollection;
 use Kevin3ssen\EntityGeneratorBundle\MetaData\MetaAttributeInterface;
 use Kevin3ssen\EntityGeneratorBundle\MetaData\MetaEntityInterface;
-use Kevin3ssen\EntityGeneratorBundle\MetaData\MetaValidation;
+use Kevin3ssen\EntityGeneratorBundle\MetaData\MetaValidationInterface;
 
 abstract class AbstractMetaProperty implements MetaPropertyInterface
 {
     /** @var MetaEntityInterface */
     protected $metaEntity;
 
-    /** @var MetaValidation[]|ArrayCollection */
+    /** @var MetaValidationInterface[]|ArrayCollection */
     protected $validations;
 
     /** @var MetaAttributeInterface[]|ArrayCollection */
@@ -95,7 +95,7 @@ abstract class AbstractMetaProperty implements MetaPropertyInterface
         return $this->setAttribute('unique', $unique);
     }
 
-    /** @return ArrayCollection|MetaValidation[] */
+    /** @return ArrayCollection|MetaValidationInterface[] */
     public function getValidations(): ArrayCollection
     {
         return $this->validations;
@@ -107,7 +107,7 @@ abstract class AbstractMetaProperty implements MetaPropertyInterface
         return $this;
     }
 
-    public function addValidation(MetaValidation $validation)
+    public function addValidation(MetaValidationInterface $validation)
     {
         if (!$this->getValidations()->contains($validation)) {
             $this->getValidations()->add($validation);
@@ -116,7 +116,7 @@ abstract class AbstractMetaProperty implements MetaPropertyInterface
         return $this;
     }
 
-    public function removeValidation(MetaValidation $validation)
+    public function removeValidation(MetaValidationInterface $validation)
     {
         if ($this->getValidations()->contains($validation)) {
             $this->getValidations()->removeElement($validation);
