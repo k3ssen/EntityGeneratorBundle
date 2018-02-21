@@ -57,7 +57,7 @@ parameters:
                 - 'Kevin3ssen\EntityGeneratorBundle\MetaData\Property\OneToManyMetaPropertyInterface'
                 - 'Kevin3ssen\EntityGeneratorBundle\MetaData\Property\OneToOneMetaPropertyInterface'
                 - 'Kevin3ssen\EntityGeneratorBundle\MetaData\Property\ManyToManyMetaPropertyInterface'
-            requirement_expression: 'metaProperty.getMappedBy() == null'
+            requirement_expression: 'metaProperty.getInversedBy() == null'
 
 services:
     _defaults:

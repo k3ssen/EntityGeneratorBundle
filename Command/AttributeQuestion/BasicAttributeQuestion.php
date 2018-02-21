@@ -35,7 +35,7 @@ class BasicAttributeQuestion implements AttributeQuestionInterface
 
     public function doQuestion(CommandInfo $commandInfo, MetaAttributeInterface $metaAttribute)
     {
-        if ($requirement = $this->getValidationExpression($metaAttribute->getName())) {
+        if ($requirement = $this->getRequirementExpression($metaAttribute->getName())) {
             $requirementResult = $this->evaluateMetaAttribute($metaAttribute, $requirement);
             if ($requirementResult === false) {
                 return;
