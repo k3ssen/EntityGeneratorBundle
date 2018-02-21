@@ -25,8 +25,32 @@ is being used.
 - Optionally specify subdirectories.
 - Interactive command allows you to edit your choices to easily fix
 mistakes or typos.
-- Extensible: override twig files, disable questions or add your own
-questions without too much effort.
+- Extensibility: override almost any file by simply extending a class, implementing an interface
+or replacing a service.
+
+## Attributes configuration
+Some questions may get annoying real quick. For instance, if you always use a standard $id property
+for all your entities, then getting asked if a property is an id is quite useless. 
+Below is an example of how to disable questions for several attributes.
+
+    entity_generator:
+        attributes:
+            id:
+                question: null
+            unique:
+                question: null
+            nullable:
+                question: null
+            length:
+                question: null
+            precision:
+                question: null
+            scale:
+                question: null
+            referencedColumnName:
+                question: null
+            orphanRemoval:
+                question: null
 
 ## Extensibility
 This generator is created to support what is expected to

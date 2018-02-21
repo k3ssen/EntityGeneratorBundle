@@ -1,50 +1,58 @@
 parameters:
-    # TODO: make sure certain settings cannot be overwritting: for example, the classes set in meta_properties should not be removed.
+    # The default_attributes can partially be overridden in service configuration 'meta_entity.attributes'.
+    # The names and types cannot be altered. Also, meta_properties can be added, but not removed.
+    # 'default', 'question', 'requirement_expression', 'valdation_expression' can be overridden.
+    # Note if 'question' is provided, then the 'BasicAttributeQuestion' service will be used. If 'null' is provided, then no question will be used
     default_attributes:
-        name: {}
+        name:
+            type: 'string'
+            meta_properties: ['Kevin3ssen\EntityGeneratorBundle\MetaData\Property\MetaPropertyInterface']
+            question: null #the 'NameAndTypeQuestion' propertyQuestion already asks for name, so we don't need this as attribute-question
         id:
-            meta_properties: 'Kevin3ssen\EntityGeneratorBundle\MetaData\Property\PrimitiveMetaPropertyInterface'
             type: 'bool'
+            meta_properties: ['Kevin3ssen\EntityGeneratorBundle\MetaData\Property\PrimitiveMetaPropertyInterface']
             default: false
             requirement_expression: 'metaEntity.getIdProperty() == null or metaEntity.getIdProperty() != metaProperty'
         unique:
-            meta_properties: 'Kevin3ssen\EntityGeneratorBundle\MetaData\Property\PrimitiveMetaPropertyInterface'
             type: 'bool'
+            meta_properties: ['Kevin3ssen\EntityGeneratorBundle\MetaData\Property\PrimitiveMetaPropertyInterface']
             default: false
         nullable:
             type: 'bool'
+            meta_properties: ['Kevin3ssen\EntityGeneratorBundle\MetaData\Property\MetaPropertyInterface']
             default: false
         length:
-            meta_properties: 'Kevin3ssen\EntityGeneratorBundle\MetaData\Property\HasLengthInterface'
             type: 'int'
-            question: null
+            meta_properties: ['Kevin3ssen\EntityGeneratorBundle\MetaData\Property\HasLengthInterface']
         precision:
-            meta_properties: 'Kevin3ssen\EntityGeneratorBundle\MetaData\Property\DecimalMetaPropertyInterface'
             type: 'int'
+            meta_properties: ['Kevin3ssen\EntityGeneratorBundle\MetaData\Property\DecimalMetaPropertyInterface']
         scale:
-            meta_properties: 'Kevin3ssen\EntityGeneratorBundle\MetaData\Property\DecimalMetaPropertyInterface'
             type: 'int'
+            meta_properties: ['Kevin3ssen\EntityGeneratorBundle\MetaData\Property\DecimalMetaPropertyInterface']
         targetEntity:
-            meta_properties: 'Kevin3ssen\EntityGeneratorBundle\MetaData\Property\RelationMetaPropertyInterface'
             type: 'object'
+            meta_properties: ['Kevin3ssen\EntityGeneratorBundle\MetaData\Property\RelationMetaPropertyInterface']
             question: 'Kevin3ssen\EntityGeneratorBundle\Command\AttributeQuestion\TargetEntityQuestion'
         referencedColumnName:
-            meta_properties: 'Kevin3ssen\EntityGeneratorBundle\MetaData\Property\RelationMetaPropertyInterface'
+            type: 'string'
+            meta_properties: ['Kevin3ssen\EntityGeneratorBundle\MetaData\Property\RelationMetaPropertyInterface']
             default: 'id'
-            question: null
         orphanRemoval:
+            type: 'bool'
             meta_properties:
                 - 'Kevin3ssen\EntityGeneratorBundle\MetaData\Property\ManyToManyMetaPropertyInterface'
                 - 'Kevin3ssen\EntityGeneratorBundle\MetaData\Property\OneToManyMetaPropertyInterface'
-            type: 'bool'
             default: false
         inversedBy:
+            type: 'string'
             meta_properties:
                 - 'Kevin3ssen\EntityGeneratorBundle\MetaData\Property\ManyToOneMetaPropertyInterface'
                 - 'Kevin3ssen\EntityGeneratorBundle\MetaData\Property\OneToOneMetaPropertyInterface'
                 - 'Kevin3ssen\EntityGeneratorBundle\MetaData\Property\ManyToManyMetaPropertyInterface'
             requirement_expression: 'metaProperty.getMappedBy() == null'
         mappedBy:
+            type: 'string'
             meta_properties:
                 - 'Kevin3ssen\EntityGeneratorBundle\MetaData\Property\OneToManyMetaPropertyInterface'
                 - 'Kevin3ssen\EntityGeneratorBundle\MetaData\Property\OneToOneMetaPropertyInterface'

@@ -29,7 +29,7 @@ class Configuration implements ConfigurationInterface
                 ->arrayNode('attributes')
                     ->arrayPrototype()
                         ->children()
-                            ->arrayNode('meta_properties')->end()
+                            ->arrayNode('meta_properties')->scalarPrototype()->end()->end()
                             ->enumNode('type')
                                 ->values(['string', 'int', 'bool', 'object', 'array'])
                             ->end()
