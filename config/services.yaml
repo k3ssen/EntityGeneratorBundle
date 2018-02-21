@@ -1,4 +1,5 @@
 parameters:
+    # TODO: make sure certain settings cannot be overwritting: for example, the classes set in meta_properties should not be removed.
     default_attributes:
         name: {}
         id:

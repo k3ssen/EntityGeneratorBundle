@@ -4,23 +4,23 @@ declare(strict_types=1);
 namespace Kevin3ssen\EntityGeneratorBundle\MetaData\Property;
 
 use Doctrine\Common\Util\Inflector;
-use Kevin3ssen\EntityGeneratorBundle\MetaData\MetaAttribute;
-use Kevin3ssen\EntityGeneratorBundle\MetaData\MetaEntity;
 use Doctrine\Common\Collections\ArrayCollection;
+use Kevin3ssen\EntityGeneratorBundle\MetaData\MetaAttributeInterface;
+use Kevin3ssen\EntityGeneratorBundle\MetaData\MetaEntityInterface;
 use Kevin3ssen\EntityGeneratorBundle\MetaData\MetaValidation;
 
 abstract class AbstractMetaProperty implements MetaPropertyInterface
 {
-    /** @var MetaEntity */
+    /** @var MetaEntityInterface */
     protected $metaEntity;
 
     /** @var MetaValidation[]|ArrayCollection */
     protected $validations;
 
-    /** @var MetaAttribute[]|ArrayCollection */
+    /** @var MetaAttributeInterface[]|ArrayCollection */
     protected $metaAttributes;
 
-    public function __construct(MetaEntity $metaEntity, ArrayCollection $metaAttributes, string $name)
+    public function __construct(MetaEntityInterface $metaEntity, ArrayCollection $metaAttributes, string $name)
     {
         $this->metaAttributes = $metaAttributes;
         $this->setMetaEntity($metaEntity);
@@ -54,12 +54,12 @@ abstract class AbstractMetaProperty implements MetaPropertyInterface
         return static::getOrmType();
     }
 
-    public function getMetaEntity(): MetaEntity
+    public function getMetaEntity(): MetaEntityInterface
     {
         return $this->metaEntity;
     }
 
-    public function setMetaEntity(MetaEntity $metaEntity)
+    public function setMetaEntity(MetaEntityInterface $metaEntity)
     {
         $this->metaEntity = $metaEntity;
         return $this;
@@ -130,14 +130,14 @@ abstract class AbstractMetaProperty implements MetaPropertyInterface
     }
 
     /**
-     * @return array|ArrayCollection|MetaAttribute[]
+     * @return array|ArrayCollection|MetaAttributeInterface[]
      */
     public function getMetaAttributes(): ArrayCollection
     {
         return $this->metaAttributes;
     }
 
-    public function addMetaAttribute(MetaAttribute $metaAttribute)
+    public function addMetaAttribute(MetaAttributeInterface $metaAttribute)
     {
         if (!$this->getMetaAttributes()->contains($metaAttribute)) {
             $this->getMetaAttributes()->set($metaAttribute->getName(), $metaAttribute);
@@ -146,7 +146,7 @@ abstract class AbstractMetaProperty implements MetaPropertyInterface
         return $this;
     }
 
-    public function removeMetaAttribute(MetaAttribute $metaAttribute)
+    public function removeMetaAttribute(MetaAttributeInterface $metaAttribute)
     {
         if (!$this->getMetaAttributes()->contains($metaAttribute)) {
             $this->getMetaAttributes()->removeElement($metaAttribute);
@@ -154,7 +154,7 @@ abstract class AbstractMetaProperty implements MetaPropertyInterface
         return $this;
     }
 
-    public function getMetaAttribute($name): MetaAttribute
+    public function getMetaAttribute($name): MetaAttributeInterface
     {
         $metaAttribute = $this->getMetaAttributes()->get($name);
         if ($metaAttribute === null) {

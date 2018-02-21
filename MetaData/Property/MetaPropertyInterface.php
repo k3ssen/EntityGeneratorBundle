@@ -3,14 +3,14 @@ declare(strict_types=1);
 
 namespace Kevin3ssen\EntityGeneratorBundle\MetaData\Property;
 
-use Kevin3ssen\EntityGeneratorBundle\MetaData\MetaAttribute;
-use Kevin3ssen\EntityGeneratorBundle\MetaData\MetaEntity;
 use Doctrine\Common\Collections\ArrayCollection;
+use Kevin3ssen\EntityGeneratorBundle\MetaData\MetaAttributeInterface;
+use Kevin3ssen\EntityGeneratorBundle\MetaData\MetaEntityInterface;
 use Kevin3ssen\EntityGeneratorBundle\MetaData\MetaValidation;
 
 interface MetaPropertyInterface
 {
-    public function __construct(MetaEntity $metaEntity, ArrayCollection $metaAttributes, string $name);
+    public function __construct(MetaEntityInterface $metaEntity, ArrayCollection $metaAttributes, string $name);
 
     public static function getReturnType(): string;
 
@@ -18,9 +18,9 @@ interface MetaPropertyInterface
 
     public static function getOrmTypeAlias();
 
-    public function getMetaEntity(): MetaEntity;
+    public function getMetaEntity(): MetaEntityInterface;
 
-    public function setMetaEntity(MetaEntity $metaEntity);
+    public function setMetaEntity(MetaEntityInterface $metaEntity);
 
     public function getName(): ?string;
 
@@ -45,14 +45,14 @@ interface MetaPropertyInterface
 
     public function isHasValidation(): bool;
 
-    /** @return array|ArrayCollection|MetaAttribute[] */
+    /** @return array|ArrayCollection|MetaAttributeInterface[] */
     public function getMetaAttributes(): ArrayCollection;
 
-    public function addMetaAttribute(MetaAttribute $metaAttribute);
+    public function addMetaAttribute(MetaAttributeInterface $metaAttribute);
 
-    public function removeMetaAttribute(MetaAttribute $metaAttribute);
+    public function removeMetaAttribute(MetaAttributeInterface $metaAttribute);
 
-    public function getMetaAttribute($name): MetaAttribute;
+    public function getMetaAttribute($name): MetaAttributeInterface;
 
     public function hasAttribute($name): bool;
 

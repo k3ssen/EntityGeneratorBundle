@@ -5,7 +5,7 @@ namespace Kevin3ssen\EntityGeneratorBundle\Command\AttributeQuestion;
 
 use Kevin3ssen\EntityGeneratorBundle\Command\Helper\CommandInfo;
 use Kevin3ssen\EntityGeneratorBundle\Command\Helper\EvaluationTrait;
-use Kevin3ssen\EntityGeneratorBundle\MetaData\MetaAttribute;
+use Kevin3ssen\EntityGeneratorBundle\MetaData\MetaAttributeInterface;
 
 class BasicAttributeQuestion implements AttributeQuestionInterface
 {
@@ -33,7 +33,7 @@ class BasicAttributeQuestion implements AttributeQuestionInterface
         return $this->supportedAttributes[$attributeName]['validation_expression'] ?? null;
     }
 
-    public function doQuestion(CommandInfo $commandInfo, MetaAttribute $metaAttribute)
+    public function doQuestion(CommandInfo $commandInfo, MetaAttributeInterface $metaAttribute)
     {
         if ($requirement = $this->getValidationExpression($metaAttribute->getName())) {
             $requirementResult = $this->evaluateMetaAttribute($metaAttribute, $requirement);

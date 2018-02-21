@@ -5,7 +5,7 @@ namespace Kevin3ssen\EntityGeneratorBundle\MetaData;
 
 use Kevin3ssen\EntityGeneratorBundle\MetaData\Property\MetaPropertyInterface;
 
-class MetaAttribute
+class MetaAttribute implements MetaAttributeInterface
 {
     protected const TYPE_STRING = 'string';
     protected const TYPE_INT = 'int';
@@ -52,7 +52,7 @@ class MetaAttribute
         return $this->metaProperty;
     }
 
-    public function setMetaProperty(MetaPropertyInterface $metaProperty): self
+    public function setMetaProperty(MetaPropertyInterface $metaProperty)
     {
         $this->metaProperty = $metaProperty;
         return $this;
@@ -68,7 +68,7 @@ class MetaAttribute
         return $this->nullable;
     }
 
-    public function setNullable(bool $nullable): self
+    public function setNullable(bool $nullable)
     {
         $this->nullable = $nullable;
         return $this;
@@ -89,7 +89,7 @@ class MetaAttribute
         return $this->getType() === static::TYPE_INT;
     }
 
-    public function setType(string $type): self
+    public function setType(string $type)
     {
         if (!in_array($type, static::ALLOWED_TYPES, true)) {
             throw new \InvalidArgumentException(sprintf(

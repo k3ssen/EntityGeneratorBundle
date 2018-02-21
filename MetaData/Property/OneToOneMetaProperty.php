@@ -5,7 +5,7 @@ namespace Kevin3ssen\EntityGeneratorBundle\MetaData\Property;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Inflector\Inflector;
-use Kevin3ssen\EntityGeneratorBundle\MetaData\MetaEntity;
+use Kevin3ssen\EntityGeneratorBundle\MetaData\MetaEntityInterface;
 use Kevin3ssen\EntityGeneratorBundle\MetaData\MetaPropertyFactory;
 
 class OneToOneMetaProperty extends AbstractRelationMetaProperty implements OneToOneMetaPropertyInterface
@@ -13,7 +13,7 @@ class OneToOneMetaProperty extends AbstractRelationMetaProperty implements OneTo
     public const ORM_TYPE_ALIAS = 'o2o';
     public const RETURN_TYPE = '\stdClass'; //Note that this class is an exception in which we actually want to return the targetEntity as returnType
 
-    public function __construct(MetaEntity $metaEntity, ArrayCollection $metaAttributes, string $name)
+    public function __construct(MetaEntityInterface $metaEntity, ArrayCollection $metaAttributes, string $name)
     {
         parent::__construct($metaEntity, $metaAttributes, $name);
         $this->getMetaAttribute('inversedBy')->setDefaultValue(lcfirst($metaEntity->getName()));

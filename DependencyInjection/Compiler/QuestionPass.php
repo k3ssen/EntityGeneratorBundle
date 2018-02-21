@@ -7,6 +7,10 @@ use Kevin3ssen\EntityGeneratorBundle\Command\AttributeQuestion\AttributeQuestion
 use Kevin3ssen\EntityGeneratorBundle\Command\AttributeQuestion\BasicAttributeQuestion;
 use Kevin3ssen\EntityGeneratorBundle\Command\EntityQuestion\EntityQuestionInterface;
 use Kevin3ssen\EntityGeneratorBundle\Command\PropertyQuestion\PropertyQuestionInterface;
+use Kevin3ssen\EntityGeneratorBundle\MetaData\MetaAttributeFactory;
+use Kevin3ssen\EntityGeneratorBundle\MetaData\MetaAttributeInterface;
+use Kevin3ssen\EntityGeneratorBundle\MetaData\MetaEntityFactory;
+use Kevin3ssen\EntityGeneratorBundle\MetaData\MetaEntityInterface;
 use Kevin3ssen\EntityGeneratorBundle\MetaData\MetaPropertyFactory;
 use Kevin3ssen\EntityGeneratorBundle\MetaData\Property\MetaPropertyInterface;
 use Symfony\Component\Config\Definition\Exception\InvalidDefinitionException;
@@ -25,6 +29,7 @@ class QuestionPass implements CompilerPassInterface
                         $attributes['priority'] = constant($definition->getClass().'::PRIORITY');
                     }
                     $definition->addTag('entity_generator.entity_question', $attributes);
+                    continue;
                 }
                 if (is_subclass_of($definition->getClass(), PropertyQuestionInterface::class, true)) {
                     $priority = 0;
@@ -32,10 +37,20 @@ class QuestionPass implements CompilerPassInterface
                         $priority = constant($definition->getClass().'::PRIORITY');
                     }
                     $definition->addTag('entity_generator.property_question', ['priority' => $priority]);
+                    continue;
                 }
 
                 if (is_subclass_of($definition->getClass(), MetaPropertyInterface::class, true)) {
                     $container->getDefinition(MetaPropertyFactory::class)->addMethodCall('addMetaPropertyClass', [$definition->getClass()]);
+                    continue;
+                }
+                if (is_subclass_of($definition->getClass(), MetaEntityInterface::class, true)) {
+                    $container->getDefinition(MetaEntityFactory::class)->addMethodCall('setMetaEntityClass', [$definition->getClass()]);
+                    continue;
+                }
+                if (is_subclass_of($definition->getClass(), MetaAttributeInterface::class, true)) {
+                    $container->getDefinition(MetaAttributeFactory::class)->addMethodCall('setMetaAttributeClass', [$definition->getClass()]);
+                    continue;
                 }
             }
         }

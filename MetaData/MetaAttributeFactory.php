@@ -8,9 +8,16 @@ class MetaAttributeFactory
     /** @var array */
     protected $attributes;
 
+    protected $metaAttributeClass;
+
     public function __construct(array $attributes)
     {
         $this->attributes = $attributes;
+    }
+
+    public function setMetaAttributeClass(string $class)
+    {
+        $this->metaAttributeClass = $class;
     }
 
     public function attributeExists(string $attributeName): bool
@@ -23,9 +30,10 @@ class MetaAttributeFactory
         return $this->attributes;
     }
 
-    public function createMetaAttribute(string $name, array $attributeInfo): MetaAttribute
+    public function createMetaAttribute(string $name, array $attributeInfo): MetaAttributeInterface
     {
-        $metaAttribute = new MetaAttribute($name);
+        /** @var MetaAttributeInterface $metaAttribute */
+        $metaAttribute = new $this->metaAttributeClass($name);
         if ($type = $attributeInfo['type'] ?? null) {
             $metaAttribute->setType((string) $type);
         }

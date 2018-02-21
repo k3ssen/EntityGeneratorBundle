@@ -4,18 +4,18 @@ declare(strict_types=1);
 namespace Kevin3ssen\EntityGeneratorBundle\MetaData\Property;
 
 use Doctrine\Common\Collections\ArrayCollection;
-use Kevin3ssen\EntityGeneratorBundle\MetaData\MetaEntity;
 use Doctrine\Common\Inflector\Inflector;
+use Kevin3ssen\EntityGeneratorBundle\MetaData\MetaEntityInterface;
 
 class OneToManyMetaProperty extends AbstractRelationMetaProperty implements OneToManyMetaPropertyInterface
 {
     public const ORM_TYPE_ALIAS = 'o2m';
     public const RETURN_TYPE = 'Collection';
 
-    public function __construct(MetaEntity $metaEntity, ArrayCollection $metaAttributes, string $name)
+    public function __construct(MetaEntityInterface $metaEntity, ArrayCollection $metaAttributes, string $name)
     {
         parent::__construct($metaEntity, $metaAttributes, $name);
-        $this->setTargetEntity(new MetaEntity($metaEntity->getNamespace().'\\'.Inflector::classify(Inflector::singularize($name))));
+        $this->getMetaAttribute('targetEntity')->setDefaultValue($metaEntity->getNamespace().'\\'.Inflector::classify(Inflector::singularize($name)));
         $this->setMappedBy(lcfirst(Inflector::classify($metaEntity->getName())));
         $this->setOrphanRemoval(false);
 

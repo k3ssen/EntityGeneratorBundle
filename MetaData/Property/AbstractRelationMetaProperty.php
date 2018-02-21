@@ -4,22 +4,22 @@ declare(strict_types=1);
 namespace Kevin3ssen\EntityGeneratorBundle\MetaData\Property;
 
 use Doctrine\Common\Collections\ArrayCollection;
-use Kevin3ssen\EntityGeneratorBundle\MetaData\MetaEntity;
+use Kevin3ssen\EntityGeneratorBundle\MetaData\MetaEntityInterface;
 
 abstract class AbstractRelationMetaProperty extends AbstractMetaProperty implements RelationMetaPropertyInterface
 {
-    public function __construct(MetaEntity $metaEntity, ArrayCollection $metaAttributes, string $name)
+    public function __construct(MetaEntityInterface $metaEntity, ArrayCollection $metaAttributes, string $name)
     {
         parent::__construct($metaEntity, $metaAttributes, $name);
-        $this->getMetaAttribute('targetEntity')->setDefaultValue(new MetaEntity($metaEntity->getNamespace().'\\'.ucfirst($name)));
+        $this->getMetaAttribute('targetEntity')->setDefaultValue($metaEntity->getNamespace().'\\'.ucfirst($name));
     }
 
-    public function getTargetEntity(): ?MetaEntity
+    public function getTargetEntity(): ?MetaEntityInterface
     {
         return $this->getAttribute('targetEntity');
     }
 
-    public function setTargetEntity(MetaEntity $targetEntity)
+    public function setTargetEntity(MetaEntityInterface $targetEntity)
     {
         $this->setAttribute('targetEntity', $targetEntity);
         if ($targetEntity->getNamespace() !== $this->getMetaEntity()->getNamespace()) {

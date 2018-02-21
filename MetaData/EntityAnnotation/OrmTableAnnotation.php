@@ -3,13 +3,14 @@ declare(strict_types=1);
 
 namespace Kevin3ssen\EntityGeneratorBundle\MetaData\EntityAnnotation;
 
-use Kevin3ssen\EntityGeneratorBundle\MetaData\MetaEntity;
+
+use Kevin3ssen\EntityGeneratorBundle\MetaData\MetaEntityInterface;
 
 class OrmTableAnnotation implements AnnotationInterface
 {
     protected $metaEntity;
 
-    public function __construct(MetaEntity $metaEntity)
+    public function __construct(MetaEntityInterface $metaEntity)
     {
         $this->metaEntity = $metaEntity;
         $metaEntity->addUsage('Doctrine\ORM\Mapping', 'ORM');

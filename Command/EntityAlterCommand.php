@@ -7,8 +7,8 @@ use Kevin3ssen\EntityGeneratorBundle\Command\EntityQuestion\EntityQuestionInterf
 use Kevin3ssen\EntityGeneratorBundle\Command\Helper\CommandInfo;
 use Kevin3ssen\EntityGeneratorBundle\Generator\EntityGenerator;
 use Kevin3ssen\EntityGeneratorBundle\MetaData\ExistingEntityToMetaEntityReader;
-use Kevin3ssen\EntityGeneratorBundle\MetaData\MetaEntity;
 use Kevin3ssen\EntityGeneratorBundle\MetaData\MetaEntityFactory;
+use Kevin3ssen\EntityGeneratorBundle\MetaData\MetaEntityInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -86,7 +86,7 @@ If you want to preserve all information, use \'entity:append\' instead.');
         }
     }
 
-    protected function getMetaEntity(CommandInfo $commandInfo): ?MetaEntity
+    protected function getMetaEntity(CommandInfo $commandInfo): ?MetaEntityInterface
     {
         if ($useSavePoint = $commandInfo->getInput()->getOption('savepoint')) {
             $commandInfo->loadMetaEntityFromTemporaryFile();

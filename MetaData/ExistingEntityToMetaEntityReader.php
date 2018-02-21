@@ -46,7 +46,7 @@ class ExistingEntityToMetaEntityReader
         $this->metaValidationFactory = $metaValidationFactory;
     }
 
-    public function extractExistingClassToMetaEntity(MetaEntity $metaEntity)
+    public function extractExistingClassToMetaEntity(MetaEntityInterface $metaEntity)
     {
         if (!class_exists($metaEntity->getFullClassName())){
             throw new \InvalidArgumentException(sprintf('No existing class found for "%s"', $metaEntity->getFullClassName()));
@@ -90,7 +90,7 @@ class ExistingEntityToMetaEntityReader
     }
 
     //TODO: set traits
-//    protected function setTraits(MetaEntity $metaEntity, ClassMetadata $classMetadata)
+//    protected function setTraits(MetaEntityInterface $metaEntity, ClassMetadata $classMetadata)
 //    {
 //        foreach ($classMetadata->getReflectionClass()->getTraits() as $trait) {
 //            $metaEntity->addTrait(
@@ -101,7 +101,7 @@ class ExistingEntityToMetaEntityReader
 //        }
 //    }
      //TODO: set interface + set parentClass
-//    protected function setInterfaces(MetaEntity $metaEntity, \ReflectionClass $reflectionClass)
+//    protected function setInterfaces(MetaEntityInterface $metaEntity, \ReflectionClass $reflectionClass)
 //    {
 //        foreach ($reflectionClass->getInterfaces() as $interface) {
 //            $metaEntity->addInterface(

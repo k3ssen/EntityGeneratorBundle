@@ -7,8 +7,8 @@ use Kevin3ssen\EntityGeneratorBundle\Command\EntityQuestion\FieldsQuestion;
 use Kevin3ssen\EntityGeneratorBundle\Command\Helper\CommandInfo;
 use Kevin3ssen\EntityGeneratorBundle\Generator\EntityAppender;
 use Kevin3ssen\EntityGeneratorBundle\Generator\EntityGenerator;
-use Kevin3ssen\EntityGeneratorBundle\MetaData\MetaEntity;
 use Kevin3ssen\EntityGeneratorBundle\MetaData\MetaEntityFactory;
+use Kevin3ssen\EntityGeneratorBundle\MetaData\MetaEntityInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -90,7 +90,7 @@ class EntityAppendCommand extends Command
         }
     }
 
-    protected function backupFile(MetaEntity $metaEntity)
+    protected function backupFile(MetaEntityInterface $metaEntity)
     {
         $reflector = new \ReflectionClass($metaEntity->getFullClassName());
         $content = file_get_contents($reflector->getFileName());
@@ -98,7 +98,7 @@ class EntityAppendCommand extends Command
         file_put_contents($temp, $content);
     }
 
-    protected function revertFileByMetaEntity(MetaEntity $metaEntity)
+    protected function revertFileByMetaEntity(MetaEntityInterface $metaEntity)
     {
         $reflector = new \ReflectionClass($metaEntity->getFullClassName());
         $temp = sys_get_temp_dir(). '/entity_backup';

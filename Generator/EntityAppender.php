@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace Kevin3ssen\EntityGeneratorBundle\Generator;
 
-use Kevin3ssen\EntityGeneratorBundle\MetaData\MetaEntity;
+use Kevin3ssen\EntityGeneratorBundle\MetaData\MetaEntityInterface;
 use Symfony\Component\HttpKernel\Config\FileLocator;
 
 class EntityAppender
@@ -18,7 +18,7 @@ class EntityAppender
         $this->overrideSkeletonPath = $overrideSkeletonPath;
     }
 
-    public function appendFields(MetaEntity $pseudoMetaEntity): string
+    public function appendFields(MetaEntityInterface $pseudoMetaEntity): string
     {
         $targetFile = $this->getTargetFile($pseudoMetaEntity);
         $currentContent = file_get_contents($targetFile);
@@ -32,7 +32,7 @@ class EntityAppender
         return $targetFile;
     }
 
-    protected function addUsages(MetaEntity $pseudoMetaEntity, string &$currentContent)
+    protected function addUsages(MetaEntityInterface $pseudoMetaEntity, string &$currentContent)
     {
         //First we check and remove usages that are already defined.
         foreach ($pseudoMetaEntity->getUsages() as $usageNamespace => $usageAlias) {
@@ -47,7 +47,7 @@ class EntityAppender
         $this->insertStrAfterLastMatch($currentContent, $usageContent, '/use .*;/');
     }
 
-    protected function addConstructorContent(MetaEntity $pseudoMetaEntity, string &$currentContent)
+    protected function addConstructorContent(MetaEntityInterface $pseudoMetaEntity, string &$currentContent)
     {
         $hasConstructor = strpos($currentContent, 'public function __construct(') !== false;
         $propertyContent = $this->getTwigEnvironment()->render('_magic_method_construct.php.twig', [
@@ -61,7 +61,7 @@ class EntityAppender
         }
     }
 
-    protected function addProperties(MetaEntity $pseudoMetaEntity, string &$currentContent)
+    protected function addProperties(MetaEntityInterface $pseudoMetaEntity, string &$currentContent)
     {
         $propertyContent = $this->getTwigEnvironment()->render('properties.php.twig', [
             'meta_entity' => $pseudoMetaEntity,
@@ -70,7 +70,7 @@ class EntityAppender
         $this->insertStrAfterLastMatch($currentContent, $propertyContent, '/(protected|private|public) \$\w+;/');
     }
 
-    protected function getAddedMethods(MetaEntity $pseudoMetaEntity, string &$currentContent)
+    protected function getAddedMethods(MetaEntityInterface $pseudoMetaEntity, string &$currentContent)
     {
         $methodsContent = $this->getTwigEnvironment()->render('property_methods.php.twig', [
             'meta_entity' => $pseudoMetaEntity,

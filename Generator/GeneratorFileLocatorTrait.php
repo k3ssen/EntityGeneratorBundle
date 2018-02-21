@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace Kevin3ssen\EntityGeneratorBundle\Generator;
 
-use Kevin3ssen\EntityGeneratorBundle\MetaData\MetaEntity;
+use Kevin3ssen\EntityGeneratorBundle\MetaData\MetaEntityInterface;
 use Kevin3ssen\EntityGeneratorBundle\Twig\IndentLexer;
 use Kevin3ssen\EntityGeneratorBundle\Twig\InflectorExtension;
 use Symfony\Component\Config\Exception\FileLocatorFileNotFoundException;
@@ -16,7 +16,7 @@ trait GeneratorFileLocatorTrait
 
     protected $overrideSkeletonPath;
 
-    protected function getTargetFile(MetaEntity $metaEntity): string
+    protected function getTargetFile(MetaEntityInterface $metaEntity): string
     {
         $targetBundlePrefix = $metaEntity->getBundleNamespace() ? '@'.$metaEntity->getBundleNamespace().DIRECTORY_SEPARATOR : '';
         if ($targetBundlePrefix) {

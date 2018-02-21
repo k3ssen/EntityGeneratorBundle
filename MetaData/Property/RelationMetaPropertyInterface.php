@@ -3,13 +3,13 @@ declare(strict_types=1);
 
 namespace Kevin3ssen\EntityGeneratorBundle\MetaData\Property;
 
-use Kevin3ssen\EntityGeneratorBundle\MetaData\MetaEntity;
+use Kevin3ssen\EntityGeneratorBundle\MetaData\MetaEntityInterface;
 
 interface RelationMetaPropertyInterface extends MetaPropertyInterface
 {
-    public function getTargetEntity(): ?MetaEntity;
+    public function getTargetEntity(): ?MetaEntityInterface;
 
-    public function setTargetEntity(MetaEntity $targetEntity);
+    public function setTargetEntity(MetaEntityInterface $targetEntity);
 
     public function getReferencedColumnName(): ?string;
 

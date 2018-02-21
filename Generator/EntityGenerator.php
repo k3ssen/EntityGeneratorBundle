@@ -3,8 +3,8 @@ declare(strict_types=1);
 
 namespace Kevin3ssen\EntityGeneratorBundle\Generator;
 
-use Kevin3ssen\EntityGeneratorBundle\MetaData\MetaEntity;
 use Kevin3ssen\EntityGeneratorBundle\MetaData\MetaEntityFactory;
+use Kevin3ssen\EntityGeneratorBundle\MetaData\MetaEntityInterface;
 use Kevin3ssen\EntityGeneratorBundle\MetaData\Property\RelationMetaPropertyInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpKernel\Config\FileLocator;
@@ -31,7 +31,7 @@ class EntityGenerator
         $this->overrideSkeletonPath = $overrideSkeletonPath;
     }
 
-    public function createEntity(MetaEntity $metaEntity): array
+    public function createEntity(MetaEntityInterface $metaEntity): array
     {
         $entityFileData = $this->getEntityContent($metaEntity);
 
@@ -50,7 +50,7 @@ class EntityGenerator
         return $affectedFiles;
     }
 
-    public function updateEntity(MetaEntity $pseudoMetaEntity): array
+    public function updateEntity(MetaEntityInterface $pseudoMetaEntity): array
     {
         return array_merge(
             [$this->entityAppender->appendFields($pseudoMetaEntity)],
@@ -58,7 +58,7 @@ class EntityGenerator
         );
     }
 
-    protected function generateMissingInversedOrMappedBy(MetaEntity $metaEntity): array
+    protected function generateMissingInversedOrMappedBy(MetaEntityInterface $metaEntity): array
     {
         $affectedFiles = [];
         foreach ($metaEntity->getRelationshipProperties() as $property) {
@@ -88,7 +88,7 @@ class EntityGenerator
         return false;
     }
 
-    public function createRepository(MetaEntity $metaEntity): string
+    public function createRepository(MetaEntityInterface $metaEntity): string
     {
         $repoFileData = $this->getRepositoryContent($metaEntity);
         $targetFile = str_replace(['/Entity', '.php'], ['/Repository', 'Repository.php'], $this->getTargetFile($metaEntity));
@@ -99,14 +99,14 @@ class EntityGenerator
         return $targetFile;
     }
 
-    protected function getRepositoryContent(MetaEntity $metaEntity)
+    protected function getRepositoryContent(MetaEntityInterface $metaEntity)
     {
         return $this->getTwigEnvironment()->render('repository.php.twig', [
             'meta_entity' => $metaEntity,
         ]);
     }
 
-    protected function getEntityContent(MetaEntity $metaEntity)
+    protected function getEntityContent(MetaEntityInterface $metaEntity)
     {
         return $this->getTwigEnvironment()->render('entity.php.twig', [
             'meta_entity' => $metaEntity,

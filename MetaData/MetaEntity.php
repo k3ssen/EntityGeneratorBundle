@@ -13,10 +13,8 @@ use Kevin3ssen\EntityGeneratorBundle\MetaData\Traits\MetaTraitInterface;
 use Doctrine\Common\Inflector\Inflector;
 use Doctrine\Common\Collections\ArrayCollection;
 
-class MetaEntity
+class MetaEntity implements MetaEntityInterface
 {
-    public const NO_BUNDLE_NAMESPACE = 'App';
-
     protected $name;
 
     protected $bundleNamespace;
@@ -264,7 +262,7 @@ class MetaEntity
         return $this->customRepository;
     }
 
-    public function setUseCustomRepository(bool $customRepository): self
+    public function setUseCustomRepository(bool $customRepository)
     {
         $this->customRepository = $customRepository;
         return $this;

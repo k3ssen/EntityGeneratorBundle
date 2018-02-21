@@ -11,6 +11,9 @@ use Doctrine\ORM\Mapping\ClassMetadataFactory;
 
 class MetaEntityFactory
 {
+    /** @var string */
+    protected $metaEntityClass;
+
     /** @var BundleProvider */
     protected $bundleProvider;
 
@@ -39,14 +42,21 @@ class MetaEntityFactory
         $this->classMetadataFactory = $em->getMetadataFactory();
     }
 
+    public function setMetaEntityClass(string $className)
+    {
+        $this->metaEntityClass = $className;
+    }
+
     /**
      * Creates a MetaEntity by the provided ClassName.
      * Preferably the fullClassName is provided, so that bundle and subdirectory can be automatically subtracted.
      * If only a name (without namespace) is provided, defaults will be used.
      */
-    public function createByClassName(string $nameOrFullClassName): MetaEntity
+    public function createByClassName(string $nameOrFullClassName): MetaEntityInterface
     {
-        return (new MetaEntity($nameOrFullClassName))
+        /** @var MetaEntityInterface $metaEntity */
+        $metaEntity = new $this->metaEntityClass($nameOrFullClassName);
+        return $metaEntity
             ->setUseCustomRepository($this->autoGenerateRepository)
         ;
     }
@@ -61,7 +71,7 @@ class MetaEntityFactory
      *  - SubDirectory/EntityName                   to specify subDir and entityName, but no bundle
      *  - EntityName                                to specify entityName, but no subDir and no bundle
      */
-    public function createByShortcutNotation(string $shortcutNotation): MetaEntity
+    public function createByShortcutNotation(string $shortcutNotation): MetaEntityInterface
     {
         $entityName = $shortcutNotation;
         $bundleName = $subDir = null;
@@ -82,7 +92,7 @@ class MetaEntityFactory
 
     /**
      * Retrieves list of existing entities as MetaEntities (only fullClassName is set on these MetaEntities)
-     * @return array|MetaEntity[]
+     * @return array|MetaEntityInterface[]
      */
     public function getEntityOptions(): array
     {
@@ -94,12 +104,12 @@ class MetaEntityFactory
 
         $entities = [];
         foreach ($entityMetadata as $meta) {
-            $entities[] = new MetaEntity($meta->getName());
+            $entities[] = new $this->metaEntityClass($meta->getName());
         }
         return $this->existingEntities = $entities;
     }
 
-    public function getMetaEntityByChosenOption($choice): ?MetaEntity
+    public function getMetaEntityByChosenOption($choice): ?MetaEntityInterface
     {
         $options = $this->getEntityOptions();
         foreach ($options as $key => $metaEntity) {
@@ -118,11 +128,8 @@ class MetaEntityFactory
 
     /**
      * Adds missing field for inversedBy or mappedBy
-     *
-     * @param MetaEntity $metaEntity
-     * @param RelationMetaPropertyInterface $property
      */
-    public function addMissingProperty(MetaEntity $metaEntity, RelationMetaPropertyInterface $property)
+    public function addMissingProperty(MetaEntityInterface $metaEntity, RelationMetaPropertyInterface $property)
     {
         $inversedBy = $property->getInversedBy();
         $mappedBy = $property->getMappedBy();

@@ -6,10 +6,12 @@ namespace Kevin3ssen\EntityGeneratorBundle\Command\PropertyQuestion;
 use Doctrine\Common\Util\Inflector;
 use Doctrine\DBAL\Types\Type;
 use Kevin3ssen\EntityGeneratorBundle\Command\Helper\CommandInfo;
-use Kevin3ssen\EntityGeneratorBundle\MetaData\MetaEntity;
 use Kevin3ssen\EntityGeneratorBundle\MetaData\MetaEntityFactory;
+use Kevin3ssen\EntityGeneratorBundle\MetaData\MetaEntityInterface;
 use Kevin3ssen\EntityGeneratorBundle\MetaData\MetaPropertyFactory;
+use Kevin3ssen\EntityGeneratorBundle\MetaData\Property\ManyToOneMetaPropertyInterface;
 use Kevin3ssen\EntityGeneratorBundle\MetaData\Property\MetaPropertyInterface;
+use Kevin3ssen\EntityGeneratorBundle\MetaData\Property\OneToManyMetaPropertyInterface;
 use Kevin3ssen\EntityGeneratorBundle\MetaData\Property\RelationMetaPropertyInterface;
 
 class NameAndTypeQuestion implements PropertyQuestionInterface
@@ -20,7 +22,7 @@ class NameAndTypeQuestion implements PropertyQuestionInterface
     protected $metaEntityFactory;
     /** @var MetaPropertyFactory */
     protected $metaPropertyFactory;
-    /** @var MetaEntity */
+    /** @var MetaEntityInterface */
     protected $guessedEntity;
 
     public function __construct(
@@ -48,7 +50,6 @@ class NameAndTypeQuestion implements PropertyQuestionInterface
     protected function askFieldType(CommandInfo $commandInfo, string $fieldName, MetaPropertyInterface $metaProperty = null)
     {
         $typeOptions = $this->metaPropertyFactory->getAliasedTypeOptions();
-        dump($typeOptions);
         $defaultType = $metaProperty ? $metaProperty->getOrmType() : $this->guessFieldType($fieldName);
         $type = $commandInfo->getIo()->choice('Field type', $typeOptions, $defaultType);
         $type = $typeOptions[$type] ?? $type;
@@ -85,13 +86,13 @@ class NameAndTypeQuestion implements PropertyQuestionInterface
         } if ($lastFourChars === 'date') {
             return Type::DATE;
         } if ($lastThreeChars === '_id' || $this->guessFieldIsManyToOne($columnName)) {
-            return MetaPropertyFactory::MANY_TO_ONE;
+            return ManyToOneMetaPropertyInterface::ORM_TYPE;
         } if (in_array($columnName, ['summary', 'description', 'text'], true)) {
             return Type::TEXT;
         } if ($lastFiveChars === 'price') {
             return Type::DECIMAL;
         } if ($this->guessFieldIsOneToMany($columnName)) {
-            return MetaPropertyFactory::ONE_TO_MANY;
+            return OneToManyMetaPropertyInterface::ORM_TYPE;
         }
             return Type::STRING;
     }
@@ -106,7 +107,7 @@ class NameAndTypeQuestion implements PropertyQuestionInterface
         return $this->guessEntity($name) !== null;
     }
 
-    protected function guessEntity(string $name): ?MetaEntity
+    protected function guessEntity(string $name): ?MetaEntityInterface
     {
         $columnName = Inflector::tableize($name);
         foreach ($this->metaEntityFactory->getEntityOptions() as $metaEntityOption) {

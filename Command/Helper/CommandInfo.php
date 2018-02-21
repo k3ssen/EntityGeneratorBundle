@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace Kevin3ssen\EntityGeneratorBundle\Command\Helper;
 
 use Kevin3ssen\EntityGeneratorBundle\Command\Style\CommandStyle;
-use Kevin3ssen\EntityGeneratorBundle\MetaData\MetaEntity;
+use Kevin3ssen\EntityGeneratorBundle\MetaData\MetaEntityInterface;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
@@ -16,13 +16,13 @@ class CommandInfo
     protected $input;
     /** @var OutputInterface */
     protected $output;
-    /** @var MetaEntity */
+    /** @var MetaEntityInterface */
     protected $metaEntity;
 
     public function __construct(
         InputInterface $input,
         OutputInterface $output,
-        MetaEntity $metaEntity = null
+        MetaEntityInterface $metaEntity = null
     ) {
         $this->input = $input;
         $this->output = $output;
@@ -39,13 +39,13 @@ class CommandInfo
         return $this->output;
     }
 
-    public function setMetaEntity(MetaEntity $metaEntity): self
+    public function setMetaEntity(MetaEntityInterface $metaEntity): self
     {
         $this->metaEntity = $metaEntity;
         return $this;
     }
 
-    public function getMetaEntity(): MetaEntity
+    public function getMetaEntity(): MetaEntityInterface
     {
         if ($this->metaEntity) {
             return $this->metaEntity;

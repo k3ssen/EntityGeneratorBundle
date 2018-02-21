@@ -56,12 +56,12 @@ class MetaPropertyFactory
         return $aliasedTypes;
     }
 
-    public function getMetaProperty(MetaEntity $metaEntity, string $type, string $name): ?MetaPropertyInterface
+    public function getMetaProperty(MetaEntityInterface $metaEntity, string $type, string $name): ?MetaPropertyInterface
     {
         if (array_key_exists($type, $this->getTypes())) {
             /** @var MetaPropertyInterface $typeClass */
             $typeClass = $this->getTypes()[$type];
-            /** @var MetaAttribute[] $metaAttributes */
+            /** @var MetaAttributeInterface[] $metaAttributes */
             $metaAttributes = new ArrayCollection();
 
             foreach ($this->metaAttributeFactory->getAttributesList() as $attributeName => $attributeInfo) {

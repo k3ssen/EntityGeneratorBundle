@@ -36,6 +36,6 @@ class BundleProvider
                 return $bundleData['namespace'];
             }
         }
-        return MetaEntity::NO_BUNDLE_NAMESPACE;
+        return MetaEntityInterface::NO_BUNDLE_NAMESPACE;
     }
 }

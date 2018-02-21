@@ -6,7 +6,7 @@ namespace Kevin3ssen\EntityGeneratorBundle\Command;
 use Kevin3ssen\EntityGeneratorBundle\Command\Helper\CommandInfo;
 use Kevin3ssen\EntityGeneratorBundle\Command\EntityQuestion\EntityQuestionInterface;
 use Kevin3ssen\EntityGeneratorBundle\Generator\EntityGenerator;
-use Kevin3ssen\EntityGeneratorBundle\MetaData\MetaEntity;
+use Kevin3ssen\EntityGeneratorBundle\MetaData\MetaEntityInterface;
 use LogicException;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -56,7 +56,7 @@ class EntityCommand extends Command
         }
     }
 
-    protected function makeEntity(CommandInfo $commandInfo): ?MetaEntity
+    protected function makeEntity(CommandInfo $commandInfo): ?MetaEntityInterface
     {
         $commandInfo->getIo()->title('Create new entity');
 

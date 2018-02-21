@@ -28,7 +28,6 @@ mistakes or typos.
 - Extensible: override twig files, disable questions or add your own
 questions without too much effort.
 
-
 ## Extensibility
 This generator is created to support what is expected to
 be useful for entities. 
