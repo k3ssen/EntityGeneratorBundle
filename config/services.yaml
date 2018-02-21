@@ -17,6 +17,7 @@ parameters:
         length:
             meta_properties: 'Kevin3ssen\EntityGeneratorBundle\MetaData\Property\HasLengthInterface'
             type: 'int'
+            question: null
         precision:
             meta_properties: 'Kevin3ssen\EntityGeneratorBundle\MetaData\Property\DecimalMetaPropertyInterface'
             type: 'int'

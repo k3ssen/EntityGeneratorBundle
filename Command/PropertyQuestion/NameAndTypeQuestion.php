@@ -9,9 +9,11 @@ use Kevin3ssen\EntityGeneratorBundle\Command\Helper\CommandInfo;
 use Kevin3ssen\EntityGeneratorBundle\MetaData\MetaEntityFactory;
 use Kevin3ssen\EntityGeneratorBundle\MetaData\MetaEntityInterface;
 use Kevin3ssen\EntityGeneratorBundle\MetaData\MetaPropertyFactory;
+use Kevin3ssen\EntityGeneratorBundle\MetaData\Property\ManyToManyMetaPropertyInterface;
 use Kevin3ssen\EntityGeneratorBundle\MetaData\Property\ManyToOneMetaPropertyInterface;
 use Kevin3ssen\EntityGeneratorBundle\MetaData\Property\MetaPropertyInterface;
 use Kevin3ssen\EntityGeneratorBundle\MetaData\Property\OneToManyMetaPropertyInterface;
+use Kevin3ssen\EntityGeneratorBundle\MetaData\Property\OneToOneMetaPropertyInterface;
 use Kevin3ssen\EntityGeneratorBundle\MetaData\Property\RelationMetaPropertyInterface;
 
 class NameAndTypeQuestion implements PropertyQuestionInterface
@@ -63,12 +65,26 @@ class NameAndTypeQuestion implements PropertyQuestionInterface
             $metaProperty->getMetaEntity()->removeProperty($metaProperty);
         }
 
-        $metaProperty = $this->metaPropertyFactory->getMetaProperty($commandInfo->getMetaEntity(), $type, $fieldName);
+        $metaProperty = $this->metaPropertyFactory->createMetaProperty($commandInfo->getMetaEntity(), $type, $fieldName);
+        if ($metaProperty instanceof RelationMetaPropertyInterface) {
+            $this->setTargetEntity($metaProperty);
+        }
 
         if ($metaProperty instanceof RelationMetaPropertyInterface && $this->guessedEntity) {
             $metaProperty->setTargetEntity($this->guessedEntity);
             $this->guessedEntity = null;
         }
+    }
+
+    protected function setTargetEntity(RelationMetaPropertyInterface $metaProperty)
+    {
+        if ($metaProperty instanceof OneToManyMetaPropertyInterface || $metaProperty instanceof ManyToManyMetaPropertyInterface) {
+            $targetEntityFullClassName = $metaProperty->getMetaEntity()->getNamespace().'\\'.Inflector::classify(Inflector::singularize($metaProperty->getName()));
+        } else {
+            $targetEntityFullClassName = $metaProperty->getMetaEntity()->getNamespace().'\\'.Inflector::classify($metaProperty->getName());
+        }
+        $targetMetaEntity = $this->metaEntityFactory->createByClassName($targetEntityFullClassName);
+        $metaProperty->getMetaAttribute('targetEntity')->setDefaultValue($targetMetaEntity);
     }
 
     protected function guessFieldType(string $fieldName): string

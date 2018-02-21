@@ -4,7 +4,12 @@ declare(strict_types=1);
 namespace Kevin3ssen\EntityGeneratorBundle\MetaData;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Util\Inflector;
+use Kevin3ssen\EntityGeneratorBundle\MetaData\Property\ManyToManyMetaPropertyInterface;
+use Kevin3ssen\EntityGeneratorBundle\MetaData\Property\ManyToOneMetaPropertyInterface;
 use Kevin3ssen\EntityGeneratorBundle\MetaData\Property\MetaPropertyInterface;
+use Kevin3ssen\EntityGeneratorBundle\MetaData\Property\OneToManyMetaPropertyInterface;
+use Kevin3ssen\EntityGeneratorBundle\MetaData\Property\OneToOneMetaPropertyInterface;
 
 class MetaPropertyFactory
 {
@@ -56,7 +61,7 @@ class MetaPropertyFactory
         return $aliasedTypes;
     }
 
-    public function getMetaProperty(MetaEntityInterface $metaEntity, string $type, string $name): ?MetaPropertyInterface
+    public function createMetaProperty(MetaEntityInterface $metaEntity, string $type, string $name): ?MetaPropertyInterface
     {
         if (array_key_exists($type, $this->getTypes())) {
             /** @var MetaPropertyInterface $typeClass */
@@ -83,7 +88,6 @@ class MetaPropertyFactory
             foreach ($metaAttributes as $metaAttribute) {
                 $metaAttribute->setMetaProperty($metaProperty);
             }
-
             return $metaProperty;
         }
         return null;

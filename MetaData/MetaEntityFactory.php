@@ -136,7 +136,7 @@ class MetaEntityFactory
         if ($newPropertyName = $mappedBy ?: $inversedBy) {
             $inversedType = MetaPropertyFactory::getInversedType($property->getOrmType());
             /** @var RelationMetaPropertyInterface $newProperty */
-            $newProperty = $this->metaPropertyFactory->getMetaProperty(
+            $newProperty = $this->metaPropertyFactory->createMetaProperty(
                 $metaEntity,
                 $inversedType,
                 $newPropertyName

@@ -15,7 +15,6 @@ class OneToManyMetaProperty extends AbstractRelationMetaProperty implements OneT
     public function __construct(MetaEntityInterface $metaEntity, ArrayCollection $metaAttributes, string $name)
     {
         parent::__construct($metaEntity, $metaAttributes, $name);
-        $this->getMetaAttribute('targetEntity')->setDefaultValue($metaEntity->getNamespace().'\\'.Inflector::classify(Inflector::singularize($name)));
         $this->setMappedBy(lcfirst(Inflector::classify($metaEntity->getName())));
         $this->setOrphanRemoval(false);
 

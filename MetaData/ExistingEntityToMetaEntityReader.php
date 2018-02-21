@@ -68,7 +68,7 @@ class ExistingEntityToMetaEntityReader
             if (!$type) {
                 continue;
             }
-            $metaProperty = $this->metaPropertyFactory->getMetaProperty($metaEntity, $type, $name);
+            $metaProperty = $this->metaPropertyFactory->createMetaProperty($metaEntity, $type, $name);
             if (!$metaProperty) {
                 continue;
             }
