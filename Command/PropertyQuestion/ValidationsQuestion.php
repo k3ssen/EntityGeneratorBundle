@@ -6,7 +6,7 @@ namespace Kevin3ssen\EntityGeneratorBundle\Command\PropertyQuestion;
 use Kevin3ssen\EntityGeneratorBundle\Command\Helper\CommandInfo;
 use Kevin3ssen\EntityGeneratorBundle\MetaData\MetaValidation;
 use Kevin3ssen\EntityGeneratorBundle\MetaData\MetaValidationFactory;
-use Kevin3ssen\EntityGeneratorBundle\MetaData\Property\AbstractProperty;
+use Kevin3ssen\EntityGeneratorBundle\MetaData\Property\MetaPropertyInterface;
 use Symfony\Component\Console\Question\Question;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
@@ -27,7 +27,7 @@ class ValidationsQuestion implements PropertyQuestionInterface
         $this->metaValidationFactory = $metaValidationFactory;
     }
 
-    public function doQuestion(CommandInfo $commandInfo, AbstractProperty $metaProperty)
+    public function doQuestion(CommandInfo $commandInfo, MetaPropertyInterface $metaProperty)
     {
         $commandInfo->saveTemporaryFile();
         $actionChoices = [
@@ -94,7 +94,7 @@ class ValidationsQuestion implements PropertyQuestionInterface
         $this->doQuestion($commandInfo, $metaProperty);
     }
 
-    protected function askMetaPropertyValidationChoice(CommandInfo $commandInfo, AbstractProperty $metaProperty): MetaValidation
+    protected function askMetaPropertyValidationChoice(CommandInfo $commandInfo, MetaPropertyInterface $metaProperty): MetaValidation
     {
         $validations = $metaProperty->getValidations();
         $validationChoice = $commandInfo->getIo()->choice('Edit validation', $validations->toArray());
@@ -139,7 +139,7 @@ class ValidationsQuestion implements PropertyQuestionInterface
         return $requiredOptions;
     }
 
-    protected function askValidationChoice(CommandInfo $commandInfo, AbstractProperty $metaProperty = null)
+    protected function askValidationChoice(CommandInfo $commandInfo, MetaPropertyInterface $metaProperty = null)
     {
         $options = $this->metaValidationFactory->getConstraintOptions($metaProperty);
         $commandInfo->getIo()->listing($options);

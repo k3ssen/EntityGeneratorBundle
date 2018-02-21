@@ -3,11 +3,11 @@ declare(strict_types=1);
 
 namespace Kevin3ssen\EntityGeneratorBundle\MetaData;
 
-use Kevin3ssen\EntityGeneratorBundle\MetaData\Property\AbstractProperty;
+use Kevin3ssen\EntityGeneratorBundle\MetaData\Property\MetaPropertyInterface;
 
 class MetaValidation
 {
-    /** @var AbstractProperty */
+    /** @var MetaPropertyInterface */
     protected $metaProperty;
 
     /** @var string */
@@ -16,7 +16,7 @@ class MetaValidation
     /** @var array */
     protected $options;
 
-    public function __construct(AbstractProperty $metaProperty, string $className, array $options = [])
+    public function __construct(MetaPropertyInterface $metaProperty, string $className, array $options = [])
     {
         $metaProperty->getMetaEntity()->addUsage('Symfony\Component\Validator\Constraints', 'Assert');
         $this->setMetaProperty($metaProperty);
@@ -92,12 +92,12 @@ class MetaValidation
         return true;
     }
 
-    public function getMetaProperty(): ?AbstractProperty
+    public function getMetaProperty(): ?MetaPropertyInterface
     {
         return $this->metaProperty;
     }
 
-    public function setMetaProperty(AbstractProperty $metaProperty)
+    public function setMetaProperty(MetaPropertyInterface $metaProperty)
     {
         $this->metaProperty = $metaProperty;
         $metaProperty->addValidation($this);

@@ -7,7 +7,7 @@ use Kevin3ssen\EntityGeneratorBundle\Command\Helper\CommandInfo;
 use Kevin3ssen\EntityGeneratorBundle\MetaData\MetaAttribute;
 use Kevin3ssen\EntityGeneratorBundle\MetaData\MetaEntity;
 use Kevin3ssen\EntityGeneratorBundle\MetaData\MetaEntityFactory;
-use Kevin3ssen\EntityGeneratorBundle\MetaData\Property\AbstractRelationshipProperty;
+use Kevin3ssen\EntityGeneratorBundle\MetaData\Property\RelationMetaPropertyInterface;
 use Symfony\Component\Console\Question\Question;
 
 class TargetEntityQuestion implements AttributeQuestionInterface
@@ -35,7 +35,7 @@ class TargetEntityQuestion implements AttributeQuestionInterface
 
     public function doQuestion(CommandInfo $commandInfo, MetaAttribute $metaAttribute)
     {
-        /** @var AbstractRelationshipProperty $metaProperty */
+        /** @var RelationMetaPropertyInterface $metaProperty */
         $metaProperty = $metaAttribute->getMetaProperty();
         if (!$metaProperty) {
             return;

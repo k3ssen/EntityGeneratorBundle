@@ -6,7 +6,7 @@ namespace Kevin3ssen\EntityGeneratorBundle\MetaData\Property;
 use Doctrine\Common\Collections\ArrayCollection;
 use Kevin3ssen\EntityGeneratorBundle\MetaData\MetaEntity;
 
-abstract class AbstractRelationshipProperty extends AbstractProperty
+abstract class AbstractRelationMetaProperty extends AbstractMetaProperty implements RelationMetaPropertyInterface
 {
     public function __construct(MetaEntity $metaEntity, ArrayCollection $metaAttributes, string $name)
     {
@@ -28,17 +28,12 @@ abstract class AbstractRelationshipProperty extends AbstractProperty
         return $this;
     }
 
-    public function getReturnType(): string
-    {
-        return $this->getTargetEntity()->getName();
-    }
-
     public function getReferencedColumnName(): ?string
     {
         return $this->getAttribute('referencedColumnName');
     }
 
-    public function setReferencedColumnName(string $referencedColumnName): self
+    public function setReferencedColumnName(string $referencedColumnName)
     {
         return $this->setAttribute('referencedColumnName', $referencedColumnName);
     }
@@ -48,7 +43,7 @@ abstract class AbstractRelationshipProperty extends AbstractProperty
         return $this->hasAttribute('inversedBy') ? $this->getAttribute('inversedBy') : null;
     }
 
-    public function setInversedBy(?string $inversedBy): self
+    public function setInversedBy(?string $inversedBy)
     {
         if ($this->getMappedBy()) {
             throw new \RuntimeException(sprintf('Cannot set inversedBy on property with name "%s"; The mappedBy has already been set', $this->getName()));
@@ -61,7 +56,7 @@ abstract class AbstractRelationshipProperty extends AbstractProperty
         return $this->hasAttribute('mappedBy') ? $this->getAttribute('mappedBy') : null;
     }
 
-    public function setMappedBy(?string $mappedBy): self
+    public function setMappedBy(?string $mappedBy)
     {
         if ($this->getInversedBy()) {
             throw new \RuntimeException(sprintf('Cannot set mappedBy on property with name "%s"; The inversedBy has already been set', $this->getName()));
@@ -74,7 +69,7 @@ abstract class AbstractRelationshipProperty extends AbstractProperty
         return $this->getAttribute('orphanRemoval');
     }
 
-    public function setOrphanRemoval(bool $orphanRemoval): self
+    public function setOrphanRemoval(bool $orphanRemoval)
     {
         return $this->setAttribute('orphanRemoval', $orphanRemoval);
     }

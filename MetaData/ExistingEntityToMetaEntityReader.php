@@ -5,8 +5,12 @@ namespace Kevin3ssen\EntityGeneratorBundle\MetaData;
 
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Kevin3ssen\EntityGeneratorBundle\Generator\EntityGenerator;
-use Kevin3ssen\EntityGeneratorBundle\MetaData\Property\AbstractProperty;
-use Kevin3ssen\EntityGeneratorBundle\MetaData\Property\AbstractRelationshipProperty;
+use Kevin3ssen\EntityGeneratorBundle\MetaData\Property\ManyToManyMetaPropertyInterface;
+use Kevin3ssen\EntityGeneratorBundle\MetaData\Property\ManyToOneMetaPropertyInterface;
+use Kevin3ssen\EntityGeneratorBundle\MetaData\Property\OneToManyMetaPropertyInterface;
+use Kevin3ssen\EntityGeneratorBundle\MetaData\Property\OneToOneMetaPropertyInterface;
+use Kevin3ssen\EntityGeneratorBundle\MetaData\Property\RelationMetaPropertyInterface;
+use Kevin3ssen\EntityGeneratorBundle\MetaData\Property\MetaPropertyInterface;
 
 class ExistingEntityToMetaEntityReader
 {
@@ -108,10 +112,10 @@ class ExistingEntityToMetaEntityReader
 //        }
 //    }
 
-    protected function setAttributesByFieldMapping(AbstractProperty $metaProperty, ClassMetadata $classMetadata)
+    protected function setAttributesByFieldMapping(MetaPropertyInterface $metaProperty, ClassMetadata $classMetadata)
     {
         $mapping = $classMetadata->fieldMappings[$metaProperty->getName()] ?? null;
-        if (!$mapping and $metaProperty instanceof AbstractRelationshipProperty) {
+        if (!$mapping and $metaProperty instanceof RelationMetaPropertyInterface) {
             $this->setAttributesByAssociationMapping($metaProperty, $classMetadata);
             return;
         }
@@ -125,7 +129,7 @@ class ExistingEntityToMetaEntityReader
         }
     }
 
-    protected function setAttributesByAssociationMapping(AbstractRelationshipProperty $metaProperty, ClassMetadata $classMetadata)
+    protected function setAttributesByAssociationMapping(RelationMetaPropertyInterface $metaProperty, ClassMetadata $classMetadata)
     {
         $mapping = $classMetadata->associationMappings[$metaProperty->getName()] ?? null;
         if (!$mapping) {
@@ -153,26 +157,22 @@ class ExistingEntityToMetaEntityReader
             $reflectionProperty = $classMetadata->getReflectionClass()->getProperty($name);
             $docComment = $reflectionProperty->getDocComment();
             if (strpos($docComment, 'ManyToOne') !== false) {
-                return MetaPropertyFactory::MANY_TO_ONE;
+                return ManyToOneMetaPropertyInterface::ORM_TYPE;
             }
             if (strpos($docComment, 'OneToMany') !== false) {
-                return MetaPropertyFactory::ONE_TO_MANY;
+                return OneToManyMetaPropertyInterface::ORM_TYPE;
             }
             if (strpos($docComment, 'ManyToMany') !== false) {
-                return MetaPropertyFactory::MANY_TO_MANY;
+                return ManyToManyMetaPropertyInterface::ORM_TYPE;
             }
             if (strpos($docComment, 'OneToOne') !== false) {
-                return MetaPropertyFactory::ONE_TO_ONE;
+                return OneToOneMetaPropertyInterface::ORM_TYPE;
             }
         }
         return $type;
     }
 
-    /**
-     * @param AbstractProperty $metaProperty
-     * @param ClassMetadata $classMetadata
-     */
-    protected function addValidations(AbstractProperty $metaProperty, ClassMetadata $classMetadata)
+    protected function addValidations(MetaPropertyInterface $metaProperty, ClassMetadata $classMetadata)
     {
         $reflectionProperty = $classMetadata->getReflectionClass()->getProperty($metaProperty->getName());
         $docComment = $reflectionProperty->getDocComment();

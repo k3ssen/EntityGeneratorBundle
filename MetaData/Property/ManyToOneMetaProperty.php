@@ -6,17 +6,19 @@ namespace Kevin3ssen\EntityGeneratorBundle\MetaData\Property;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Inflector\Inflector;
 use Kevin3ssen\EntityGeneratorBundle\MetaData\MetaEntity;
-use Kevin3ssen\EntityGeneratorBundle\MetaData\MetaPropertyFactory;
 
-class ManyToOneProperty extends AbstractRelationshipProperty
+class ManyToOneMetaProperty extends AbstractRelationMetaProperty implements ManyToOneMetaPropertyInterface
 {
+    public const ORM_TYPE_ALIAS = 'm2o';
+    public const RETURN_TYPE = '\stdClass'; //Note that this class is an exception in which we actually want to return the targetEntity as returnType
+
     public function __construct(MetaEntity $metaEntity, ArrayCollection $metaAttributes, string $name)
     {
         parent::__construct($metaEntity, $metaAttributes, $name);
         $this->getMetaAttribute('inversedBy')->setDefaultValue(lcfirst(Inflector::pluralize($metaEntity->getName())));
     }
 
-    public function setMappedBy(?string $mappedBy): AbstractRelationshipProperty
+    public function setMappedBy(?string $mappedBy): RelationMetaPropertyInterface
     {
         throw new \RuntimeException(sprintf('Cannot call setMappedBy on "%s"; A ManyToOne property always is the mapping side', static::class));
     }
@@ -35,10 +37,5 @@ class ManyToOneProperty extends AbstractRelationshipProperty
             '@ORM\JoinColumn('.$joinColumnOptions.')',
         ];
         return array_merge($annotationLines, parent::getAnnotationLines());
-    }
-
-    public function getOrmType(): string
-    {
-        return MetaPropertyFactory::MANY_TO_ONE;
     }
 }

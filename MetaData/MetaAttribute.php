@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace Kevin3ssen\EntityGeneratorBundle\MetaData;
 
-use Kevin3ssen\EntityGeneratorBundle\MetaData\Property\AbstractProperty;
+use Kevin3ssen\EntityGeneratorBundle\MetaData\Property\MetaPropertyInterface;
 
 class MetaAttribute
 {
@@ -21,7 +21,7 @@ class MetaAttribute
         self::TYPE_OBJECT,
     ];
 
-    /** @var AbstractProperty */
+    /** @var MetaPropertyInterface */
     protected $metaProperty;
 
     /** @var string */
@@ -47,12 +47,12 @@ class MetaAttribute
         $this->name = $name;
     }
 
-    public function getMetaProperty(): ?AbstractProperty
+    public function getMetaProperty(): ?MetaPropertyInterface
     {
         return $this->metaProperty;
     }
 
-    public function setMetaProperty(AbstractProperty $metaProperty): self
+    public function setMetaProperty(MetaPropertyInterface $metaProperty): self
     {
         $this->metaProperty = $metaProperty;
         return $this;

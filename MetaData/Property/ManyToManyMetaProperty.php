@@ -6,10 +6,12 @@ namespace Kevin3ssen\EntityGeneratorBundle\MetaData\Property;
 use Doctrine\Common\Collections\ArrayCollection;
 use Kevin3ssen\EntityGeneratorBundle\MetaData\MetaEntity;
 use Doctrine\Common\Inflector\Inflector;
-use Kevin3ssen\EntityGeneratorBundle\MetaData\MetaPropertyFactory;
 
-class ManyToManyProperty extends AbstractRelationshipProperty
+class ManyToManyMetaProperty extends AbstractRelationMetaProperty implements ManyToManyMetaPropertyInterface
 {
+    public const ORM_TYPE_ALIAS = 'm2m';
+    public const RETURN_TYPE = 'Collection';
+
     public function __construct(MetaEntity $metaEntity, ArrayCollection $metaAttributes, string $name)
     {
         parent::__construct($metaEntity, $metaAttributes, $name);
@@ -18,11 +20,6 @@ class ManyToManyProperty extends AbstractRelationshipProperty
 
         $metaEntity->addUsage('Doctrine\Common\Collections\Collection');
         $metaEntity->addUsage('Doctrine\Common\Collections\ArrayCollection');
-    }
-
-    public function getReturnType(): string
-    {
-        return 'Collection';
     }
 
     public function setNullable(?bool $nullable)
@@ -57,10 +54,5 @@ class ManyToManyProperty extends AbstractRelationshipProperty
         }
 
         return array_merge($annotationLines, parent::getAnnotationLines());
-    }
-
-    public function getOrmType(): string
-    {
-        return MetaPropertyFactory::MANY_TO_MANY;
     }
 }

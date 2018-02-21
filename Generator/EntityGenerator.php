@@ -5,7 +5,7 @@ namespace Kevin3ssen\EntityGeneratorBundle\Generator;
 
 use Kevin3ssen\EntityGeneratorBundle\MetaData\MetaEntity;
 use Kevin3ssen\EntityGeneratorBundle\MetaData\MetaEntityFactory;
-use Kevin3ssen\EntityGeneratorBundle\MetaData\Property\AbstractRelationshipProperty;
+use Kevin3ssen\EntityGeneratorBundle\MetaData\Property\RelationMetaPropertyInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpKernel\Config\FileLocator;
 
@@ -78,7 +78,7 @@ class EntityGenerator
         return $affectedFiles;
     }
 
-    protected function checkEntityHasProperty($fullClassName, AbstractRelationshipProperty $property): bool
+    protected function checkEntityHasProperty($fullClassName, RelationMetaPropertyInterface $property): bool
     {
         foreach ((new \ReflectionClass($fullClassName))->getProperties() as $reflectionProperty) {
             if (\in_array($reflectionProperty->getName(), [$property->getMappedBy(), $property->getInversedBy()])) {

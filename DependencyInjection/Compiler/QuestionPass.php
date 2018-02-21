@@ -7,6 +7,8 @@ use Kevin3ssen\EntityGeneratorBundle\Command\AttributeQuestion\AttributeQuestion
 use Kevin3ssen\EntityGeneratorBundle\Command\AttributeQuestion\BasicAttributeQuestion;
 use Kevin3ssen\EntityGeneratorBundle\Command\EntityQuestion\EntityQuestionInterface;
 use Kevin3ssen\EntityGeneratorBundle\Command\PropertyQuestion\PropertyQuestionInterface;
+use Kevin3ssen\EntityGeneratorBundle\MetaData\MetaPropertyFactory;
+use Kevin3ssen\EntityGeneratorBundle\MetaData\Property\MetaPropertyInterface;
 use Symfony\Component\Config\Definition\Exception\InvalidDefinitionException;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -30,6 +32,10 @@ class QuestionPass implements CompilerPassInterface
                         $priority = constant($definition->getClass().'::PRIORITY');
                     }
                     $definition->addTag('entity_generator.property_question', ['priority' => $priority]);
+                }
+
+                if (is_subclass_of($definition->getClass(), MetaPropertyInterface::class, true)) {
+                    $container->getDefinition(MetaPropertyFactory::class)->addMethodCall('addMetaPropertyClass', [$definition->getClass()]);
                 }
             }
         }

@@ -8,8 +8,11 @@ use Doctrine\Common\Inflector\Inflector;
 use Kevin3ssen\EntityGeneratorBundle\MetaData\MetaEntity;
 use Kevin3ssen\EntityGeneratorBundle\MetaData\MetaPropertyFactory;
 
-class OneToOneProperty extends AbstractRelationshipProperty
+class OneToOneMetaProperty extends AbstractRelationMetaProperty implements OneToOneMetaPropertyInterface
 {
+    public const ORM_TYPE_ALIAS = 'o2o';
+    public const RETURN_TYPE = '\stdClass'; //Note that this class is an exception in which we actually want to return the targetEntity as returnType
+
     public function __construct(MetaEntity $metaEntity, ArrayCollection $metaAttributes, string $name)
     {
         parent::__construct($metaEntity, $metaAttributes, $name);
@@ -33,10 +36,5 @@ class OneToOneProperty extends AbstractRelationshipProperty
             $annotationLines[] = '@ORM\JoinColumn('.$joinColumnOptions.')';
         }
         return array_merge($annotationLines, parent::getAnnotationLines());
-    }
-
-    public function getOrmType(): string
-    {
-        return MetaPropertyFactory::ONE_TO_ONE;
     }
 }

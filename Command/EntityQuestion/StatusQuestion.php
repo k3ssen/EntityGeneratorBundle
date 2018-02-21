@@ -4,8 +4,8 @@ declare(strict_types=1);
 namespace Kevin3ssen\EntityGeneratorBundle\Command\EntityQuestion;
 
 use Kevin3ssen\EntityGeneratorBundle\Command\Helper\CommandInfo;
-use Kevin3ssen\EntityGeneratorBundle\MetaData\Property\AbstractPrimitiveProperty;
-use Kevin3ssen\EntityGeneratorBundle\MetaData\Property\AbstractRelationshipProperty;
+use Kevin3ssen\EntityGeneratorBundle\MetaData\Property\PrimitiveMetaPropertyInterface;
+use Kevin3ssen\EntityGeneratorBundle\MetaData\Property\RelationMetaPropertyInterface;
 
 class StatusQuestion implements EntityQuestionInterface
 {
@@ -32,10 +32,10 @@ class StatusQuestion implements EntityQuestionInterface
             $propertyOutputs[] = [
                 $property->getName(),
                 $property->getOrmType()
-                    . ($property instanceof AbstractRelationshipProperty ? '<comment> ['.$property->getTargetEntity().']</comment>' : '')
-                    . ($property instanceof AbstractPrimitiveProperty && $property->isId() ? ' [<comment>id</comment>]' : '')
+                    . ($property instanceof RelationMetaPropertyInterface ? '<comment> ['.$property->getTargetEntity().']</comment>' : '')
+                    . ($property instanceof PrimitiveMetaPropertyInterface && $property->isId() ? ' [<comment>id</comment>]' : '')
                     . ($commandInfo->getMetaEntity()->getDisplayProperty() === $property ? ' [<comment>display field</comment>]' : '')
-                    . ($property instanceof AbstractPrimitiveProperty && $property->isNullable() ? ' <comment>[nullable]</comment>' : '')
+                    . ($property instanceof PrimitiveMetaPropertyInterface && $property->isNullable() ? ' <comment>[nullable]</comment>' : '')
                 ,
                 implode(', ', $validationNames),
             ];

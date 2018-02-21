@@ -4,58 +4,44 @@ declare(strict_types=1);
 namespace Kevin3ssen\EntityGeneratorBundle\MetaData;
 
 use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\DBAL\Types\Type;
-use Kevin3ssen\EntityGeneratorBundle\MetaData\Property;
+use Kevin3ssen\EntityGeneratorBundle\MetaData\Property\MetaPropertyInterface;
 
 class MetaPropertyFactory
 {
-    public const MANY_TO_MANY = 'ManyToMany';
-    public const ONE_TO_MANY = 'OneToMany';
-    public const MANY_TO_ONE = 'ManyToOne';
-    public const ONE_TO_ONE = 'OneToOne';
+    /** @var array */
+    protected $metaPropertyClasses = [];
 
     /** @var MetaAttributeFactory */
     protected $metaAttributeFactory;
 
-    public function __construct(array $attributes, MetaAttributeFactory $metaAttributeFactory)
+    public function __construct(MetaAttributeFactory $metaAttributeFactory)
     {
         $this->metaAttributeFactory = $metaAttributeFactory;
     }
 
+    public function addMetaPropertyClass(string $class)
+    {
+        $ormType = call_user_func([$class, 'getOrmType']);
+        if (!array_key_exists($ormType, $this->metaPropertyClasses)) {
+            $this->metaPropertyClasses[$ormType] = $class;
+        }
+    }
+
     public function getTypes()
     {
-        return [
-            Type::STRING => Property\StringProperty::class,
-            Type::INTEGER => Property\IntegerProperty::class,
-            Type::SMALLINT => Property\SmallIntProperty::class,
-            TYPE::BIGINT => Property\BigIntProperty::class,
-            Type::DECIMAL => Property\DecimalProperty::class,
-            Type::TEXT => Property\TextProperty::class,
-            Type::DATE => Property\DateProperty::class,
-            Type::TIME => Property\TimeProperty::class,
-            Type::DATETIME => Property\DateTimeProperty::class,
-            Type::BOOLEAN => Property\BooleanProperty::class,
-            Type::SIMPLE_ARRAY => Property\SimpleArrayProperty::class,
-            Type::JSON => Property\JsonProperty::class,
-            TYPE::OBJECT => Property\ObjectProperty::class,
-            static::MANY_TO_ONE => Property\ManyToOneProperty::class,
-            static::ONE_TO_MANY => Property\OneToManyProperty::class,
-            static::MANY_TO_MANY => Property\ManyToManyProperty::class,
-            static::ONE_TO_ONE => Property\OneToOneProperty::class,
-        ];
+        return $this->metaPropertyClasses;
     }
 
     public static function getInversedType($type): string
     {
         switch ($type) {
-            case static::MANY_TO_ONE:
-                return static::ONE_TO_MANY;
-            case static::ONE_TO_MANY:
-                return static::MANY_TO_ONE;
-            case static::MANY_TO_MANY:
-                return static::MANY_TO_MANY;
-            case static::ONE_TO_ONE:
-                return static::ONE_TO_ONE;
+            case Property\ManyToOneMetaPropertyInterface::ORM_TYPE:
+                return Property\OneToManyMetaPropertyInterface::ORM_TYPE;
+            case Property\OneToManyMetaPropertyInterface::ORM_TYPE:
+                return Property\ManyToOneMetaPropertyInterface::ORM_TYPE;
+            case Property\ManyToManyMetaPropertyInterface::ORM_TYPE:
+            case Property\OneToOneMetaPropertyInterface::ORM_TYPE:
+                return $type;
             default:
                 throw new \InvalidArgumentException(sprintf('Type "%s" has no inversed type.', $type));
         }
@@ -63,31 +49,17 @@ class MetaPropertyFactory
 
     public function getAliasedTypeOptions(): array
     {
-        return [
-            'str' => Type::STRING,
-            'int' => Type::INTEGER,
-            'sint' => Type::SMALLINT,
-            'bint' => TYPE::BIGINT,
-            'dec' => Type::DECIMAL,
-            'txt' => Type::TEXT,
-            'date' => Type::DATE,
-            'time' => Type::TIME,
-            'dt' => Type::DATETIME,
-            'bool' => Type::BOOLEAN,
-            'sarr' => Type::SIMPLE_ARRAY,
-            'json' => Type::JSON,
-            'obj' => TYPE::OBJECT,
-            'm2o' => static::MANY_TO_ONE,
-            'o2m' => static::ONE_TO_MANY,
-            'm2m' => static::MANY_TO_MANY,
-            'o2o' => static::ONE_TO_ONE,
-        ];
+        $aliasedTypes = [];
+        foreach ($this->metaPropertyClasses as $ormType => $class) {
+            $aliasedTypes[call_user_func([$class, 'getOrmTypeAlias'])] = $ormType;
+        }
+        return $aliasedTypes;
     }
 
-    public function getMetaProperty(MetaEntity $metaEntity, string $type, string $name): ?Property\AbstractProperty
+    public function getMetaProperty(MetaEntity $metaEntity, string $type, string $name): ?MetaPropertyInterface
     {
         if (array_key_exists($type, $this->getTypes())) {
-            /** @var Property\AbstractProperty $typeClass */
+            /** @var MetaPropertyInterface $typeClass */
             $typeClass = $this->getTypes()[$type];
             /** @var MetaAttribute[] $metaAttributes */
             $metaAttributes = new ArrayCollection();

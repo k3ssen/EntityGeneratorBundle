@@ -6,7 +6,7 @@ namespace Kevin3ssen\EntityGeneratorBundle\Command\EntityQuestion;
 use Kevin3ssen\EntityGeneratorBundle\Command\Helper\CommandInfo;
 use Kevin3ssen\EntityGeneratorBundle\Command\PropertyQuestion\PropertyQuestionInterface;
 use Kevin3ssen\EntityGeneratorBundle\MetaData\MetaEntityFactory;
-use Kevin3ssen\EntityGeneratorBundle\MetaData\Property\AbstractProperty;
+use Kevin3ssen\EntityGeneratorBundle\MetaData\Property\MetaPropertyInterface;
 
 class FieldsQuestion implements EntityQuestionInterface
 {
@@ -55,7 +55,7 @@ class FieldsQuestion implements EntityQuestionInterface
         } while(true);
     }
 
-    public function editField(CommandInfo $commandInfo, AbstractProperty $metaProperty = null)
+    public function editField(CommandInfo $commandInfo, MetaPropertyInterface $metaProperty = null)
     {
         if (!$metaProperty) {
             $commandInfo->getIo()->section('Edit field');
@@ -70,7 +70,7 @@ class FieldsQuestion implements EntityQuestionInterface
         }
     }
 
-    public function removeField(CommandInfo $commandInfo, AbstractProperty $metaProperty = null)
+    public function removeField(CommandInfo $commandInfo, MetaPropertyInterface $metaProperty = null)
     {
         if (!$metaProperty) {
             $commandInfo->getIo()->section('Remove field');
@@ -87,7 +87,7 @@ class FieldsQuestion implements EntityQuestionInterface
         $commandInfo->saveTemporaryFile();
     }
 
-    protected function chooseField(CommandInfo $commandInfo): ?AbstractProperty
+    protected function chooseField(CommandInfo $commandInfo): ?MetaPropertyInterface
     {
         $properties = $commandInfo->getMetaEntity()->getProperties();
         $propertyChoice = $commandInfo->getIo()->choice(

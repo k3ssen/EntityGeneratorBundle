@@ -5,7 +5,7 @@ namespace Kevin3ssen\EntityGeneratorBundle\MetaData;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Kevin3ssen\EntityGeneratorBundle\Generator\EntityGenerator;
-use Kevin3ssen\EntityGeneratorBundle\MetaData\Property\AbstractRelationshipProperty;
+use Kevin3ssen\EntityGeneratorBundle\MetaData\Property\RelationMetaPropertyInterface;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Mapping\ClassMetadataFactory;
 
@@ -120,15 +120,15 @@ class MetaEntityFactory
      * Adds missing field for inversedBy or mappedBy
      *
      * @param MetaEntity $metaEntity
-     * @param AbstractRelationshipProperty $property
+     * @param RelationMetaPropertyInterface $property
      */
-    public function addMissingProperty(MetaEntity $metaEntity, AbstractRelationshipProperty $property)
+    public function addMissingProperty(MetaEntity $metaEntity, RelationMetaPropertyInterface $property)
     {
         $inversedBy = $property->getInversedBy();
         $mappedBy = $property->getMappedBy();
         if ($newPropertyName = $mappedBy ?: $inversedBy) {
             $inversedType = MetaPropertyFactory::getInversedType($property->getOrmType());
-            /** @var AbstractRelationshipProperty $newProperty */
+            /** @var RelationMetaPropertyInterface $newProperty */
             $newProperty = $this->metaPropertyFactory->getMetaProperty(
                 $metaEntity,
                 $inversedType,

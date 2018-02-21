@@ -9,8 +9,8 @@ use Kevin3ssen\EntityGeneratorBundle\Command\Helper\CommandInfo;
 use Kevin3ssen\EntityGeneratorBundle\MetaData\MetaEntity;
 use Kevin3ssen\EntityGeneratorBundle\MetaData\MetaEntityFactory;
 use Kevin3ssen\EntityGeneratorBundle\MetaData\MetaPropertyFactory;
-use Kevin3ssen\EntityGeneratorBundle\MetaData\Property\AbstractProperty;
-use Kevin3ssen\EntityGeneratorBundle\MetaData\Property\AbstractRelationshipProperty;
+use Kevin3ssen\EntityGeneratorBundle\MetaData\Property\MetaPropertyInterface;
+use Kevin3ssen\EntityGeneratorBundle\MetaData\Property\RelationMetaPropertyInterface;
 
 class NameAndTypeQuestion implements PropertyQuestionInterface
 {
@@ -31,7 +31,7 @@ class NameAndTypeQuestion implements PropertyQuestionInterface
         $this->metaEntityFactory = $metaEntityFactory;
     }
 
-    public function doQuestion(CommandInfo $commandInfo, AbstractProperty $metaProperty = null)
+    public function doQuestion(CommandInfo $commandInfo, MetaPropertyInterface $metaProperty = null)
     {
         if ($metaProperty) {
             $fieldName = $commandInfo->getIo()->ask('Field name', $metaProperty->getName());
@@ -45,9 +45,10 @@ class NameAndTypeQuestion implements PropertyQuestionInterface
         $this->askFieldType($commandInfo, $fieldName, $metaProperty);
     }
 
-    protected function askFieldType(CommandInfo $commandInfo, string $fieldName, AbstractProperty $metaProperty = null)
+    protected function askFieldType(CommandInfo $commandInfo, string $fieldName, MetaPropertyInterface $metaProperty = null)
     {
         $typeOptions = $this->metaPropertyFactory->getAliasedTypeOptions();
+        dump($typeOptions);
         $defaultType = $metaProperty ? $metaProperty->getOrmType() : $this->guessFieldType($fieldName);
         $type = $commandInfo->getIo()->choice('Field type', $typeOptions, $defaultType);
         $type = $typeOptions[$type] ?? $type;
@@ -63,7 +64,7 @@ class NameAndTypeQuestion implements PropertyQuestionInterface
 
         $metaProperty = $this->metaPropertyFactory->getMetaProperty($commandInfo->getMetaEntity(), $type, $fieldName);
 
-        if ($metaProperty instanceof AbstractRelationshipProperty && $this->guessedEntity) {
+        if ($metaProperty instanceof RelationMetaPropertyInterface && $this->guessedEntity) {
             $metaProperty->setTargetEntity($this->guessedEntity);
             $this->guessedEntity = null;
         }

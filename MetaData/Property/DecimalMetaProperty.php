@@ -5,8 +5,12 @@ namespace Kevin3ssen\EntityGeneratorBundle\MetaData\Property;
 
 use Doctrine\DBAL\Types\Type;
 
-class DecimalProperty extends AbstractPrimitiveProperty
+class DecimalMetaProperty extends AbstractPrimitiveMetaProperty implements DecimalMetaPropertyInterface
 {
+    public const ORM_TYPE = Type::DECIMAL;
+    public const RETURN_TYPE = 'string';
+    public const ORM_TYPE_ALIAS = 'dec';
+
     /** @var int */
     protected $precision;
 
@@ -18,7 +22,7 @@ class DecimalProperty extends AbstractPrimitiveProperty
         return $this->getAttribute('precision');
     }
 
-    public function setPrecision(?int $precision): self
+    public function setPrecision(?int $precision)
     {
         return $this->setAttribute('precision', $precision);
     }
@@ -28,14 +32,9 @@ class DecimalProperty extends AbstractPrimitiveProperty
         return $this->getAttribute('scale');
     }
 
-    public function setScale(?int $scale): self
+    public function setScale(?int $scale)
     {
         return $this->setAttribute('scale', $scale);
-    }
-
-    public function getReturnType(): string
-    {
-        return 'string';
     }
 
     public function getColumnAnnotationOptions()
@@ -45,10 +44,5 @@ class DecimalProperty extends AbstractPrimitiveProperty
         $optionsString .= $this->getScale() ? ', scale='.$this->getScale() : '';
 
         return $optionsString;
-    }
-
-    public function getOrmType(): string
-    {
-        return Type::DECIMAL;
     }
 }

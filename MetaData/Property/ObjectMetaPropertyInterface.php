@@ -5,10 +5,6 @@ namespace Kevin3ssen\EntityGeneratorBundle\MetaData\Property;
 
 use Doctrine\DBAL\Types\Type;
 
-class BigIntProperty extends IntegerProperty
+interface ObjectMetaPropertyInterface extends PrimitiveMetaPropertyInterface
 {
-    public function getOrmType(): string
-    {
-        return Type::BIGINT;
-    }
 }

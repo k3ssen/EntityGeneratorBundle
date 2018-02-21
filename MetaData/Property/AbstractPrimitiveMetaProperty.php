@@ -5,9 +5,8 @@ namespace Kevin3ssen\EntityGeneratorBundle\MetaData\Property;
 
 use Doctrine\Common\Inflector\Inflector;
 
-abstract class AbstractPrimitiveProperty extends AbstractProperty
+abstract class AbstractPrimitiveMetaProperty extends AbstractMetaProperty implements PrimitiveMetaPropertyInterface
 {
-    /** @var mixed */
     protected $default;
 
     public function isId(): ?bool
@@ -25,10 +24,6 @@ abstract class AbstractPrimitiveProperty extends AbstractProperty
         return $this->getAttribute('default');
     }
 
-    /**
-     * @param $default
-     * @return static
-     */
     public function setDefault($default)
     {
         return $this->setAttribute('default', $default);

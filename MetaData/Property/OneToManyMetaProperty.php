@@ -6,10 +6,12 @@ namespace Kevin3ssen\EntityGeneratorBundle\MetaData\Property;
 use Doctrine\Common\Collections\ArrayCollection;
 use Kevin3ssen\EntityGeneratorBundle\MetaData\MetaEntity;
 use Doctrine\Common\Inflector\Inflector;
-use Kevin3ssen\EntityGeneratorBundle\MetaData\MetaPropertyFactory;
 
-class OneToManyProperty extends AbstractRelationshipProperty
+class OneToManyMetaProperty extends AbstractRelationMetaProperty implements OneToManyMetaPropertyInterface
 {
+    public const ORM_TYPE_ALIAS = 'o2m';
+    public const RETURN_TYPE = 'Collection';
+
     public function __construct(MetaEntity $metaEntity, ArrayCollection $metaAttributes, string $name)
     {
         parent::__construct($metaEntity, $metaAttributes, $name);
@@ -21,7 +23,7 @@ class OneToManyProperty extends AbstractRelationshipProperty
         $metaEntity->addUsage('Doctrine\Common\Collections\ArrayCollection');
     }
 
-    public function setInversedBy(?string $inversedBy): AbstractRelationshipProperty
+    public function setInversedBy(?string $inversedBy): RelationMetaPropertyInterface
     {
         throw new \RuntimeException(sprintf('Cannot call setInversedBy on "%s"; A OneToMany property always is the inversed side', static::class));
     }
@@ -46,15 +48,5 @@ class OneToManyProperty extends AbstractRelationshipProperty
             '@ORM\OneToMany('.$OneToManyOptions.')',
         ];
         return array_merge($annotationLines, parent::getAnnotationLines());
-    }
-
-    public function getReturnType(): string
-    {
-        return 'Collection';
-    }
-
-    public function getOrmType(): string
-    {
-        return MetaPropertyFactory::ONE_TO_MANY;
     }
 }

@@ -6,7 +6,7 @@ namespace Kevin3ssen\EntityGeneratorBundle\Command\PropertyQuestion;
 use Kevin3ssen\EntityGeneratorBundle\Command\Helper\CommandInfo;
 use Kevin3ssen\EntityGeneratorBundle\Command\AttributeQuestion\AttributeQuestionInterface;
 use Kevin3ssen\EntityGeneratorBundle\Command\Helper\EvaluationTrait;
-use Kevin3ssen\EntityGeneratorBundle\MetaData\Property\AbstractProperty;
+use Kevin3ssen\EntityGeneratorBundle\MetaData\Property\MetaPropertyInterface;
 
 class AttributesQuestion implements PropertyQuestionInterface
 {
@@ -22,7 +22,7 @@ class AttributesQuestion implements PropertyQuestionInterface
         $this->attributeQuestions = $attributeQuestions;
     }
 
-    public function doQuestion(CommandInfo $commandInfo, AbstractProperty $metaProperty = null)
+    public function doQuestion(CommandInfo $commandInfo, MetaPropertyInterface $metaProperty = null)
     {
         foreach ($metaProperty->getMetaAttributes() as $metaAttribute) {
             foreach ($this->attributeQuestions as $attributeQuestion) {

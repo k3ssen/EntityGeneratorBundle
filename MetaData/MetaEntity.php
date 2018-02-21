@@ -6,9 +6,9 @@ namespace Kevin3ssen\EntityGeneratorBundle\MetaData;
 use Kevin3ssen\EntityGeneratorBundle\MetaData\EntityAnnotation\AnnotationInterface;
 use Kevin3ssen\EntityGeneratorBundle\MetaData\EntityAnnotation\OrmEntityAnnotation;
 use Kevin3ssen\EntityGeneratorBundle\MetaData\EntityAnnotation\OrmTableAnnotation;
-use Kevin3ssen\EntityGeneratorBundle\MetaData\Property\AbstractPrimitiveProperty;
-use Kevin3ssen\EntityGeneratorBundle\MetaData\Property\AbstractProperty;
-use Kevin3ssen\EntityGeneratorBundle\MetaData\Property\AbstractRelationshipProperty;
+use Kevin3ssen\EntityGeneratorBundle\MetaData\Property\PrimitiveMetaPropertyInterface;
+use Kevin3ssen\EntityGeneratorBundle\MetaData\Property\RelationMetaPropertyInterface;
+use Kevin3ssen\EntityGeneratorBundle\MetaData\Property\MetaPropertyInterface;
 use Kevin3ssen\EntityGeneratorBundle\MetaData\Traits\MetaTraitInterface;
 use Doctrine\Common\Inflector\Inflector;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -32,7 +32,7 @@ class MetaEntity
     /** @var array */
     protected $properties = [];
 
-    /** @var AbstractPrimitiveProperty */
+    /** @var PrimitiveMetaPropertyInterface */
     protected $displayProperty;
 
     protected $customRepository = true;
@@ -197,14 +197,14 @@ class MetaEntity
     }
 
     /**
-     * @return AbstractProperty[]|ArrayCollection
+     * @return MetaPropertyInterface[]|ArrayCollection
      */
     public function getProperties(): ArrayCollection
     {
         return $this->properties;
     }
 
-    public function addProperty(AbstractProperty $property)
+    public function addProperty(MetaPropertyInterface $property)
     {
         if (!$this->getProperties()->contains($property)) {
             $this->getProperties()->add($property);
@@ -213,7 +213,7 @@ class MetaEntity
         return $this;
     }
 
-    public function removeProperty(AbstractProperty $property)
+    public function removeProperty(MetaPropertyInterface $property)
     {
         if ($this->getProperties()->contains($property)) {
             $this->getProperties()->removeElement($property);
@@ -223,25 +223,25 @@ class MetaEntity
 
     public function getCollectionProperties(): ArrayCollection
     {
-        return $this->getProperties()->filter(function(AbstractProperty $property){
+        return $this->getProperties()->filter(function(MetaPropertyInterface $property){
             return $property->getReturnType() === 'Collection';
         });
     }
 
-    /** @return ArrayCollection|AbstractRelationshipProperty[] */
+    /** @return ArrayCollection|RelationMetaPropertyInterface[] */
     public function getRelationshipProperties(): ArrayCollection
     {
-        return $this->getProperties()->filter(function (AbstractProperty $property) {
-            return $property instanceof AbstractRelationshipProperty;
+        return $this->getProperties()->filter(function (MetaPropertyInterface $property) {
+            return $property instanceof RelationMetaPropertyInterface;
         });
     }
 
-    public function getDisplayProperty(): ?AbstractPrimitiveProperty
+    public function getDisplayProperty(): ?PrimitiveMetaPropertyInterface
     {
         return $this->displayProperty;
     }
 
-    public function setDisplayProperty(?AbstractPrimitiveProperty $displayProperty)
+    public function setDisplayProperty(?PrimitiveMetaPropertyInterface $displayProperty)
     {
         if ($displayProperty && !$this->getProperties()->contains($displayProperty)) {
             throw new \RuntimeException(sprintf('Cannot set property %s as display-property; This property hasn\'t been added to this entity yet', $displayProperty));
@@ -249,10 +249,10 @@ class MetaEntity
         $this->displayProperty = $displayProperty;
     }
 
-    public function getIdProperty(): ?AbstractPrimitiveProperty
+    public function getIdProperty(): ?PrimitiveMetaPropertyInterface
     {
         foreach ($this->getProperties() as $property) {
-            if ($property instanceof  AbstractPrimitiveProperty && $property->isId()) {
+            if ($property instanceof  PrimitiveMetaPropertyInterface && $property->isId()) {
                 return $property;
             }
         }

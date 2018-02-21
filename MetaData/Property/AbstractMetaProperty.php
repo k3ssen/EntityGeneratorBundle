@@ -9,7 +9,7 @@ use Kevin3ssen\EntityGeneratorBundle\MetaData\MetaEntity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Kevin3ssen\EntityGeneratorBundle\MetaData\MetaValidation;
 
-abstract class AbstractProperty
+abstract class AbstractMetaProperty implements MetaPropertyInterface
 {
     /** @var MetaEntity */
     protected $metaEntity;
@@ -30,12 +30,36 @@ abstract class AbstractProperty
         $metaEntity->addProperty($this);
     }
 
+    public static function getReturnType(): string
+    {
+        if (defined('static::RETURN_TYPE')) {
+            return constant('static::RETURN_TYPE');
+        }
+        throw new \RuntimeException('Expected public constant "RETURN_TYPE" to be defined in class "%s", but none found', static::class);
+    }
+
+    public static function getOrmType(): string
+    {
+        if (defined('static::ORM_TYPE')) {
+            return constant('static::ORM_TYPE');
+        }
+        throw new \RuntimeException('Expected public constant "ORM_TYPE" to be defined in class "%s", but none found', static::class);
+    }
+
+    public static function getOrmTypeAlias(): string
+    {
+        if (defined('static::ORM_TYPE_ALIAS')) {
+            return constant('static::ORM_TYPE_ALIAS');
+        }
+        return static::getOrmType();
+    }
+
     public function getMetaEntity(): MetaEntity
     {
         return $this->metaEntity;
     }
 
-    public function setMetaEntity(MetaEntity $metaEntity): self
+    public function setMetaEntity(MetaEntity $metaEntity)
     {
         $this->metaEntity = $metaEntity;
         return $this;
@@ -46,7 +70,7 @@ abstract class AbstractProperty
         return $this->getAttribute('name');
     }
 
-    public function setName(string $name): self
+    public function setName(string $name)
     {
         return $this->setAttribute('name', lcfirst(Inflector::classify($name)));
     }
@@ -66,7 +90,7 @@ abstract class AbstractProperty
         return $this->getAttribute('unique');
     }
 
-    public function setUnique(?bool $unique): self
+    public function setUnique(?bool $unique)
     {
         return $this->setAttribute('unique', $unique);
     }
@@ -77,13 +101,13 @@ abstract class AbstractProperty
         return $this->validations;
     }
 
-    public function setValidations(ArrayCollection $validations): self
+    public function setValidations(ArrayCollection $validations)
     {
         $this->validations = $validations;
         return $this;
     }
 
-    public function addValidation(MetaValidation $validation): self
+    public function addValidation(MetaValidation $validation)
     {
         if (!$this->getValidations()->contains($validation)) {
             $this->getValidations()->add($validation);
@@ -92,7 +116,7 @@ abstract class AbstractProperty
         return $this;
     }
 
-    public function removeValidation(MetaValidation $validation): self
+    public function removeValidation(MetaValidation $validation)
     {
         if ($this->getValidations()->contains($validation)) {
             $this->getValidations()->removeElement($validation);
@@ -113,7 +137,7 @@ abstract class AbstractProperty
         return $this->metaAttributes;
     }
 
-    public function addMetaAttribute(MetaAttribute $metaAttribute): self
+    public function addMetaAttribute(MetaAttribute $metaAttribute)
     {
         if (!$this->getMetaAttributes()->contains($metaAttribute)) {
             $this->getMetaAttributes()->set($metaAttribute->getName(), $metaAttribute);
@@ -122,7 +146,7 @@ abstract class AbstractProperty
         return $this;
     }
 
-    public function removeMetaAttribute(MetaAttribute $metaAttribute): self
+    public function removeMetaAttribute(MetaAttribute $metaAttribute)
     {
         if (!$this->getMetaAttributes()->contains($metaAttribute)) {
             $this->getMetaAttributes()->removeElement($metaAttribute);
@@ -154,10 +178,6 @@ abstract class AbstractProperty
         $this->getMetaAttribute($name)->setValue($value);
         return $this;
     }
-    
-    abstract public function getReturnType(): string;
-
-    abstract public function getOrmType(): string;
 
     public function getAnnotationLines(): array
     {
