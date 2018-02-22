@@ -1,14 +1,14 @@
 <?php
 declare(strict_types=1);
 
-namespace Kevin3ssen\EntityGeneratorBundle\Command;
+namespace K3ssen\EntityGeneratorBundle\Command;
 
-use Kevin3ssen\EntityGeneratorBundle\Command\EntityQuestion\EntityQuestionInterface;
-use Kevin3ssen\EntityGeneratorBundle\Command\Helper\CommandInfo;
-use Kevin3ssen\EntityGeneratorBundle\Generator\EntityGenerator;
-use Kevin3ssen\EntityGeneratorBundle\MetaData\ExistingEntityToMetaEntityReader;
-use Kevin3ssen\EntityGeneratorBundle\MetaData\MetaEntityFactory;
-use Kevin3ssen\EntityGeneratorBundle\MetaData\MetaEntityInterface;
+use K3ssen\EntityGeneratorBundle\Command\EntityQuestion\EntityQuestionInterface;
+use K3ssen\EntityGeneratorBundle\Command\Helper\CommandInfo;
+use K3ssen\EntityGeneratorBundle\Generator\EntityGenerator;
+use K3ssen\EntityGeneratorBundle\MetaData\ExistingEntityToMetaEntityReader;
+use K3ssen\EntityGeneratorBundle\MetaData\MetaEntityFactory;
+use K3ssen\EntityGeneratorBundle\MetaData\MetaEntityInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;

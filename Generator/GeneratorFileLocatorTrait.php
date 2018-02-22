@@ -1,11 +1,11 @@
 <?php
 declare(strict_types=1);
 
-namespace Kevin3ssen\EntityGeneratorBundle\Generator;
+namespace K3ssen\EntityGeneratorBundle\Generator;
 
-use Kevin3ssen\EntityGeneratorBundle\MetaData\MetaEntityInterface;
-use Kevin3ssen\EntityGeneratorBundle\Twig\IndentLexer;
-use Kevin3ssen\EntityGeneratorBundle\Twig\InflectorExtension;
+use K3ssen\EntityGeneratorBundle\MetaData\MetaEntityInterface;
+use K3ssen\EntityGeneratorBundle\Twig\IndentLexer;
+use K3ssen\EntityGeneratorBundle\Twig\InflectorExtension;
 use Symfony\Component\Config\Exception\FileLocatorFileNotFoundException;
 use Symfony\Component\HttpKernel\Config\FileLocator;
 
@@ -53,7 +53,7 @@ trait GeneratorFileLocatorTrait
         try {
             $dirs[$this->fileLocator->locate('../EntityGenerator/templates/skeleton/')] = 'App';
         } catch (FileLocatorFileNotFoundException $e) {}
-        $dirs[$this->fileLocator->locate('@EntityGeneratorBundle/templates/skeleton/')] = 'EntityGeneratorBundle';
+        $dirs[$this->fileLocator->locate('@EntityGeneratorBundle/Resources/views/skeleton/')] = 'EntityGeneratorBundle';
         return $dirs;
     }
 

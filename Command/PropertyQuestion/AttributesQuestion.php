@@ -1,12 +1,12 @@
 <?php
 declare(strict_types=1);
 
-namespace Kevin3ssen\EntityGeneratorBundle\Command\PropertyQuestion;
+namespace K3ssen\EntityGeneratorBundle\Command\PropertyQuestion;
 
-use Kevin3ssen\EntityGeneratorBundle\Command\Helper\CommandInfo;
-use Kevin3ssen\EntityGeneratorBundle\Command\AttributeQuestion\AttributeQuestionInterface;
-use Kevin3ssen\EntityGeneratorBundle\Command\Helper\EvaluationTrait;
-use Kevin3ssen\EntityGeneratorBundle\MetaData\Property\MetaPropertyInterface;
+use K3ssen\EntityGeneratorBundle\Command\Helper\CommandInfo;
+use K3ssen\EntityGeneratorBundle\Command\AttributeQuestion\AttributeQuestionInterface;
+use K3ssen\EntityGeneratorBundle\Command\Helper\EvaluationTrait;
+use K3ssen\EntityGeneratorBundle\MetaData\Property\MetaPropertyInterface;
 
 class AttributesQuestion implements PropertyQuestionInterface
 {

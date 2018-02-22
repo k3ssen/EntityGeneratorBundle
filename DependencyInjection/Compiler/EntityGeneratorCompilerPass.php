@@ -1,20 +1,20 @@
 <?php
 declare(strict_types=1);
 
-namespace Kevin3ssen\EntityGeneratorBundle\DependencyInjection\Compiler;
+namespace K3ssen\EntityGeneratorBundle\DependencyInjection\Compiler;
 
-use Kevin3ssen\EntityGeneratorBundle\Command\AttributeQuestion\AttributeQuestionInterface;
-use Kevin3ssen\EntityGeneratorBundle\Command\AttributeQuestion\BasicAttributeQuestion;
-use Kevin3ssen\EntityGeneratorBundle\Command\EntityQuestion\EntityQuestionInterface;
-use Kevin3ssen\EntityGeneratorBundle\Command\PropertyQuestion\PropertyQuestionInterface;
-use Kevin3ssen\EntityGeneratorBundle\MetaData\MetaAttributeFactory;
-use Kevin3ssen\EntityGeneratorBundle\MetaData\MetaAttributeInterface;
-use Kevin3ssen\EntityGeneratorBundle\MetaData\MetaEntityFactory;
-use Kevin3ssen\EntityGeneratorBundle\MetaData\MetaEntityInterface;
-use Kevin3ssen\EntityGeneratorBundle\MetaData\MetaPropertyFactory;
-use Kevin3ssen\EntityGeneratorBundle\MetaData\MetaValidationFactory;
-use Kevin3ssen\EntityGeneratorBundle\MetaData\MetaValidationInterface;
-use Kevin3ssen\EntityGeneratorBundle\MetaData\Property\MetaPropertyInterface;
+use K3ssen\EntityGeneratorBundle\Command\AttributeQuestion\AttributeQuestionInterface;
+use K3ssen\EntityGeneratorBundle\Command\AttributeQuestion\BasicAttributeQuestion;
+use K3ssen\EntityGeneratorBundle\Command\EntityQuestion\EntityQuestionInterface;
+use K3ssen\EntityGeneratorBundle\Command\PropertyQuestion\PropertyQuestionInterface;
+use K3ssen\EntityGeneratorBundle\MetaData\MetaAttributeFactory;
+use K3ssen\EntityGeneratorBundle\MetaData\MetaAttributeInterface;
+use K3ssen\EntityGeneratorBundle\MetaData\MetaEntityFactory;
+use K3ssen\EntityGeneratorBundle\MetaData\MetaEntityInterface;
+use K3ssen\EntityGeneratorBundle\MetaData\MetaPropertyFactory;
+use K3ssen\EntityGeneratorBundle\MetaData\MetaValidationFactory;
+use K3ssen\EntityGeneratorBundle\MetaData\MetaValidationInterface;
+use K3ssen\EntityGeneratorBundle\MetaData\Property\MetaPropertyInterface;
 use Symfony\Component\Config\Definition\Exception\InvalidDefinitionException;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;

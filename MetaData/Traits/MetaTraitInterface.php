@@ -1,10 +1,10 @@
 <?php
 declare(strict_types=1);
 
-namespace Kevin3ssen\EntityGeneratorBundle\MetaData\Traits;
+namespace K3ssen\EntityGeneratorBundle\MetaData\Traits;
 
 
-use Kevin3ssen\EntityGeneratorBundle\MetaData\MetaEntityInterface;
+use K3ssen\EntityGeneratorBundle\MetaData\MetaEntityInterface;
 
 interface MetaTraitInterface
 {

@@ -1,9 +1,9 @@
 <?php
 declare(strict_types=1);
 
-namespace Kevin3ssen\EntityGeneratorBundle\MetaData;
+namespace K3ssen\EntityGeneratorBundle\MetaData;
 
-use Kevin3ssen\EntityGeneratorBundle\MetaData\Property\MetaPropertyInterface;
+use K3ssen\EntityGeneratorBundle\MetaData\Property\MetaPropertyInterface;
 
 class MetaValidation
 {

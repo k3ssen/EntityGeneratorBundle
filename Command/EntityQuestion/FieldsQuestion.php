@@ -1,12 +1,12 @@
 <?php
 declare(strict_types=1);
 
-namespace Kevin3ssen\EntityGeneratorBundle\Command\EntityQuestion;
+namespace K3ssen\EntityGeneratorBundle\Command\EntityQuestion;
 
-use Kevin3ssen\EntityGeneratorBundle\Command\Helper\CommandInfo;
-use Kevin3ssen\EntityGeneratorBundle\Command\PropertyQuestion\PropertyQuestionInterface;
-use Kevin3ssen\EntityGeneratorBundle\MetaData\MetaEntityFactory;
-use Kevin3ssen\EntityGeneratorBundle\MetaData\Property\MetaPropertyInterface;
+use K3ssen\EntityGeneratorBundle\Command\Helper\CommandInfo;
+use K3ssen\EntityGeneratorBundle\Command\PropertyQuestion\PropertyQuestionInterface;
+use K3ssen\EntityGeneratorBundle\MetaData\MetaEntityFactory;
+use K3ssen\EntityGeneratorBundle\MetaData\Property\MetaPropertyInterface;
 
 class FieldsQuestion implements EntityQuestionInterface
 {

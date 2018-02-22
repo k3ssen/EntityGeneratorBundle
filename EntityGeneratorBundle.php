@@ -1,9 +1,9 @@
 <?php
 declare(strict_types=1);
 
-namespace Kevin3ssen\EntityGeneratorBundle;
+namespace K3ssen\EntityGeneratorBundle;
 
-use Kevin3ssen\EntityGeneratorBundle\DependencyInjection\Compiler\EntityGeneratorCompilerPass;
+use K3ssen\EntityGeneratorBundle\DependencyInjection\Compiler\EntityGeneratorCompilerPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 

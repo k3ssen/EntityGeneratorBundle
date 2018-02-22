@@ -1,13 +1,13 @@
 <?php
 declare(strict_types=1);
 
-namespace Kevin3ssen\EntityGeneratorBundle\MetaData;
+namespace K3ssen\EntityGeneratorBundle\MetaData;
 
-use Kevin3ssen\EntityGeneratorBundle\MetaData\EntityAnnotation\AnnotationInterface;
-use Kevin3ssen\EntityGeneratorBundle\MetaData\Property\PrimitiveMetaPropertyInterface;
-use Kevin3ssen\EntityGeneratorBundle\MetaData\Property\RelationMetaPropertyInterface;
-use Kevin3ssen\EntityGeneratorBundle\MetaData\Property\MetaPropertyInterface;
-use Kevin3ssen\EntityGeneratorBundle\MetaData\Traits\MetaTraitInterface;
+use K3ssen\EntityGeneratorBundle\MetaData\EntityAnnotation\AnnotationInterface;
+use K3ssen\EntityGeneratorBundle\MetaData\Property\PrimitiveMetaPropertyInterface;
+use K3ssen\EntityGeneratorBundle\MetaData\Property\RelationMetaPropertyInterface;
+use K3ssen\EntityGeneratorBundle\MetaData\Property\MetaPropertyInterface;
+use K3ssen\EntityGeneratorBundle\MetaData\Traits\MetaTraitInterface;
 use Doctrine\Common\Collections\ArrayCollection;
 
 interface MetaEntityInterface

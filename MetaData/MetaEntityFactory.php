@@ -1,11 +1,11 @@
 <?php
 declare(strict_types=1);
 
-namespace Kevin3ssen\EntityGeneratorBundle\MetaData;
+namespace K3ssen\EntityGeneratorBundle\MetaData;
 
 use Doctrine\ORM\EntityManagerInterface;
-use Kevin3ssen\EntityGeneratorBundle\Generator\EntityGenerator;
-use Kevin3ssen\EntityGeneratorBundle\MetaData\Property\RelationMetaPropertyInterface;
+use K3ssen\EntityGeneratorBundle\Generator\EntityGenerator;
+use K3ssen\EntityGeneratorBundle\MetaData\Property\RelationMetaPropertyInterface;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Mapping\ClassMetadataFactory;
 

@@ -1,11 +1,11 @@
 <?php
 declare(strict_types=1);
 
-namespace Kevin3ssen\EntityGeneratorBundle\Command\AttributeQuestion;
+namespace K3ssen\EntityGeneratorBundle\Command\AttributeQuestion;
 
-use Kevin3ssen\EntityGeneratorBundle\Command\Helper\CommandInfo;
-use Kevin3ssen\EntityGeneratorBundle\Command\Helper\EvaluationTrait;
-use Kevin3ssen\EntityGeneratorBundle\MetaData\MetaAttributeInterface;
+use K3ssen\EntityGeneratorBundle\Command\Helper\CommandInfo;
+use K3ssen\EntityGeneratorBundle\Command\Helper\EvaluationTrait;
+use K3ssen\EntityGeneratorBundle\MetaData\MetaAttributeInterface;
 
 class BasicAttributeQuestion implements AttributeQuestionInterface
 {

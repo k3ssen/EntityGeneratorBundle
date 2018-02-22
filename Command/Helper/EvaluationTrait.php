@@ -1,9 +1,9 @@
 <?php
 declare(strict_types=1);
 
-namespace Kevin3ssen\EntityGeneratorBundle\Command\Helper;
+namespace K3ssen\EntityGeneratorBundle\Command\Helper;
 
-use Kevin3ssen\EntityGeneratorBundle\MetaData\MetaAttributeInterface;
+use K3ssen\EntityGeneratorBundle\MetaData\MetaAttributeInterface;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 
 trait EvaluationTrait

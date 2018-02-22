@@ -1,15 +1,15 @@
 <?php
 declare(strict_types=1);
 
-namespace Kevin3ssen\EntityGeneratorBundle\MetaData;
+namespace K3ssen\EntityGeneratorBundle\MetaData;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Util\Inflector;
-use Kevin3ssen\EntityGeneratorBundle\MetaData\Property\ManyToManyMetaPropertyInterface;
-use Kevin3ssen\EntityGeneratorBundle\MetaData\Property\ManyToOneMetaPropertyInterface;
-use Kevin3ssen\EntityGeneratorBundle\MetaData\Property\MetaPropertyInterface;
-use Kevin3ssen\EntityGeneratorBundle\MetaData\Property\OneToManyMetaPropertyInterface;
-use Kevin3ssen\EntityGeneratorBundle\MetaData\Property\OneToOneMetaPropertyInterface;
+use K3ssen\EntityGeneratorBundle\MetaData\Property\ManyToManyMetaPropertyInterface;
+use K3ssen\EntityGeneratorBundle\MetaData\Property\ManyToOneMetaPropertyInterface;
+use K3ssen\EntityGeneratorBundle\MetaData\Property\MetaPropertyInterface;
+use K3ssen\EntityGeneratorBundle\MetaData\Property\OneToManyMetaPropertyInterface;
+use K3ssen\EntityGeneratorBundle\MetaData\Property\OneToOneMetaPropertyInterface;
 
 class MetaPropertyFactory
 {

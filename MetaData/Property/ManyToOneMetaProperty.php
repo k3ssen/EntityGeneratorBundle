@@ -1,11 +1,11 @@
 <?php
 declare(strict_types=1);
 
-namespace Kevin3ssen\EntityGeneratorBundle\MetaData\Property;
+namespace K3ssen\EntityGeneratorBundle\MetaData\Property;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Inflector\Inflector;
-use Kevin3ssen\EntityGeneratorBundle\MetaData\MetaEntityInterface;
+use K3ssen\EntityGeneratorBundle\MetaData\MetaEntityInterface;
 
 class ManyToOneMetaProperty extends AbstractRelationMetaProperty implements ManyToOneMetaPropertyInterface
 {

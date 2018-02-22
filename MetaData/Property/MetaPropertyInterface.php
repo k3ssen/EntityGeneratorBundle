@@ -1,12 +1,12 @@
 <?php
 declare(strict_types=1);
 
-namespace Kevin3ssen\EntityGeneratorBundle\MetaData\Property;
+namespace K3ssen\EntityGeneratorBundle\MetaData\Property;
 
 use Doctrine\Common\Collections\ArrayCollection;
-use Kevin3ssen\EntityGeneratorBundle\MetaData\MetaAttributeInterface;
-use Kevin3ssen\EntityGeneratorBundle\MetaData\MetaEntityInterface;
-use Kevin3ssen\EntityGeneratorBundle\MetaData\MetaValidationInterface;
+use K3ssen\EntityGeneratorBundle\MetaData\MetaAttributeInterface;
+use K3ssen\EntityGeneratorBundle\MetaData\MetaEntityInterface;
+use K3ssen\EntityGeneratorBundle\MetaData\MetaValidationInterface;
 
 interface MetaPropertyInterface
 {

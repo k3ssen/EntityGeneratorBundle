@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace Kevin3ssen\EntityGeneratorBundle\Command\Style;
+namespace K3ssen\EntityGeneratorBundle\Command\Style;
 
 use Symfony\Component\Console\Question\Question;
 use Symfony\Component\Console\Style\SymfonyStyle;

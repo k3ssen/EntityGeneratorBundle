@@ -1,16 +1,16 @@
 <?php
 declare(strict_types=1);
 
-namespace Kevin3ssen\EntityGeneratorBundle\MetaData;
+namespace K3ssen\EntityGeneratorBundle\MetaData;
 
 use Doctrine\ORM\Mapping\ClassMetadata;
-use Kevin3ssen\EntityGeneratorBundle\Generator\EntityGenerator;
-use Kevin3ssen\EntityGeneratorBundle\MetaData\Property\ManyToManyMetaPropertyInterface;
-use Kevin3ssen\EntityGeneratorBundle\MetaData\Property\ManyToOneMetaPropertyInterface;
-use Kevin3ssen\EntityGeneratorBundle\MetaData\Property\OneToManyMetaPropertyInterface;
-use Kevin3ssen\EntityGeneratorBundle\MetaData\Property\OneToOneMetaPropertyInterface;
-use Kevin3ssen\EntityGeneratorBundle\MetaData\Property\RelationMetaPropertyInterface;
-use Kevin3ssen\EntityGeneratorBundle\MetaData\Property\MetaPropertyInterface;
+use K3ssen\EntityGeneratorBundle\Generator\EntityGenerator;
+use K3ssen\EntityGeneratorBundle\MetaData\Property\ManyToManyMetaPropertyInterface;
+use K3ssen\EntityGeneratorBundle\MetaData\Property\ManyToOneMetaPropertyInterface;
+use K3ssen\EntityGeneratorBundle\MetaData\Property\OneToManyMetaPropertyInterface;
+use K3ssen\EntityGeneratorBundle\MetaData\Property\OneToOneMetaPropertyInterface;
+use K3ssen\EntityGeneratorBundle\MetaData\Property\RelationMetaPropertyInterface;
+use K3ssen\EntityGeneratorBundle\MetaData\Property\MetaPropertyInterface;
 
 class ExistingEntityToMetaEntityReader
 {

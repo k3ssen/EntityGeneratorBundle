@@ -1,9 +1,9 @@
 <?php
 declare(strict_types=1);
 
-namespace Kevin3ssen\EntityGeneratorBundle\Command\EntityQuestion;
+namespace K3ssen\EntityGeneratorBundle\Command\EntityQuestion;
 
-use Kevin3ssen\EntityGeneratorBundle\Command\Helper\CommandInfo;
+use K3ssen\EntityGeneratorBundle\Command\Helper\CommandInfo;
 
 class SubDirQuestion implements EntityQuestionInterface
 {

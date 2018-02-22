@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace Kevin3ssen\EntityGeneratorBundle\Twig;
+namespace K3ssen\EntityGeneratorBundle\Twig;
 
 use Twig_Source;
 

@@ -1,10 +1,10 @@
 <?php
 declare(strict_types=1);
 
-namespace Kevin3ssen\EntityGeneratorBundle\Command\EntityQuestion;
+namespace K3ssen\EntityGeneratorBundle\Command\EntityQuestion;
 
-use Kevin3ssen\EntityGeneratorBundle\Command\Helper\CommandInfo;
-use Kevin3ssen\EntityGeneratorBundle\MetaData\MetaEntityFactory;
+use K3ssen\EntityGeneratorBundle\Command\Helper\CommandInfo;
+use K3ssen\EntityGeneratorBundle\MetaData\MetaEntityFactory;
 
 class EntityNameQuestion implements EntityQuestionInterface
 {

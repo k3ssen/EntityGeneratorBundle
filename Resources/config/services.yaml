@@ -6,57 +6,57 @@ parameters:
     default_attributes:
         name:
             type: 'string'
-            meta_properties: ['Kevin3ssen\EntityGeneratorBundle\MetaData\Property\MetaPropertyInterface']
+            meta_properties: ['K3ssen\EntityGeneratorBundle\MetaData\Property\MetaPropertyInterface']
             question: null #the 'NameAndTypeQuestion' propertyQuestion already asks for name, so we don't need this as attribute-question
         id:
             type: 'bool'
-            meta_properties: ['Kevin3ssen\EntityGeneratorBundle\MetaData\Property\PrimitiveMetaPropertyInterface']
+            meta_properties: ['K3ssen\EntityGeneratorBundle\MetaData\Property\PrimitiveMetaPropertyInterface']
             default: false
             requirement_expression: 'metaEntity.getIdProperty() == null or metaEntity.getIdProperty() != metaProperty'
         unique:
             type: 'bool'
-            meta_properties: ['Kevin3ssen\EntityGeneratorBundle\MetaData\Property\PrimitiveMetaPropertyInterface']
+            meta_properties: ['K3ssen\EntityGeneratorBundle\MetaData\Property\PrimitiveMetaPropertyInterface']
             default: false
         nullable:
             type: 'bool'
-            meta_properties: ['Kevin3ssen\EntityGeneratorBundle\MetaData\Property\MetaPropertyInterface']
+            meta_properties: ['K3ssen\EntityGeneratorBundle\MetaData\Property\MetaPropertyInterface']
             default: false
         length:
             type: 'int'
-            meta_properties: ['Kevin3ssen\EntityGeneratorBundle\MetaData\Property\HasLengthInterface']
+            meta_properties: ['K3ssen\EntityGeneratorBundle\MetaData\Property\HasLengthInterface']
         precision:
             type: 'int'
-            meta_properties: ['Kevin3ssen\EntityGeneratorBundle\MetaData\Property\DecimalMetaPropertyInterface']
+            meta_properties: ['K3ssen\EntityGeneratorBundle\MetaData\Property\DecimalMetaPropertyInterface']
         scale:
             type: 'int'
-            meta_properties: ['Kevin3ssen\EntityGeneratorBundle\MetaData\Property\DecimalMetaPropertyInterface']
+            meta_properties: ['K3ssen\EntityGeneratorBundle\MetaData\Property\DecimalMetaPropertyInterface']
         targetEntity:
             type: 'object'
-            meta_properties: ['Kevin3ssen\EntityGeneratorBundle\MetaData\Property\RelationMetaPropertyInterface']
-            question: 'Kevin3ssen\EntityGeneratorBundle\Command\AttributeQuestion\TargetEntityQuestion'
+            meta_properties: ['K3ssen\EntityGeneratorBundle\MetaData\Property\RelationMetaPropertyInterface']
+            question: 'K3ssen\EntityGeneratorBundle\Command\AttributeQuestion\TargetEntityQuestion'
         referencedColumnName:
             type: 'string'
-            meta_properties: ['Kevin3ssen\EntityGeneratorBundle\MetaData\Property\RelationMetaPropertyInterface']
+            meta_properties: ['K3ssen\EntityGeneratorBundle\MetaData\Property\RelationMetaPropertyInterface']
             default: 'id'
         orphanRemoval:
             type: 'bool'
             meta_properties:
-                - 'Kevin3ssen\EntityGeneratorBundle\MetaData\Property\ManyToManyMetaPropertyInterface'
-                - 'Kevin3ssen\EntityGeneratorBundle\MetaData\Property\OneToManyMetaPropertyInterface'
+                - 'K3ssen\EntityGeneratorBundle\MetaData\Property\ManyToManyMetaPropertyInterface'
+                - 'K3ssen\EntityGeneratorBundle\MetaData\Property\OneToManyMetaPropertyInterface'
             default: false
         inversedBy:
             type: 'string'
             meta_properties:
-                - 'Kevin3ssen\EntityGeneratorBundle\MetaData\Property\ManyToOneMetaPropertyInterface'
-                - 'Kevin3ssen\EntityGeneratorBundle\MetaData\Property\OneToOneMetaPropertyInterface'
-                - 'Kevin3ssen\EntityGeneratorBundle\MetaData\Property\ManyToManyMetaPropertyInterface'
+                - 'K3ssen\EntityGeneratorBundle\MetaData\Property\ManyToOneMetaPropertyInterface'
+                - 'K3ssen\EntityGeneratorBundle\MetaData\Property\OneToOneMetaPropertyInterface'
+                - 'K3ssen\EntityGeneratorBundle\MetaData\Property\ManyToManyMetaPropertyInterface'
             requirement_expression: 'metaProperty.getMappedBy() == null'
         mappedBy:
             type: 'string'
             meta_properties:
-                - 'Kevin3ssen\EntityGeneratorBundle\MetaData\Property\OneToManyMetaPropertyInterface'
-                - 'Kevin3ssen\EntityGeneratorBundle\MetaData\Property\OneToOneMetaPropertyInterface'
-                - 'Kevin3ssen\EntityGeneratorBundle\MetaData\Property\ManyToManyMetaPropertyInterface'
+                - 'K3ssen\EntityGeneratorBundle\MetaData\Property\OneToManyMetaPropertyInterface'
+                - 'K3ssen\EntityGeneratorBundle\MetaData\Property\OneToOneMetaPropertyInterface'
+                - 'K3ssen\EntityGeneratorBundle\MetaData\Property\ManyToManyMetaPropertyInterface'
             requirement_expression: 'metaProperty.getInversedBy() == null'
 
 services:
@@ -73,6 +73,6 @@ services:
             $autoGenerateRepository: '%entity_generator.auto_generate_repository%'
             $bundlesMetaData: '%kernel.bundles_metadata%'
 
-    Kevin3ssen\EntityGeneratorBundle\:
-        resource: '../*'
-        exclude: '../{Entity,Migrations,Tests}'
+    K3ssen\EntityGeneratorBundle\:
+        resource: '../../*'
+        exclude: '../../{Entity,Migrations,Tests}'

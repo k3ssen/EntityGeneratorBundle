@@ -1,10 +1,10 @@
 <?php
 declare(strict_types=1);
 
-namespace Kevin3ssen\EntityGeneratorBundle\MetaData\EntityAnnotation;
+namespace K3ssen\EntityGeneratorBundle\MetaData\EntityAnnotation;
 
 
-use Kevin3ssen\EntityGeneratorBundle\MetaData\MetaEntityInterface;
+use K3ssen\EntityGeneratorBundle\MetaData\MetaEntityInterface;
 
 interface AnnotationInterface
 {

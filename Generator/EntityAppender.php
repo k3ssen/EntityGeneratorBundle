@@ -1,9 +1,9 @@
 <?php
 declare(strict_types=1);
 
-namespace Kevin3ssen\EntityGeneratorBundle\Generator;
+namespace K3ssen\EntityGeneratorBundle\Generator;
 
-use Kevin3ssen\EntityGeneratorBundle\MetaData\MetaEntityInterface;
+use K3ssen\EntityGeneratorBundle\MetaData\MetaEntityInterface;
 use Symfony\Component\HttpKernel\Config\FileLocator;
 
 class EntityAppender

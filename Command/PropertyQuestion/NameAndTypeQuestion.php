@@ -1,20 +1,20 @@
 <?php
 declare(strict_types=1);
 
-namespace Kevin3ssen\EntityGeneratorBundle\Command\PropertyQuestion;
+namespace K3ssen\EntityGeneratorBundle\Command\PropertyQuestion;
 
 use Doctrine\Common\Util\Inflector;
 use Doctrine\DBAL\Types\Type;
-use Kevin3ssen\EntityGeneratorBundle\Command\Helper\CommandInfo;
-use Kevin3ssen\EntityGeneratorBundle\MetaData\MetaEntityFactory;
-use Kevin3ssen\EntityGeneratorBundle\MetaData\MetaEntityInterface;
-use Kevin3ssen\EntityGeneratorBundle\MetaData\MetaPropertyFactory;
-use Kevin3ssen\EntityGeneratorBundle\MetaData\Property\ManyToManyMetaPropertyInterface;
-use Kevin3ssen\EntityGeneratorBundle\MetaData\Property\ManyToOneMetaPropertyInterface;
-use Kevin3ssen\EntityGeneratorBundle\MetaData\Property\MetaPropertyInterface;
-use Kevin3ssen\EntityGeneratorBundle\MetaData\Property\OneToManyMetaPropertyInterface;
-use Kevin3ssen\EntityGeneratorBundle\MetaData\Property\OneToOneMetaPropertyInterface;
-use Kevin3ssen\EntityGeneratorBundle\MetaData\Property\RelationMetaPropertyInterface;
+use K3ssen\EntityGeneratorBundle\Command\Helper\CommandInfo;
+use K3ssen\EntityGeneratorBundle\MetaData\MetaEntityFactory;
+use K3ssen\EntityGeneratorBundle\MetaData\MetaEntityInterface;
+use K3ssen\EntityGeneratorBundle\MetaData\MetaPropertyFactory;
+use K3ssen\EntityGeneratorBundle\MetaData\Property\ManyToManyMetaPropertyInterface;
+use K3ssen\EntityGeneratorBundle\MetaData\Property\ManyToOneMetaPropertyInterface;
+use K3ssen\EntityGeneratorBundle\MetaData\Property\MetaPropertyInterface;
+use K3ssen\EntityGeneratorBundle\MetaData\Property\OneToManyMetaPropertyInterface;
+use K3ssen\EntityGeneratorBundle\MetaData\Property\OneToOneMetaPropertyInterface;
+use K3ssen\EntityGeneratorBundle\MetaData\Property\RelationMetaPropertyInterface;
 
 class NameAndTypeQuestion implements PropertyQuestionInterface
 {

@@ -1,10 +1,10 @@
 <?php
 declare(strict_types=1);
 
-namespace Kevin3ssen\EntityGeneratorBundle\Command\Helper;
+namespace K3ssen\EntityGeneratorBundle\Command\Helper;
 
-use Kevin3ssen\EntityGeneratorBundle\Command\Style\CommandStyle;
-use Kevin3ssen\EntityGeneratorBundle\MetaData\MetaEntityInterface;
+use K3ssen\EntityGeneratorBundle\Command\Style\CommandStyle;
+use K3ssen\EntityGeneratorBundle\MetaData\MetaEntityInterface;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;

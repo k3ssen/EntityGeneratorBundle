@@ -1,21 +1,21 @@
 <?php
 declare(strict_types=1);
 
-namespace Kevin3ssen\EntityGeneratorBundle\MetaData;
+namespace K3ssen\EntityGeneratorBundle\MetaData;
 
-use Kevin3ssen\EntityGeneratorBundle\MetaData\Property\BooleanMetaPropertyInterface;
-use Kevin3ssen\EntityGeneratorBundle\MetaData\Property\DateMetaPropertyInterface;
-use Kevin3ssen\EntityGeneratorBundle\MetaData\Property\DateTimeMetaPropertyInterface;
-use Kevin3ssen\EntityGeneratorBundle\MetaData\Property\IntegerMetaPropertyInterface;
-use Kevin3ssen\EntityGeneratorBundle\MetaData\Property\JsonMetaPropertyInterface;
-use Kevin3ssen\EntityGeneratorBundle\MetaData\Property\ManyToManyMetaPropertyInterface;
-use Kevin3ssen\EntityGeneratorBundle\MetaData\Property\MetaPropertyInterface;
-use Kevin3ssen\EntityGeneratorBundle\MetaData\Property\OneToManyMetaPropertyInterface;
-use Kevin3ssen\EntityGeneratorBundle\MetaData\Property\RelationMetaPropertyInterface;
-use Kevin3ssen\EntityGeneratorBundle\MetaData\Property\SimpleArrayMetaPropertyInterface;
-use Kevin3ssen\EntityGeneratorBundle\MetaData\Property\StringMetaPropertyInterface;
-use Kevin3ssen\EntityGeneratorBundle\MetaData\Property\TextMetaPropertyInterface;
-use Kevin3ssen\EntityGeneratorBundle\MetaData\Property\TimeMetaPropertyInterface;
+use K3ssen\EntityGeneratorBundle\MetaData\Property\BooleanMetaPropertyInterface;
+use K3ssen\EntityGeneratorBundle\MetaData\Property\DateMetaPropertyInterface;
+use K3ssen\EntityGeneratorBundle\MetaData\Property\DateTimeMetaPropertyInterface;
+use K3ssen\EntityGeneratorBundle\MetaData\Property\IntegerMetaPropertyInterface;
+use K3ssen\EntityGeneratorBundle\MetaData\Property\JsonMetaPropertyInterface;
+use K3ssen\EntityGeneratorBundle\MetaData\Property\ManyToManyMetaPropertyInterface;
+use K3ssen\EntityGeneratorBundle\MetaData\Property\MetaPropertyInterface;
+use K3ssen\EntityGeneratorBundle\MetaData\Property\OneToManyMetaPropertyInterface;
+use K3ssen\EntityGeneratorBundle\MetaData\Property\RelationMetaPropertyInterface;
+use K3ssen\EntityGeneratorBundle\MetaData\Property\SimpleArrayMetaPropertyInterface;
+use K3ssen\EntityGeneratorBundle\MetaData\Property\StringMetaPropertyInterface;
+use K3ssen\EntityGeneratorBundle\MetaData\Property\TextMetaPropertyInterface;
+use K3ssen\EntityGeneratorBundle\MetaData\Property\TimeMetaPropertyInterface;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Constraints;
 

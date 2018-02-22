@@ -7,7 +7,7 @@
     "authors": [
         {
             "name": "Kevin Driessen",
-            "email": "kevin3ssen@gmail.com"
+            "email": "k3ssen@gmail.com"
         }
     ],
     "require": {
@@ -21,12 +21,12 @@
         "symfony/console": "~4.0",
         "symfony/validator": "~4.0",
         "symfony/orm-pack": "~1.0",
-        "symfony/expression-language": "~4.0"
+        "symfony/expression-language": "~4.0",
     },
     "suggest": {
     },
     "autoload": {
-        "psr-4": { "Kevin3ssen\\EntityGeneratorBundle\\": "" },
+        "psr-4": { "K3ssen\\EntityGeneratorBundle\\": "" },
         "exclude-from-classmap": [
             "/Tests/"
         ]

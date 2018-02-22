@@ -1,9 +1,9 @@
 <?php
 declare(strict_types=1);
 
-namespace Kevin3ssen\EntityGeneratorBundle\MetaData\Property;
+namespace K3ssen\EntityGeneratorBundle\MetaData\Property;
 
-use Kevin3ssen\EntityGeneratorBundle\MetaData\MetaEntityInterface;
+use K3ssen\EntityGeneratorBundle\MetaData\MetaEntityInterface;
 
 interface RelationMetaPropertyInterface extends MetaPropertyInterface
 {
