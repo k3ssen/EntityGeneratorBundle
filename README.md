@@ -1,7 +1,7 @@
 EntityGeneratorBundle
 =====================
 
-**WORK IN PROGRESS: major changes are constantly being made at this moment**
+**WORK IN PROGRES: major changes are constantly being made at this moment**
 
 
 Bundle to interactively generate entities in Symfony 4. 
