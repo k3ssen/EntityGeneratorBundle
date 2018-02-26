@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace K3ssen\EntityGeneratorBundle\Command\EntityQuestion;
 
 use K3ssen\EntityGeneratorBundle\Command\Helper\CommandInfo;
-use K3ssen\EntityGeneratorBundle\MetaData\BundleProvider;
+use K3ssen\MetaEntityBundle\Reader\BundleProvider;
 use Symfony\Component\Console\Question\Question;
 
 class BundleQuestion implements EntityQuestionInterface

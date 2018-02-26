@@ -1,5 +1,5 @@
-{# @var meta_entity \K3ssen\EntityGeneratorBundle\MetaData\MetaEntity #}
-{# @var property \K3ssen\EntityGeneratorBundle\MetaData\Property\AbstractProperty #}
+{# @var meta_entity \K3ssen\MetaEntityBundle\MetaData\MetaEntity #}
+{# @var property \K3ssen\MetaEntityBundle\MetaData\Property\AbstractProperty #}
 {% block property_methods %}
 {% if meta_entity.idProperty is null and skip_id is not defined %}
 
@@ -11,13 +11,13 @@
 {% for property in meta_entity.properties %}
 
 {% if 'Collection' in property.returnType %}{{ block('property_collection_methods') }}{% else %}
-    public function set{{ property.name | classify }}({{ property.nullable ? '?' : '' }}{{ property.returnType }} ${{ property.name }}): self
+    public function set{{ property.name | classify }}({{ property.nullable ? '?' : '' }}{{ property.returnType(property) }} ${{ property.name }}): self
     {
         $this->{{ property.name }} = ${{ property.name }};
         return $this;
     }
 
-    public function get{{ property.name | classify }}(): {{ property.nullable ? '?' : '' }}{{ property.returnType }}
+    public function get{{ property.name | classify }}(): {{ property.nullable ? '?' : '' }}{{ property.returnType(property) }}
     {
         return $this->{{ property.name }};
     }
@@ -26,7 +26,7 @@
 {% endblock %}
 
 {% block property_collection_methods %}
-{# @var property \K3ssen\EntityGeneratorBundle\MetaData\Property\AbstractRelationshipProperty #}
+{# @var property \K3ssen\MetaEntityBundle\MetaData\Property\AbstractRelationshipProperty #}
     /**
      * @return Collection|ArrayCollection|{{ property.targetEntity.name }}[]
      */

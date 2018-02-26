@@ -26,17 +26,6 @@ class Configuration implements ConfigurationInterface
                 ->booleanNode('auto_generate_repository')
                     ->defaultTrue()
                 ->end()
-                ->arrayNode('attributes')
-                    ->arrayPrototype()
-                        ->children()
-                            ->arrayNode('meta_properties')->scalarPrototype()->end()->end()
-                            ->enumNode('type')
-                                ->values(['string', 'int', 'bool', 'object', 'array'])
-                            ->end()
-                            ->booleanNode('default')->end()
-                        ->end()
-                    ->end()
-                ->end()
             ->end()
         ;
         return $treeBuilder;

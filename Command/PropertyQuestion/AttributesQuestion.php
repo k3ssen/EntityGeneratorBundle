@@ -6,7 +6,7 @@ namespace K3ssen\EntityGeneratorBundle\Command\PropertyQuestion;
 use K3ssen\EntityGeneratorBundle\Command\Helper\CommandInfo;
 use K3ssen\EntityGeneratorBundle\Command\AttributeQuestion\AttributeQuestionInterface;
 use K3ssen\EntityGeneratorBundle\Command\Helper\EvaluationTrait;
-use K3ssen\EntityGeneratorBundle\MetaData\Property\MetaPropertyInterface;
+use K3ssen\MetaEntityBundle\MetaData\Property\MetaPropertyInterface;
 
 class AttributesQuestion implements PropertyQuestionInterface
 {

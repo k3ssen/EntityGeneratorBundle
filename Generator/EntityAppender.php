@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace K3ssen\EntityGeneratorBundle\Generator;
 
-use K3ssen\EntityGeneratorBundle\MetaData\MetaEntityInterface;
+use K3ssen\MetaEntityBundle\MetaData\MetaEntityInterface;
 use Symfony\Component\HttpKernel\Config\FileLocator;
 
 class EntityAppender

@@ -5,7 +5,7 @@ namespace K3ssen\EntityGeneratorBundle\Command\AttributeQuestion;
 
 use K3ssen\EntityGeneratorBundle\Command\Helper\CommandInfo;
 use K3ssen\EntityGeneratorBundle\Command\Helper\EvaluationTrait;
-use K3ssen\EntityGeneratorBundle\MetaData\MetaAttributeInterface;
+use K3ssen\MetaEntityBundle\MetaData\MetaAttributeInterface;
 
 class BasicAttributeQuestion implements AttributeQuestionInterface
 {

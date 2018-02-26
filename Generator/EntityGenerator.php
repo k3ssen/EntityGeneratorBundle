@@ -3,9 +3,10 @@ declare(strict_types=1);
 
 namespace K3ssen\EntityGeneratorBundle\Generator;
 
-use K3ssen\EntityGeneratorBundle\MetaData\MetaEntityFactory;
-use K3ssen\EntityGeneratorBundle\MetaData\MetaEntityInterface;
-use K3ssen\EntityGeneratorBundle\MetaData\Property\RelationMetaPropertyInterface;
+use K3ssen\MetaEntityBundle\MetaData\MetaEntityFactory;
+use K3ssen\MetaEntityBundle\MetaData\MetaEntityInterface;
+use K3ssen\MetaEntityBundle\MetaData\Property\ManyToOneMetaPropertyInterface;
+use K3ssen\MetaEntityBundle\MetaData\Property\RelationMetaPropertyInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpKernel\Config\FileLocator;
 
@@ -45,9 +46,7 @@ class EntityGenerator
             $affectedFiles[] = $this->createRepository($metaEntity);
         }
 
-        $affectedFiles = array_merge($affectedFiles, $this->generateMissingInversedOrMappedBy($metaEntity));
-
-        return $affectedFiles;
+        return array_merge($affectedFiles, $this->generateMissingInversedOrMappedBy($metaEntity));
     }
 
     public function updateEntity(MetaEntityInterface $pseudoMetaEntity): array
@@ -72,7 +71,7 @@ class EntityGenerator
             if ($existingClass) {
                 $affectedFiles[] = $this->entityAppender->appendFields($targetMetaEntity);
             } else {
-                $affectedFiles[] = $this->createEntity($targetMetaEntity);
+                $affectedFiles = array_merge($affectedFiles, $this->createEntity($targetMetaEntity));
             }
         }
         return $affectedFiles;

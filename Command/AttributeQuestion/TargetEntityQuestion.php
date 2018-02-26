@@ -4,10 +4,10 @@ declare(strict_types=1);
 namespace K3ssen\EntityGeneratorBundle\Command\AttributeQuestion;
 
 use K3ssen\EntityGeneratorBundle\Command\Helper\CommandInfo;
-use K3ssen\EntityGeneratorBundle\MetaData\MetaAttributeInterface;
-use K3ssen\EntityGeneratorBundle\MetaData\MetaEntityFactory;
-use K3ssen\EntityGeneratorBundle\MetaData\MetaEntityInterface;
-use K3ssen\EntityGeneratorBundle\MetaData\Property\RelationMetaPropertyInterface;
+use K3ssen\MetaEntityBundle\MetaData\MetaAttributeInterface;
+use K3ssen\MetaEntityBundle\MetaData\MetaEntityFactory;
+use K3ssen\MetaEntityBundle\MetaData\MetaEntityInterface;
+use K3ssen\MetaEntityBundle\MetaData\Property\RelationMetaPropertyInterface;
 use Symfony\Component\Console\Question\Question;
 
 class TargetEntityQuestion implements AttributeQuestionInterface

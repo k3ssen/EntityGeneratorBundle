@@ -6,7 +6,7 @@ namespace K3ssen\EntityGeneratorBundle\Command;
 use K3ssen\EntityGeneratorBundle\Command\Helper\CommandInfo;
 use K3ssen\EntityGeneratorBundle\Command\EntityQuestion\EntityQuestionInterface;
 use K3ssen\EntityGeneratorBundle\Generator\EntityGenerator;
-use K3ssen\EntityGeneratorBundle\MetaData\MetaEntityInterface;
+use K3ssen\MetaEntityBundle\MetaData\MetaEntityInterface;
 use LogicException;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;

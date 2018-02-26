@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace K3ssen\EntityGeneratorBundle\Command\Helper;
 
 use K3ssen\EntityGeneratorBundle\Command\Style\CommandStyle;
-use K3ssen\EntityGeneratorBundle\MetaData\MetaEntityInterface;
+use K3ssen\MetaEntityBundle\MetaData\MetaEntityInterface;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;

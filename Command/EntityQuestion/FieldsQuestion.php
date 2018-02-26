@@ -5,8 +5,8 @@ namespace K3ssen\EntityGeneratorBundle\Command\EntityQuestion;
 
 use K3ssen\EntityGeneratorBundle\Command\Helper\CommandInfo;
 use K3ssen\EntityGeneratorBundle\Command\PropertyQuestion\PropertyQuestionInterface;
-use K3ssen\EntityGeneratorBundle\MetaData\MetaEntityFactory;
-use K3ssen\EntityGeneratorBundle\MetaData\Property\MetaPropertyInterface;
+use K3ssen\MetaEntityBundle\MetaData\MetaEntityFactory;
+use K3ssen\MetaEntityBundle\MetaData\Property\MetaPropertyInterface;
 
 class FieldsQuestion implements EntityQuestionInterface
 {

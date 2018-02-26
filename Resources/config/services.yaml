@@ -1,63 +1,16 @@
 parameters:
-    # The default_attributes can partially be overridden in service configuration 'meta_entity.attributes'.
-    # The names and types cannot be altered. Also, meta_properties can be added, but not removed.
-    # 'default', 'question', 'requirement_expression', 'valdation_expression' can be overridden.
-    # Note if 'question' is provided, then the 'BasicAttributeQuestion' service will be used. If 'null' is provided, then no question will be used
-    default_attributes:
-        name:
-            type: 'string'
-            meta_properties: ['K3ssen\EntityGeneratorBundle\MetaData\Property\MetaPropertyInterface']
-            question: null #the 'NameAndTypeQuestion' propertyQuestion already asks for name, so we don't need this as attribute-question
-        id:
-            type: 'bool'
-            meta_properties: ['K3ssen\EntityGeneratorBundle\MetaData\Property\PrimitiveMetaPropertyInterface']
-            default: false
-            requirement_expression: 'metaEntity.getIdProperty() == null or metaEntity.getIdProperty() != metaProperty'
-        unique:
-            type: 'bool'
-            meta_properties: ['K3ssen\EntityGeneratorBundle\MetaData\Property\PrimitiveMetaPropertyInterface']
-            default: false
-        nullable:
-            type: 'bool'
-            meta_properties: ['K3ssen\EntityGeneratorBundle\MetaData\Property\MetaPropertyInterface']
-            default: false
-        length:
-            type: 'int'
-            meta_properties: ['K3ssen\EntityGeneratorBundle\MetaData\Property\HasLengthInterface']
-        precision:
-            type: 'int'
-            meta_properties: ['K3ssen\EntityGeneratorBundle\MetaData\Property\DecimalMetaPropertyInterface']
-        scale:
-            type: 'int'
-            meta_properties: ['K3ssen\EntityGeneratorBundle\MetaData\Property\DecimalMetaPropertyInterface']
-        targetEntity:
-            type: 'object'
-            meta_properties: ['K3ssen\EntityGeneratorBundle\MetaData\Property\RelationMetaPropertyInterface']
-            question: 'K3ssen\EntityGeneratorBundle\Command\AttributeQuestion\TargetEntityQuestion'
-        referencedColumnName:
-            type: 'string'
-            meta_properties: ['K3ssen\EntityGeneratorBundle\MetaData\Property\RelationMetaPropertyInterface']
-            default: 'id'
-        orphanRemoval:
-            type: 'bool'
-            meta_properties:
-                - 'K3ssen\EntityGeneratorBundle\MetaData\Property\ManyToManyMetaPropertyInterface'
-                - 'K3ssen\EntityGeneratorBundle\MetaData\Property\OneToManyMetaPropertyInterface'
-            default: false
-        inversedBy:
-            type: 'string'
-            meta_properties:
-                - 'K3ssen\EntityGeneratorBundle\MetaData\Property\ManyToOneMetaPropertyInterface'
-                - 'K3ssen\EntityGeneratorBundle\MetaData\Property\OneToOneMetaPropertyInterface'
-                - 'K3ssen\EntityGeneratorBundle\MetaData\Property\ManyToManyMetaPropertyInterface'
-            requirement_expression: 'metaProperty.getMappedBy() == null'
-        mappedBy:
-            type: 'string'
-            meta_properties:
-                - 'K3ssen\EntityGeneratorBundle\MetaData\Property\OneToManyMetaPropertyInterface'
-                - 'K3ssen\EntityGeneratorBundle\MetaData\Property\OneToOneMetaPropertyInterface'
-                - 'K3ssen\EntityGeneratorBundle\MetaData\Property\ManyToManyMetaPropertyInterface'
-            requirement_expression: 'metaProperty.getInversedBy() == null'
+#   # Note if 'question' is provided, then the 'BasicAttributeQuestion' service will be used. If 'null' is provided, then no question will be used
+#    prepend_meta_entity_attributes:
+#        name:
+#            question: null #the 'NameAndTypeQuestion' propertyQuestion already asks for name, so we don't need this as attribute-question
+#        id:
+#            requirement_expression: 'metaEntity.getIdProperty() == null or metaEntity.getIdProperty() != metaProperty'
+#        targetEntity:
+#            question: 'K3ssen\EntityGeneratorBundle\Command\AttributeQuestion\TargetEntityQuestion'
+#        inversedBy:
+#            requirement_expression: 'metaProperty.getMappedBy() == null'
+#        mappedBy:
+#            requirement_expression: 'metaProperty.getInversedBy() == null'
 
 services:
     _defaults:
@@ -65,13 +18,11 @@ services:
         autoconfigure: true
         public: false
         bind:
-            $attributes: '%entity_generator.attributes%'
             $entityQuestions: !tagged entity_generator.entity_question
             $propertyQuestions: !tagged entity_generator.property_question
             $attributeQuestions: !tagged entity_generator.attribute_question
             $overrideSkeletonPath: '%entity_generator.override_skeleton_path%'
-            $autoGenerateRepository: '%entity_generator.auto_generate_repository%'
-            $bundlesMetaData: '%kernel.bundles_metadata%'
+#            $autoGenerateRepository: '%entity_generator.auto_generate_repository%'
 
     K3ssen\EntityGeneratorBundle\:
         resource: '../../*'

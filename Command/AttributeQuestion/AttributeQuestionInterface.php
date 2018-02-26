@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace K3ssen\EntityGeneratorBundle\Command\AttributeQuestion;
 
 use K3ssen\EntityGeneratorBundle\Command\Helper\CommandInfo;
-use K3ssen\EntityGeneratorBundle\MetaData\MetaAttributeInterface;
+use K3ssen\MetaEntityBundle\MetaData\MetaAttributeInterface;
 
 interface AttributeQuestionInterface
 {

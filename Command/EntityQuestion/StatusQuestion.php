@@ -4,8 +4,8 @@ declare(strict_types=1);
 namespace K3ssen\EntityGeneratorBundle\Command\EntityQuestion;
 
 use K3ssen\EntityGeneratorBundle\Command\Helper\CommandInfo;
-use K3ssen\EntityGeneratorBundle\MetaData\Property\PrimitiveMetaPropertyInterface;
-use K3ssen\EntityGeneratorBundle\MetaData\Property\RelationMetaPropertyInterface;
+use K3ssen\MetaEntityBundle\MetaData\Property\PrimitiveMetaPropertyInterface;
+use K3ssen\MetaEntityBundle\MetaData\Property\RelationMetaPropertyInterface;
 
 class StatusQuestion implements EntityQuestionInterface
 {

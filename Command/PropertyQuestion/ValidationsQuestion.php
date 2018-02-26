@@ -4,9 +4,9 @@ declare(strict_types=1);
 namespace K3ssen\EntityGeneratorBundle\Command\PropertyQuestion;
 
 use K3ssen\EntityGeneratorBundle\Command\Helper\CommandInfo;
-use K3ssen\EntityGeneratorBundle\MetaData\MetaValidationFactory;
-use K3ssen\EntityGeneratorBundle\MetaData\MetaValidationInterface;
-use K3ssen\EntityGeneratorBundle\MetaData\Property\MetaPropertyInterface;
+use K3ssen\MetaEntityBundle\MetaData\MetaValidationFactory;
+use K3ssen\MetaEntityBundle\MetaData\MetaValidationInterface;
+use K3ssen\MetaEntityBundle\MetaData\Property\MetaPropertyInterface;
 use Symfony\Component\Console\Question\Question;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Exception\ConstraintDefinitionException;

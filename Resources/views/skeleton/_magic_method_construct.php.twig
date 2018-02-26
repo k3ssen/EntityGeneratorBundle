@@ -1,5 +1,5 @@
-{# @var meta_entity \K3ssen\EntityGeneratorBundle\MetaData\MetaEntity #}
-{# @var property \K3ssen\EntityGeneratorBundle\MetaData\Property\AbstractProperty #}
+{# @var meta_entity \K3ssen\MetaEntityBundle\MetaData\MetaEntity #}
+{# @var property \K3ssen\MetaEntityBundle\MetaData\Property\AbstractProperty #}
 {% block __construct %}
 {% for property in meta_entity.collectionProperties %}
 {%- if loop.first and (inner_content_only is not defined or inner_content_only == false) %}

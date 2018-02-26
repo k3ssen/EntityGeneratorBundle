@@ -1,5 +1,5 @@
-{# @var meta_entity \K3ssen\EntityGeneratorBundle\MetaData\MetaEntity #}
-{# @var property \K3ssen\EntityGeneratorBundle\MetaData\Property\AbstractProperty #}
+{# @var meta_entity \K3ssen\MetaEntityBundle\MetaData\MetaEntity #}
+{# @var property \K3ssen\MetaEntityBundle\MetaData\Property\AbstractProperty #}
 {% block properties %}
 {%- if meta_entity.idProperty is null and skip_id is not defined %}
 
@@ -14,7 +14,7 @@
 {%- for property in meta_entity.properties %}
 
     /**
-     * @var {{ property.returnType }}{{ property.returnType == 'Collection' ? '|ArrayCollection|'~property.targetEntity.name~'[]' }}
+     * @var {{ property.returnType(property) }}{{ property.returnType(property) == 'Collection' ? '|ArrayCollection|'~property.targetEntity.name~'[]' }}
      {%- for annotation_line in property.annotationLines %}
 
      * {{ annotation_line | raw }}

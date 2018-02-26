@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace K3ssen\EntityGeneratorBundle\Command\EntityQuestion;
 
 use K3ssen\EntityGeneratorBundle\Command\Helper\CommandInfo;
-use K3ssen\EntityGeneratorBundle\MetaData\MetaEntityFactory;
+use K3ssen\MetaEntityBundle\MetaData\MetaEntityFactory;
 
 class EntityNameQuestion implements EntityQuestionInterface
 {
