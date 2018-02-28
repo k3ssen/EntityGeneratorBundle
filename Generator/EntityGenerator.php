@@ -20,16 +20,19 @@ class EntityGenerator
     /** @var EntityAppender */
     protected $entityAppender;
 
+    /** @var \Twig_Environment */
+    protected $twig;
+
     public function __construct(
         MetaEntityFactory $metaEntityFactory,
         EntityAppender $entityAppender,
         FileLocator $fileLocator,
-        ?string $overrideSkeletonPath
+        \Twig_Environment $twig
     ) {
         $this->entityAppender = $entityAppender;
         $this->metaEntityFactory = $metaEntityFactory;
         $this->fileLocator = $fileLocator;
-        $this->overrideSkeletonPath = $overrideSkeletonPath;
+        $this->twig = $twig;
     }
 
     public function createEntity(MetaEntityInterface $metaEntity): array
@@ -100,14 +103,14 @@ class EntityGenerator
 
     protected function getRepositoryContent(MetaEntityInterface $metaEntity)
     {
-        return $this->getTwigEnvironment()->render('repository.php.twig', [
+        return $this->twig->render('@EntityGenerator/skeleton/repository.php.twig', [
             'meta_entity' => $metaEntity,
         ]);
     }
 
     protected function getEntityContent(MetaEntityInterface $metaEntity)
     {
-        return $this->getTwigEnvironment()->render('entity.php.twig', [
+        return $this->twig->render('@EntityGenerator/skeleton/entity.php.twig', [
             'meta_entity' => $metaEntity,
         ]);
     }

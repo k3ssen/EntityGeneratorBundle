@@ -10,12 +10,15 @@ class EntityAppender
 {
     use GeneratorFileLocatorTrait;
 
+    /** @var \Twig_Environment */
+    protected $twig;
+
     public function __construct(
         FileLocator $fileLocator,
-        ?string $overrideSkeletonPath
+        \Twig_Environment $twig
     ) {
         $this->fileLocator = $fileLocator;
-        $this->overrideSkeletonPath = $overrideSkeletonPath;
+        $this->twig = $twig;
     }
 
     public function appendFields(MetaEntityInterface $pseudoMetaEntity): string
@@ -40,7 +43,7 @@ class EntityAppender
                 $pseudoMetaEntity->removeUsage($usageNamespace);
             }
         }
-        $usageContent = $this->getTwigEnvironment()->render('_usages.php.twig', [
+        $usageContent = $this->twig->render('@EntityGenerator/skeleton/_usages.php.twig', [
             'meta_entity' => $pseudoMetaEntity,
         ]);
 
@@ -50,7 +53,7 @@ class EntityAppender
     protected function addConstructorContent(MetaEntityInterface $pseudoMetaEntity, string &$currentContent)
     {
         $hasConstructor = strpos($currentContent, 'public function __construct(') !== false;
-        $propertyContent = $this->getTwigEnvironment()->render('_magic_method_construct.php.twig', [
+        $propertyContent = $this->twig->render('@EntityGenerator/skeleton/_magic_method_construct.php.twig', [
             'meta_entity' => $pseudoMetaEntity,
             'inner_content_only' => $hasConstructor,
         ]);
@@ -63,7 +66,7 @@ class EntityAppender
 
     protected function addProperties(MetaEntityInterface $pseudoMetaEntity, string &$currentContent)
     {
-        $propertyContent = $this->getTwigEnvironment()->render('properties.php.twig', [
+        $propertyContent = $this->twig->render('@EntityGenerator/skeleton/properties.php.twig', [
             'meta_entity' => $pseudoMetaEntity,
             'skip_id' => true,
         ]);
@@ -72,7 +75,7 @@ class EntityAppender
 
     protected function getAddedMethods(MetaEntityInterface $pseudoMetaEntity, string &$currentContent)
     {
-        $methodsContent = $this->getTwigEnvironment()->render('property_methods.php.twig', [
+        $methodsContent = $this->twig->render('@EntityGenerator/skeleton/property_methods.php.twig', [
             'meta_entity' => $pseudoMetaEntity,
             'skip_id' => true,
         ]);

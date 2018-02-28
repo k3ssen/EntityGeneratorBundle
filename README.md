@@ -72,29 +72,27 @@ as services, which you can override, for instance to use different
 classes that you've defined.
 
 ### Overriding skeleton
-The entity is generated through twig-files, which you can overwrite or
-extend by adding files with identical names to any of the following directories:
-- `{projectDir}/templates/bundles/EntityGeneratorBundle/skeleton`
-- `{projectDir}/EntityGenerator/skeleton`
-- `{projectDir}/EntityGeneratorBundle/skeleton`
+The final result is being generated through twig-files, which you can easily extend or overwrite.
+See https://symfony.com/doc/current/templating/overriding.html for info about overriding twig files.
 
-Instead of either of these options, you can also specify any skeleton-location
-in the configuration option `entity_generator.override_skeleton_path`. 
-For example:
+**Usage example:**  
+Lets say you want all your entities to include a trait called 'MyTraitThatIsHelpfulForEntities', located
+in 'src/Entity/Traits'.
 
+A simple way would be to create a file `templates/bundles/EntityGeneratorBundle/skeleton/entity.php`
+with the following content:
 
-    entity_generator:
-        override_skeleton_path: '%kernel.root_dir%/Generators/EntityGenerator/skeleton/'
-        
-
-If you want to extend one of the files, you could for example add a file
-`_traits.php.twig` to your skeleton-dir, with the following content:
-
-    {% use '@EntityGeneratorBundle/_traits.php.twig' %}
-    {% block traits %}
-        use MySpecificEntityTraitThatShouldAlwaysBeIncluded;
-        {{ parent() }}
+    {% extends '@!EntityGenerator/skeleton/entity.php.twig' %}
+    {% block usages %}{{ parent() -}}
+    use App\Entity\Traits\MyTraitThatIsHelpfulForEntities;
+    {% endblock %}
+    {% block traits %}{{ parent() }}
+        use MyTraitThatIsHelpfulForEntities;
     {% endblock %}
 
-This way you can add a trait which will always be included, while other traits
-are still managed by the generator itself.
+If you need to access data you can use the `meta_entity`, which is an instance of the MetaDataInterface.
+Furthermore, the `entity.php.twig` file uses several other twig files to keep things separate, so if
+you're in need of making lots of alterations, you might want to override those files instead. 
+Just have a look at the files in 
+[EntityGeneratorBundle/Resources/views/skeleton](./Resources/views/skeleton) 
+to get a feeling of what you could use.

@@ -1,17 +1,3 @@
-parameters:
-#   # Note if 'question' is provided, then the 'BasicAttributeQuestion' service will be used. If 'null' is provided, then no question will be used
-#    prepend_meta_entity_attributes:
-#        name:
-#            question: null #the 'NameAndTypeQuestion' propertyQuestion already asks for name, so we don't need this as attribute-question
-#        id:
-#            requirement_expression: 'metaEntity.getIdProperty() == null or metaEntity.getIdProperty() != metaProperty'
-#        targetEntity:
-#            question: 'K3ssen\EntityGeneratorBundle\Command\AttributeQuestion\TargetEntityQuestion'
-#        inversedBy:
-#            requirement_expression: 'metaProperty.getMappedBy() == null'
-#        mappedBy:
-#            requirement_expression: 'metaProperty.getInversedBy() == null'
-
 services:
     _defaults:
         autowire: true
@@ -21,8 +7,6 @@ services:
             $entityQuestions: !tagged entity_generator.entity_question
             $propertyQuestions: !tagged entity_generator.property_question
             $attributeQuestions: !tagged entity_generator.attribute_question
-            $overrideSkeletonPath: '%entity_generator.override_skeleton_path%'
-#            $autoGenerateRepository: '%entity_generator.auto_generate_repository%'
 
     K3ssen\EntityGeneratorBundle\:
         resource: '../../*'

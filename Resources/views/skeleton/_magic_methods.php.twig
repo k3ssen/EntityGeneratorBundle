@@ -1,6 +1,6 @@
 {# @var meta_entity \K3ssen\MetaEntityBundle\MetaData\MetaEntity #}
 {# @var property \K3ssen\MetaEntityBundle\MetaData\Property\AbstractProperty #}
-{% use '_magic_method_construct.php.twig' %}
+{% use '@EntityGenerator/skeleton/_magic_method_construct.php.twig' %}
 {% block magic_methods %}
 {% block __construct %}{{ parent() }}{% endblock %}
 {% block __toString %}
