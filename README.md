@@ -11,17 +11,18 @@ entities.
 
 Features:
 
-- Three console commands:
+- console commands:
     - `entity:generate` to create a new entity.
     - `entity:append` to safely add fields to an existing entity without overwriting anything else.
     - `entity:alter` command to load content of an existing entity and allows you to
-    edit that very content.
+    - `entity:skeleton-override` command to create skeleton files that extend the skeleton of this 
+    EntityGeneratorBundle, so to can quickly make adjustments to the generator.
 - Supports lots of ORM types, including 
 ManyToOne, OneToMany, ManyToMany and OneToOne relationships.
 - Automatically creates or updates targetEntity when mappedBy or InversedBy
 is being used.
 - Optionally add validation to fields.
-- Supports multiple bundles, as well the bundleless 'App' namespace.
+- Supports multiple bundles, as well the bundleless 'App' namespace, even if there're combined.
 - Optionally specify subdirectories.
 - Interactive command allows you to edit your choices to easily fix
 mistakes or typos.
@@ -29,7 +30,7 @@ mistakes or typos.
 or replacing a service.
 
 ## Attributes configuration
-Some questions may get annoying real quick. For instance, if you always use a standard $id property
+Some questions may get annoying real quick. For instance, if you always use the standard $id property
 for all your entities, then getting asked if a property is an id is quite useless. 
 Below is an example of how to disable questions for several attributes.
 
@@ -75,7 +76,7 @@ classes that you've defined.
 The final result is being generated through twig-files, which you can easily extend or overwrite.
 See https://symfony.com/doc/current/templating/overriding.html for info about overriding twig files.
 
-**Usage example:**  
+#### Usage example:
 Lets say you want all your entities to include a trait called 'MyTraitThatIsHelpfulForEntities', located
 in 'src/Entity/Traits'.
 
@@ -96,3 +97,11 @@ you're in need of making lots of alterations, you might want to override those f
 Just have a look at the files in 
 [EntityGeneratorBundle/Resources/views/skeleton](./Resources/views/skeleton) 
 to get a feeling of what you could use.
+
+
+#### Command `entity:skeleton-override`
+It's bothersome to search files in a vendor directory just to know where to start for overriding files.
+
+Using the command `php bin/console entity:skeleton-override`, the twig-files that extend the EntityGeneratorBundle are automatically
+created inside the templates directory of your project.
+This will give you a quick start for making any alterations you want.

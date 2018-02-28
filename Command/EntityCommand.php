@@ -39,7 +39,7 @@ class EntityCommand extends Command
         $this
             ->setDescription('Create an entity')
             ->addArgument('entity', InputArgument::OPTIONAL, 'Argument description')
-            ->addOption('savepoint', 's', InputOption::VALUE_NONE, false)
+            ->addOption('savepoint', 's', InputOption::VALUE_NONE, 'Load the last entity information that was created during interaction')
         ;
     }
 
